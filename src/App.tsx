@@ -341,20 +341,20 @@ export default function App() {
                 ].map((pillar, idx) => (
                   <div 
                     key={idx}
-                    className="bg-white rounded-2xl p-8 shadow-sm hover:shadow-xl transition-all duration-300 border border-slate-100 group hover:-translate-y-2 flex flex-col justify-between"
+                    className="bg-gradient-to-br from-[#0A192F] via-[#0F2A4A] to-[#173860] text-white rounded-2xl p-8 shadow-xl hover:shadow-2xl transition-all duration-300 border border-slate-700 group hover:-translate-y-2 flex flex-col justify-between"
                   >
                     <div className="space-y-6">
-                      <div className={`w-16 h-16 rounded-2xl flex items-center justify-center border ${pillar.color} group-hover:scale-110 transition duration-300`}>
+                      <div className="w-16 h-16 rounded-2xl flex items-center justify-center border bg-white/10 text-amber-300 border-white/20 group-hover:scale-110 transition duration-300">
                         <pillar.icon className="w-8 h-8" />
                       </div>
-                      <h3 className="text-2xl font-bold font-['Montserrat'] text-[#0A192F]">
+                      <h3 className="text-2xl font-bold font-['Montserrat'] text-white">
                         {pillar.title}
                       </h3>
-                      <p className="text-slate-600 leading-relaxed text-sm sm:text-base">
+                      <p className="text-slate-300 leading-relaxed text-sm sm:text-base">
                         {pillar.desc}
                       </p>
                     </div>
-                    <div className="pt-6 mt-6 border-t border-slate-100 flex items-center justify-between text-sm font-semibold text-[#0A192F] group-hover:text-[#800020]">
+                    <div className="pt-6 mt-6 border-t border-slate-800 flex items-center justify-between text-sm font-semibold text-amber-300 group-hover:text-amber-200">
                       <span>Learn more</span>
                       <ChevronRight className="w-4 h-4 transform group-hover:translate-x-1 transition" />
                     </div>
