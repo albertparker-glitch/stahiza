@@ -1,0 +1,6 @@
+{
+  "name": "Standard High School Zzana - STAHIZA",
+  "description": "Official website and eCampus portal for Standard High School, Zzana (STAHIZA) - Education Is The Way. Academic excellence, USSSA sports champions, and holistic leadership.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
