@@ -243,7 +243,7 @@ export default function App() {
                     "Education Is The Way"
                   </p>
                   <p className="text-slate-300 text-base sm:text-lg leading-relaxed max-w-2xl">
-                    Located along Entebbe Road, Zzana/Nyanama, we offer world-class UNEB O and A-Level education blended with unmatched sports championships, discipline, and holistic character development.
+                    When the horizon seems uncertain, remember that education is the ultimate guide. It equips you with the strength to rise, the wisdom to choose, and the power to succeed. Walk boldly—because education is the way.
                   </p>
                   <div className="flex flex-wrap gap-4 pt-4">
                     <button
@@ -465,36 +465,43 @@ export default function App() {
               {[
                 {
                   role: "Headteacher",
-                  name: "Mr. Mukasa Ronald",
-                  qual: "B.Ed, M.A Educational Management",
-                  bio: "Over 20 years of transformative leadership in top Ugandan secondary institutions, championing holistic discipline and academic rigor."
+                  name: "Mr. Kurahuka Ostricast",
+                  img: "/pages/images/ostricast.jpeg"
+                },
+                {
+                  role: "Deputy Headteacher",
+                  name: "Mrs. Mbabazi Bena",
+                  img: "/pages/images/bena.jpeg"
                 },
                 {
                   role: "Deputy Headteacher (Academics)",
-                  name: "Mrs. Namubiru Grace",
-                  qual: "B.Sc (Hons), Dip.Ed",
-                  bio: "Spearheading our UNEB O & A Level drilling programs with outstanding university progression records."
-                },
-                {
-                  role: "Dean of Sports & Co-Curricular",
-                  name: "Coach Kigozi Patrick",
-                  qual: "B.A Sports Science, CAF License",
-                  bio: "Mastermind behind STAHIZA's legendary USSSA football championships and athletic prowess."
+                  name: "Mr. Odeke Leonard",
+                  img: "/pages/images/odeke.jpeg"
                 },
               ].map((leader, idx) => (
-                <div key={idx} className="bg-white rounded-2xl p-8 shadow-sm border border-slate-200 space-y-4 hover:shadow-lg transition">
-                  <div className="flex items-center justify-between">
-                    <div className="w-16 h-16 rounded-2xl bg-[#0A192F] text-white flex items-center justify-center text-xl font-black font-['Montserrat'] shadow-md">
-                      {leader.name.split(' ')[1]?.[0] || 'S'}
+                <div key={idx} className="bg-white rounded-3xl overflow-hidden shadow-md border border-slate-200 hover:shadow-xl transition flex flex-col">
+                  <div className="relative w-full h-80 bg-slate-100 overflow-hidden">
+                    <img 
+                      src={leader.img} 
+                      alt={leader.name} 
+                      className="w-full h-full object-cover object-top"
+                      onError={(e) => {
+                        const target = e.currentTarget;
+                        target.style.display = 'none';
+                      }}
+                    />
+                    <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-md p-2 rounded-xl shadow-lg">
+                      <SchoolBadgeImg size={34} />
                     </div>
-                    <SchoolBadgeImg size={38} className="opacity-80" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-[#0A192F]/90 via-transparent to-transparent flex items-end p-6">
+                      <span className="bg-[#800020] text-white text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider shadow">
+                        {leader.role}
+                      </span>
+                    </div>
                   </div>
-                  <div>
-                    <span className="text-xs font-bold text-[#800020] uppercase tracking-wider">{leader.role}</span>
-                    <h3 className="text-xl font-bold font-['Montserrat'] text-[#0A192F] mt-1">{leader.name}</h3>
-                    <p className="text-xs text-slate-500 font-medium mt-0.5">{leader.qual}</p>
+                  <div className="p-6 bg-white">
+                    <h3 className="text-xl font-extrabold font-['Montserrat'] text-[#0A192F]">{leader.name}</h3>
                   </div>
-                  <p className="text-slate-600 text-sm leading-relaxed">{leader.bio}</p>
                 </div>
               ))}
             </div>
