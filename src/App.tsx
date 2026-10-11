@@ -478,6 +478,41 @@ export default function App() {
                   name: "Mr. Odeke Leonard",
                   img: "/pages/images/odeke.jpeg"
                 },
+                {
+                  role: "Dean Arts",
+                  name: "Mr. Kyeyune",
+                  img: "/pages/images/odeke.jpeg"
+                },
+                {
+                  role: "Dean Sciences",
+                  name: "Mr. Waiswa Adi",
+                  img: "/pages/images/odeke.jpeg"
+                },
+                {
+                  role: "DOS",
+                  name: "Mr. Kahesi Hillary",
+                  img: "/pages/images/odeke.jpeg"
+                },
+                {
+                  role: "UNSA President 2023",
+                  name: "Mr. Odeke Leonard",
+                  img: "/pages/images/odeke.jpeg"
+                },
+                {
+                  role: "UNSA President 2024",
+                  name: "Mr. Odeke Leonard",
+                  img: "/pages/images/odeke.jpeg"
+                },
+                {
+                  role: "UNSA President 2025",
+                  name: "Mr. Odeke Leonard",
+                  img: "/pages/images/odeke.jpeg"
+                },
+                {
+                  role: "UNSA President 2026",
+                  name: "Mr. Odeke Leonard",
+                  img: "/pages/images/odeke.jpeg"
+                },
               ].map((leader, idx) => (
                 <div key={idx} className="bg-white rounded-3xl overflow-hidden shadow-md border border-slate-200 hover:shadow-xl transition flex flex-col">
                   <div className="relative w-full h-80 bg-slate-100 overflow-hidden">
