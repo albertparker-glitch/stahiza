@@ -1,0 +1,231 @@
+import React, { useState } from 'react';
+import { MapPin, Phone, Mail, Clock, Send, ArrowRight, CheckCircle2 } from 'lucide-react';
+import { SchoolBadgeImg } from './SchoolBadgeImg';
+import { SCHOOL_CONTACTS } from '../data/schoolData';
+
+export const ContactSection: React.FC = () => {
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    phone: '',
+    subject: '',
+    message: ''
+  });
+  const [submitted, setSubmitted] = useState(false);
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    setSubmitted(true);
+  };
+
+  return (
+    <div className="py-16 px-4 sm:px-8 max-w-7xl mx-auto space-y-12 animate-fadeIn">
+      <div className="text-center max-w-3xl mx-auto space-y-4">
+        <SchoolBadgeImg size={56} className="mx-auto" />
+        <span className="text-[#800020] font-bold uppercase tracking-wider text-sm block">Let's Connect</span>
+        <h2 className="text-3xl sm:text-5xl font-extrabold font-['Montserrat'] text-[#0A192F]">
+          Get in Touch With STAHIZA
+        </h2>
+        <p className="text-slate-600 text-base">
+          Have a question, need admissions support, or want to plan a visit? We're here to help.
+        </p>
+      </div>
+
+      {/* SPLIT CARD CONTAINER MATCHING REFERENCE IMAGE */}
+      <div className="bg-white rounded-[32px] shadow-2xl border border-slate-200 overflow-hidden grid grid-cols-1 lg:grid-cols-12">
+        
+        {/* LEFT PANEL: GET IN TOUCH FORM (DARK THEME) */}
+        <div className="lg:col-span-7 bg-gradient-to-br from-[#0A192F] via-[#0F2A4A] to-[#173860] text-white p-8 sm:p-12 flex flex-col justify-between">
+          <div className="space-y-4">
+            <div className="inline-flex items-center gap-2 bg-white/10 px-3 py-1 rounded-full text-amber-300 text-xs font-semibold">
+              <SchoolBadgeImg size={20} className="w-5 h-5" /> Direct Inquiry Desk
+            </div>
+            <h3 className="text-3xl font-extrabold font-['Montserrat'] tracking-tight">Get in Touch</h3>
+            <p className="text-slate-300 text-sm leading-relaxed">
+              Fill out the form below and our administrative office will respond within 24 hours.
+            </p>
+          </div>
+
+          {submitted ? (
+            <div className="py-16 text-center space-y-4 my-auto">
+              <div className="w-16 h-16 bg-emerald-500/20 text-emerald-400 rounded-full mx-auto flex items-center justify-center border border-emerald-500/40">
+                <CheckCircle2 className="w-8 h-8" />
+              </div>
+              <h4 className="text-2xl font-bold font-['Montserrat'] text-white">Message Sent Successfully!</h4>
+              <p className="text-slate-300 text-sm max-w-md mx-auto">
+                Thank you, <span className="font-bold text-amber-300">{formData.name}</span>. Your inquiry has been forwarded to the STAHIZA admissions desk. We will call you at <span className="font-bold text-amber-300">{formData.phone}</span> shortly.
+              </p>
+              <button
+                onClick={() => setSubmitted(false)}
+                className="mt-4 px-6 py-2.5 bg-white/10 hover:bg-white/20 text-white font-semibold rounded-xl text-xs transition"
+              >
+                Send Another Message
+              </button>
+            </div>
+          ) : (
+            <form onSubmit={handleSubmit} className="space-y-5 pt-8">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-bold text-slate-300 mb-1.5 uppercase tracking-wider">Your Name *</label>
+                  <input
+                    type="text"
+                    required
+                    value={formData.name}
+                    onChange={e => setFormData({ ...formData, name: e.target.value })}
+                    placeholder="Enter your full name"
+                    className="w-full px-4 py-3 rounded-xl bg-white/10 border border-white/20 text-white placeholder-slate-400 text-sm focus:outline-none focus:ring-2 focus:ring-amber-300 transition"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-slate-300 mb-1.5 uppercase tracking-wider">Your Email *</label>
+                  <input
+                    type="email"
+                    required
+                    value={formData.email}
+                    onChange={e => setFormData({ ...formData, email: e.target.value })}
+                    placeholder="Enter your email"
+                    className="w-full px-4 py-3 rounded-xl bg-white/10 border border-white/20 text-white placeholder-slate-400 text-sm focus:outline-none focus:ring-2 focus:ring-amber-300 transition"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-bold text-slate-300 mb-1.5 uppercase tracking-wider">Phone Number *</label>
+                  <input
+                    type="tel"
+                    required
+                    value={formData.phone}
+                    onChange={e => setFormData({ ...formData, phone: e.target.value })}
+                    placeholder="+256 ..."
+                    className="w-full px-4 py-3 rounded-xl bg-white/10 border border-white/20 text-white placeholder-slate-400 text-sm focus:outline-none focus:ring-2 focus:ring-amber-300 transition"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-slate-300 mb-1.5 uppercase tracking-wider">Subject / Program *</label>
+                  <input
+                    type="text"
+                    required
+                    value={formData.subject}
+                    onChange={e => setFormData({ ...formData, subject: e.target.value })}
+                    placeholder="e.g. A-Level Admissions"
+                    className="w-full px-4 py-3 rounded-xl bg-white/10 border border-white/20 text-white placeholder-slate-400 text-sm focus:outline-none focus:ring-2 focus:ring-amber-300 transition"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-slate-300 mb-1.5 uppercase tracking-wider">Your Message *</label>
+                <textarea
+                  required
+                  rows={4}
+                  value={formData.message}
+                  onChange={e => setFormData({ ...formData, message: e.target.value })}
+                  placeholder="Type your message here..."
+                  className="w-full px-4 py-3 rounded-xl bg-white/10 border border-white/20 text-white placeholder-slate-400 text-sm focus:outline-none focus:ring-2 focus:ring-amber-300 transition resize-none"
+                ></textarea>
+              </div>
+
+              <button
+                type="submit"
+                className="bg-[#800020] hover:bg-[#600018] text-white font-bold px-8 py-3.5 rounded-xl shadow-lg transition flex items-center gap-3 text-sm transform hover:-translate-y-0.5"
+              >
+                <span>Send Message</span>
+                <Send className="w-4 h-4" />
+              </button>
+            </form>
+          )}
+
+          <div className="pt-8 mt-8 border-t border-slate-800 flex items-center justify-between text-xs text-slate-400 flex-wrap gap-4">
+            <span>Official STAHIZA Portal</span>
+            <span>Education Is The Way</span>
+            <span>Kampala, Uganda</span>
+          </div>
+        </div>
+
+        {/* RIGHT PANEL: SCENIC NATURE PHOTO BACKGROUND (MATCHING REFERENCE IMAGE) */}
+        <div className="lg:col-span-5 relative p-8 sm:p-12 flex flex-col justify-between overflow-hidden border-t lg:border-t-0 lg:border-l border-slate-200">
+          {/* Background Scenic Nature Image */}
+          <div className="absolute inset-0 z-0">
+            <img 
+              src="https://images.unsplash.com/photo-1511497584788-87676119230a?q=80&w=1200&auto=format&fit=crop" 
+              alt="Scenic Nature" 
+              className="w-full h-full object-cover object-center filter brightness-90 contrast-105"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-white/95 via-white/85 to-white/60 backdrop-blur-[1px]"></div>
+          </div>
+
+          <div className="relative z-10 space-y-6">
+            <div className="space-y-2">
+              <span className="text-xs font-bold text-[#800020] uppercase tracking-wider">We're Here To Help</span>
+              <h3 className="text-2xl sm:text-3xl font-extrabold font-['Montserrat'] text-[#0A192F]">
+                Let's Build Safer Tomorrow
+              </h3>
+              <p className="text-slate-700 text-sm leading-relaxed font-medium">
+                Our team is always ready to answer your questions and discuss how we can support your academic journey.
+              </p>
+            </div>
+
+            <div className="space-y-3.5 pt-2">
+              <div className="flex items-start gap-4 p-3.5 rounded-2xl bg-white/90 backdrop-blur-md shadow-sm border border-slate-200 hover:shadow-md transition">
+                <div className="w-9 h-9 rounded-xl bg-rose-50 text-[#800020] flex items-center justify-center shrink-0">
+                  <MapPin className="w-4 h-4" />
+                </div>
+                <div>
+                  <h4 className="font-bold text-[10px] uppercase tracking-wider text-slate-400">Address</h4>
+                  <p className="text-[#0A192F] font-semibold text-xs mt-0.5">Entebbe Road, Zzana/Nyanama, Kampala</p>
+                </div>
+              </div>
+
+              <div className="flex items-start gap-4 p-3.5 rounded-2xl bg-white/90 backdrop-blur-md shadow-sm border border-slate-200 hover:shadow-md transition">
+                <div className="w-9 h-9 rounded-xl bg-rose-50 text-[#800020] flex items-center justify-center shrink-0">
+                  <Mail className="w-4 h-4" />
+                </div>
+                <div>
+                  <h4 className="font-bold text-[10px] uppercase tracking-wider text-slate-400">Email</h4>
+                  <p className="text-[#0A192F] font-semibold text-xs mt-0.5">{SCHOOL_CONTACTS.email}</p>
+                </div>
+              </div>
+
+              <div className="flex items-start gap-4 p-3.5 rounded-2xl bg-white/90 backdrop-blur-md shadow-sm border border-slate-200 hover:shadow-md transition">
+                <div className="w-9 h-9 rounded-xl bg-rose-50 text-[#800020] flex items-center justify-center shrink-0">
+                  <Phone className="w-4 h-4" />
+                </div>
+                <div>
+                  <h4 className="font-bold text-[10px] uppercase tracking-wider text-slate-400">Phone</h4>
+                  <p className="text-[#0A192F] font-semibold text-xs mt-0.5">{SCHOOL_CONTACTS.phone1} / {SCHOOL_CONTACTS.phone2}</p>
+                </div>
+              </div>
+
+              <div className="flex items-start gap-4 p-3.5 rounded-2xl bg-white/90 backdrop-blur-md shadow-sm border border-slate-200 hover:shadow-md transition">
+                <div className="w-9 h-9 rounded-xl bg-rose-50 text-[#800020] flex items-center justify-center shrink-0">
+                  <Clock className="w-4 h-4" />
+                </div>
+                <div>
+                  <h4 className="font-bold text-[10px] uppercase tracking-wider text-slate-400">Business Hours</h4>
+                  <p className="text-[#0A192F] font-semibold text-xs mt-0.5">Mon – Fri: 7:30 AM – 5:00 PM<br />Sat: 9:00 AM – 1:00 PM</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* SCENIC CARD BOTTOM MAP BUTTON */}
+          <div className="relative z-10 pt-6 mt-6 border-t border-slate-200/80">
+            <a
+              href="https://maps.google.com/?q=Zzana+Entebbe+Road+Kampala"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="w-full py-3.5 bg-[#0A192F] hover:bg-[#163c6c] text-white font-bold rounded-2xl shadow-lg transition flex items-center justify-center gap-2 text-sm"
+            >
+              <MapPin className="w-4 h-4 text-amber-300" />
+              <span>Open Campus Map Directions</span>
+              <ArrowRight className="w-4 h-4" />
+            </a>
+          </div>
+
+        </div>
+
+      </div>
+    </div>
+  );
+};

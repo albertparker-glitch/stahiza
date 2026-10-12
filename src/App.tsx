@@ -19,6 +19,7 @@ import { SchoolBadgeImg } from './components/SchoolBadgeImg';
 import { Navbar } from './components/Navbar';
 import { Footer } from './components/Footer';
 import { ApplyModal } from './components/ApplyModal';
+import { ContactSection } from './components/ContactSection';
 import { Leader, fetchLeaders, SCHOOL_CONTACTS } from './data/schoolData';
 
 export default function App() {
@@ -460,93 +461,7 @@ export default function App() {
         )}
 
         {activeTab === 'contact' && (
-          <div className="py-16 px-4 sm:px-8 max-w-7xl mx-auto space-y-12">
-            <div className="text-center max-w-3xl mx-auto space-y-4">
-              <SchoolBadgeImg size={56} className="mx-auto" />
-              <span className="text-[#800020] font-bold uppercase tracking-wider text-sm block">Get in Touch</span>
-              <h2 className="text-3xl sm:text-5xl font-extrabold font-['Montserrat'] text-[#0A192F]">
-                Contact Standard High School Zzana
-              </h2>
-              <p className="text-slate-600 text-base">
-                We are eager to answer your inquiries regarding admissions, visits, and school fees.
-              </p>
-            </div>
-
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-              <div className="bg-white rounded-3xl p-8 sm:p-10 shadow-sm border border-slate-200 space-y-8">
-                <div className="flex items-center justify-between">
-                  <h3 className="text-2xl font-bold font-['Montserrat'] text-[#0A192F]">School Office Contacts</h3>
-                  <SchoolBadgeImg size={42} />
-                </div>
-                <div className="space-y-6">
-                  <div className="flex items-start gap-4">
-                    <div className="w-12 h-12 rounded-xl bg-rose-50 text-[#800020] flex items-center justify-center shrink-0">
-                      <MapPin className="w-6 h-6" />
-                    </div>
-                    <div>
-                      <h4 className="font-bold text-slate-800">Physical Location</h4>
-                      <p className="text-slate-600 text-sm">{SCHOOL_CONTACTS.location}</p>
-                    </div>
-                  </div>
-                  <div className="flex items-start gap-4">
-                    <div className="w-12 h-12 rounded-xl bg-rose-50 text-[#800020] flex items-center justify-center shrink-0">
-                      <Phone className="w-6 h-6" />
-                    </div>
-                    <div>
-                      <h4 className="font-bold text-slate-800">Telephone Lines</h4>
-                      <p className="text-slate-600 text-sm">{SCHOOL_CONTACTS.phone1} / {SCHOOL_CONTACTS.phone2}</p>
-                    </div>
-                  </div>
-                  <div className="flex items-start gap-4">
-                    <div className="w-12 h-12 rounded-xl bg-rose-50 text-[#800020] flex items-center justify-center shrink-0">
-                      <Mail className="w-6 h-6" />
-                    </div>
-                    <div>
-                      <h4 className="font-bold text-slate-800">Email Address</h4>
-                      <p className="text-slate-600 text-sm">{SCHOOL_CONTACTS.email}</p>
-                    </div>
-                  </div>
-                  <div className="flex items-start gap-4">
-                    <div className="w-12 h-12 rounded-xl bg-rose-50 text-[#800020] flex items-center justify-center shrink-0">
-                      <Clock className="w-6 h-6" />
-                    </div>
-                    <div>
-                      <h4 className="font-bold text-slate-800">Office Working Hours</h4>
-                      <p className="text-slate-600 text-sm">Mon – Fri: 7:30 AM – 5:00 PM<br />Sat: 9:00 AM – 1:00 PM</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div className="bg-[#0A192F] text-white rounded-3xl p-8 sm:p-10 shadow-xl space-y-6 flex flex-col justify-between">
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <h3 className="text-2xl font-bold font-['Montserrat']">Plan Your Visit</h3>
-                    <SchoolBadgeImg size={42} />
-                  </div>
-                  <p className="text-slate-300 text-sm leading-relaxed">
-                    Parents and prospective students are welcome to tour our campus along Entebbe Road any weekday. Meet our teachers and experience our learning facilities firsthand.
-                  </p>
-                </div>
-                <div className="pt-6 border-t border-slate-800 space-y-4">
-                  <button
-                    onClick={() => setApplyModalOpen(true)}
-                    className="w-full py-4 bg-[#800020] hover:bg-[#600018] text-white font-bold rounded-xl shadow transition text-center block"
-                  >
-                    Start Online Admission Form
-                  </button>
-                  <a
-                    href="https://maps.google.com/?q=Zzana+Entebbe+Road+Kampala"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="w-full py-4 bg-white/10 hover:bg-white/20 text-white font-semibold rounded-xl transition text-center block"
-                  >
-                    Open Google Maps Directions
-                  </a>
-                </div>
-              </div>
-            </div>
-          </div>
+          <ContactSection />
         )}
       </main>
 
