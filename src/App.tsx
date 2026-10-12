@@ -294,7 +294,7 @@ export default function App() {
                     <img 
                       src={leader.img} 
                       alt={leader.name} 
-                      className="w-full h-full object-cover object-top"
+                      className="w-full h-full object-cover object-top shadow-xl transition-transform duration-500 hover:scale-110 active:scale-110 cursor-pointer"
                       onError={(e) => {
                         const target = e.currentTarget;
                         target.style.display = 'none';

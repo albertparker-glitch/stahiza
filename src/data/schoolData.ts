@@ -24,7 +24,7 @@ export const FALLBACK_LEADERS: Leader[] = [
   },
   {
     role: "Dean Arts",
-    name: "Mr. Kyeyune",
+    name: "Mr. Kyeyune Andrew",
     img: getSupabasePublicUrl("odeke.jpeg")
   },
   {

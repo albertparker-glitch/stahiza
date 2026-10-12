@@ -54,7 +54,6 @@ export const Footer: React.FC<FooterProps> = ({ setActiveTab, setApplyModalOpen 
                   onClick={() => {
                     if (link.tab) setActiveTab(link.tab);
                     if (link.modal === 'apply') setApplyModalOpen(true);
-                    window.scrollTo({ top: 0, behavior: 'smooth' });
                   }}
                   className="hover:text-amber-300 transition flex items-center gap-1.5"
                 >
