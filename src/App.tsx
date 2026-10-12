@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Phone,
   Mail,
@@ -19,11 +19,16 @@ import { SchoolBadgeImg } from './components/SchoolBadgeImg';
 import { Navbar } from './components/Navbar';
 import { Footer } from './components/Footer';
 import { ApplyModal } from './components/ApplyModal';
-import { LEADERS, SCHOOL_CONTACTS } from './data/schoolData';
+import { Leader, fetchLeaders, SCHOOL_CONTACTS } from './data/schoolData';
 
 export default function App() {
   const [activeTab, setActiveTab] = useState<'home' | 'leadership' | 'academics' | 'sports' | 'campus' | 'contact'>('home');
   const [applyModalOpen, setApplyModalOpen] = useState(false);
+  const [leaders, setLeaders] = useState<Leader[]>([]);
+
+  useEffect(() => {
+    fetchLeaders().then(data => setLeaders(data));
+  }, []);
 
   return (
     <div className="min-h-screen bg-[#F8FAFC] text-slate-800 font-['Inter',sans-serif] selection:bg-[#800020] selection:text-white">
@@ -283,7 +288,7 @@ export default function App() {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              {LEADERS.map((leader, idx) => (
+              {leaders.map((leader, idx) => (
                 <div key={idx} className="bg-white rounded-3xl overflow-hidden shadow-md border border-slate-200 hover:shadow-xl transition flex flex-col">
                   <div className="relative w-full h-80 bg-slate-100 overflow-hidden">
                     <img 

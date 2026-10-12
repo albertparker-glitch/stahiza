@@ -1,10 +1,12 @@
+import { supabase } from '../lib/supabase';
+
 export interface Leader {
   role: string;
   name: string;
   img: string;
 }
 
-export const LEADERS: Leader[] = [
+export const FALLBACK_LEADERS: Leader[] = [
   {
     role: "Headteacher",
     name: "Mr. Kurahuka Ostricast",
@@ -56,6 +58,32 @@ export const LEADERS: Leader[] = [
     img: "/pages/images/odeke.jpeg"
   },
 ];
+
+export async function fetchLeaders(): Promise<Leader[]> {
+  if (!supabase) {
+    return FALLBACK_LEADERS;
+  }
+
+  try {
+    const { data, error } = await supabase
+      .from('leaders')
+      .select('role, name, img_url');
+
+    if (error || !data || data.length === 0) {
+      console.warn('Supabase fetch leaders error or empty, using fallback:', error);
+      return FALLBACK_LEADERS;
+    }
+
+    return data.map((item: any) => ({
+      role: item.role,
+      name: item.name,
+      img: item.img_url || item.img || "/pages/images/odeke.jpeg"
+    }));
+  } catch (err) {
+    console.error('Supabase exception, using fallback leaders:', err);
+    return FALLBACK_LEADERS;
+  }
+}
 
 export const SCHOOL_CONTACTS = {
   phone1: "+256 772 831 704",
