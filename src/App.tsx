@@ -8,208 +8,32 @@ import {
   Trophy,
   BookOpen,
   Users,
-  Menu,
-  X,
   ChevronRight,
   ShieldCheck,
   Award,
-  Sparkles,
-  Send,
-  Calendar,
-  FileText,
   CheckCircle2,
   Building2,
-  HeartHandshake,
-  Search,
-  Lock,
-  User,
-  ArrowRight,
-  Play,
-  Facebook,
-  Twitter,
-  Instagram,
-  Youtube
+  ArrowRight
 } from 'lucide-react';
-
-// Badge Component using badge.png with SVG fallback
-const SchoolBadgeImg = ({ className = "w-12 h-12", size = 48, zoom = 1.3 }: { className?: string; size?: number; zoom?: number }) => {
-  const [hasError, setHasError] = useState(false);
-
-  if (hasError) {
-    return (
-      <svg width={size} height={size} viewBox="0 0 100 100" className={`shrink-0 drop-shadow-md ${className}`}>
-        <circle cx="50" cy="50" r="48" fill="#0F2A4A" stroke="#800020" strokeWidth="4" />
-        <text x="50" y="55" fill="#ffffff" fontSize="24" fontWeight="900" textAnchor="middle" fontFamily="Montserrat">STH</text>
-      </svg>
-    );
-  }
-
-  return (
-    <img 
-      src="/pages/images/badge.png" 
-      alt="Standard High School Zzana Badge" 
-      width={Math.round(size * zoom)}
-      height={Math.round(size * zoom)}
-      className={`object-contain shrink-0 drop-shadow-md transform scale-125 hover:scale-135 transition duration-300 ${className}`}
-      onError={(e) => {
-        const target = e.currentTarget;
-        if (target.src.includes('/pages/images/badge.png')) {
-          target.src = '/badge.png';
-        } else {
-          setHasError(true);
-        }
-      }}
-    />
-  );
-};
+import { SchoolBadgeImg } from './components/SchoolBadgeImg';
+import { Navbar } from './components/Navbar';
+import { Footer } from './components/Footer';
+import { ApplyModal } from './components/ApplyModal';
+import { LEADERS, SCHOOL_CONTACTS } from './data/schoolData';
 
 export default function App() {
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<'home' | 'leadership' | 'academics' | 'sports' | 'campus' | 'contact'>('home');
   const [applyModalOpen, setApplyModalOpen] = useState(false);
-
-  // Apply Form State
-  const [applyForm, setApplyForm] = useState({
-    studentName: '',
-    parentName: '',
-    phone: '',
-    email: '',
-    level: 'o-level',
-    combination: 'pcm',
-    previousSchool: '',
-    notes: ''
-  });
-  const [applySubmitted, setApplySubmitted] = useState(false);
-
-  const handleApplySubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    setApplySubmitted(true);
-  };
 
   return (
     <div className="min-h-screen bg-[#F8FAFC] text-slate-800 font-['Inter',sans-serif] selection:bg-[#800020] selection:text-white">
       
-      {/* TOP UTILITY BAR */}
-      <div className="bg-[#0A192F] text-slate-300 text-xs sm:text-sm py-2 px-4 sm:px-8 border-b border-slate-800">
-        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-2">
-          <div className="flex items-center gap-6 flex-wrap justify-center sm:justify-start">
-            <a href="tel:+256772831704" className="flex items-center gap-1.5 hover:text-white transition">
-              <Phone className="w-3.5 h-3.5 text-[#8A1C24]" />
-              <span>Office Desk: +256 772 831 704</span>
-            </a>
-            <a href="mailto:stahiza2020@gmail.com" className="flex items-center gap-1.5 hover:text-white transition border-2 border-rose-500 shadow-md px-2.5 py-1 rounded-lg bg-slate-800 text-rose-200">
-              <Mail className="w-3.5 h-3.5 text-[#8A1C24]" />
-              <span>stahiza2020@gmail.com</span>
-            </a>
-            <div className="hidden md:flex items-center gap-1.5 text-slate-400">
-              <MapPin className="w-3.5 h-3.5 text-[#8A1C24]" />
-              <span>Entebbe Road, Zzana/Nyanama, Kampala</span>
-            </div>
-          </div>
-          <div className="flex items-center gap-4">
-            <span className="text-emerald-300 font-semibold flex items-center gap-1.5 border-2 border-emerald-500 shadow-lg px-3.5 py-1 rounded-full bg-emerald-950/60">
-              <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span> Admissions 2027 Open
-            </span>
-          </div>
-        </div>
-      </div>
-
-      {/* HEADER & NAVIGATION */}
-      <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md shadow-sm border-b border-slate-100">
-        <div className="max-w-7xl mx-auto px-4 sm:px-8 h-20 flex items-center justify-between">
-          
-          {/* LOGO & BRANDING */}
-          <div 
-            onClick={() => setActiveTab('home')} 
-            className="flex items-center gap-3 cursor-pointer group"
-          >
-            <SchoolBadgeImg size={46} className="transition group-hover:scale-105" />
-            <div>
-              <h1 className="font-extrabold text-lg sm:text-xl tracking-tight text-[#0A192F] font-['Montserrat'] leading-tight">
-                STAHIZA <span className="text-[#800020]">ZZANA</span>
-              </h1>
-              <p className="text-[10px] sm:text-xs font-medium tracking-wider text-slate-500 uppercase">
-                Education Is The Way
-              </p>
-            </div>
-          </div>
-
-          {/* DESKTOP NAV LINKS */}
-          <nav className="hidden lg:flex items-center gap-1 font-medium text-sm text-slate-700">
-            {[
-              { id: 'home', label: 'Home' },
-              { id: 'leadership', label: 'Leadership' },
-              { id: 'academics', label: 'Academics' },
-              { id: 'sports', label: 'Sports & Talent' },
-              { id: 'campus', label: 'Campus Life' },
-              { id: 'contact', label: 'Contact Us' },
-            ].map(item => (
-              <button
-                key={item.id}
-                onClick={() => setActiveTab(item.id as any)}
-                className={`px-4 py-2 rounded-lg transition ${
-                  activeTab === item.id 
-                    ? 'bg-[#0A192F] text-white font-semibold shadow-sm' 
-                    : 'hover:bg-slate-100 hover:text-[#0A192F]'
-                }`}
-              >
-                {item.label}
-              </button>
-            ))}
-          </nav>
-
-          {/* CTA APPLY BUTTON */}
-          <div className="hidden sm:flex items-center gap-3">
-            <button
-              onClick={() => setApplyModalOpen(true)}
-              className="bg-[#800020] hover:bg-[#600018] text-white font-semibold px-5 py-2.5 rounded-xl shadow-md hover:shadow-lg transition transform hover:-translate-y-0.5 text-sm flex items-center gap-2"
-            >
-              <SchoolBadgeImg size={22} className="w-5 h-5" />
-              <span>Apply Now</span>
-            </button>
-          </div>
-
-          {/* MOBILE BURGER TOGGLE */}
-          <button 
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="lg:hidden p-2 text-slate-700 hover:text-[#0A192F]"
-          >
-            {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-          </button>
-        </div>
-
-        {/* MOBILE MENU DROPDOWN */}
-        {mobileMenuOpen && (
-          <div className="lg:hidden bg-white border-b border-slate-200 px-4 pt-2 pb-6 space-y-2 shadow-xl animate-fadeIn">
-            {[
-              { id: 'home', label: 'Home' },
-              { id: 'leadership', label: 'Leadership' },
-              { id: 'academics', label: 'Academics' },
-              { id: 'sports', label: 'Sports & Talent' },
-              { id: 'campus', label: 'Campus Life' },
-              { id: 'contact', label: 'Contact Us' },
-            ].map(item => (
-              <button
-                key={item.id}
-                onClick={() => { setActiveTab(item.id as any); setMobileMenuOpen(false); }}
-                className={`w-full text-left px-4 py-3 rounded-lg font-medium transition ${
-                  activeTab === item.id ? 'bg-[#0A192F] text-white' : 'hover:bg-slate-50'
-                }`}
-              >
-                {item.label}
-              </button>
-            ))}
-            <div className="pt-2 flex flex-col gap-2">
-              <button
-                onClick={() => { setApplyModalOpen(true); setMobileMenuOpen(false); }}
-                className="w-full text-center py-2.5 rounded-lg bg-[#800020] text-white font-semibold shadow"
-              >
-                Apply Now 2027
-              </button>
-            </div>
-          </div>
-        )}
-      </header>
+      {/* NAVBAR */}
+      <Navbar 
+        activeTab={activeTab} 
+        setActiveTab={setActiveTab} 
+        setApplyModalOpen={setApplyModalOpen} 
+      />
 
       {/* MAIN CONTENT AREA */}
       <main>
@@ -270,8 +94,8 @@ export default function App() {
                   </div>
                   <div className="text-center space-y-2">
                     <h3 className="text-xl font-extrabold font-['Montserrat'] text-white">Standard High School Zzana</h3>
-                    <p className="text-xs text-amber-300 font-semibold">P.O. Box 22981 Kampala - Uganda</p>
-                    <p className="text-xs text-slate-300">Office Desk: +256 772 831 704</p>
+                    <p className="text-xs text-amber-300 font-semibold">{SCHOOL_CONTACTS.box}</p>
+                    <p className="text-xs text-slate-300">Office Desk: {SCHOOL_CONTACTS.phone1}</p>
                   </div>
                   <div className="grid grid-cols-2 gap-4 w-full pt-2">
                     <div className="bg-black/20 p-4 rounded-xl text-center border border-white/10">
@@ -324,19 +148,16 @@ export default function App() {
                     icon: BookOpen,
                     title: "Academics",
                     desc: "Comprehensive UNEB O & A Level drilling in Arts and Sciences. Our dedicated faculty ensures exceptional grades and university admissions.",
-                    color: "bg-rose-50 text-[#800020] border-rose-200"
                   },
                   {
                     icon: Trophy,
                     title: "Sports",
                     desc: "Undisputed champions in USSSA football, basketball, athletics, and netball. We launch professional athletic careers while instilling teamwork.",
-                    color: "bg-amber-50 text-amber-600 border-amber-200"
                   },
                   {
                     icon: ShieldCheck,
                     title: "Discipline",
                     desc: "Instilling moral uprightness, leadership, scouting, and spiritual nourishment to mold well-rounded, responsible citizens.",
-                    color: "bg-blue-50 text-[#0A192F] border-blue-200"
                   },
                 ].map((pillar, idx) => (
                   <div 
@@ -424,7 +245,7 @@ export default function App() {
                     Need assistance with school fees or subject combinations?
                   </h3>
                   <p className="text-slate-300 text-sm sm:text-base leading-relaxed">
-                    Our administrative staff is available Monday to Friday (7:30 AM – 5:00 PM) and Saturday (9:00 AM – 1:00 PM) at our Entebbe Road campus. Call us directly at +256 772 831 704 or submit an online application form.
+                    Our administrative staff is available Monday to Friday (7:30 AM – 5:00 PM) and Saturday (9:00 AM – 1:00 PM) at our Entebbe Road campus. Call us directly at {SCHOOL_CONTACTS.phone1} or submit an online application form.
                   </p>
                 </div>
                 <div className="flex flex-col sm:flex-row gap-4">
@@ -440,7 +261,7 @@ export default function App() {
                     className="bg-white/10 hover:bg-white/20 border border-white/20 text-white font-semibold px-8 py-4 rounded-xl backdrop-blur-md transition flex items-center justify-center gap-2 whitespace-nowrap"
                   >
                     <Phone className="w-5 h-5 text-amber-300" />
-                    <span>+256 772 831 704</span>
+                    <span>{SCHOOL_CONTACTS.phone1}</span>
                   </a>
                 </div>
               </div>
@@ -462,58 +283,7 @@ export default function App() {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              {[
-                {
-                  role: "Headteacher",
-                  name: "Mr. Kurahuka Ostricast",
-                  img: "/pages/images/ostricast.jpeg"
-                },
-                {
-                  role: "Deputy Headteacher",
-                  name: "Mrs. Mbabazi Bena",
-                  img: "/pages/images/bena.jpeg"
-                },
-                {
-                  role: "Deputy Headteacher (Academics)",
-                  name: "Mr. Odeke Leonard",
-                  img: "/pages/images/odeke.jpeg"
-                },
-                {
-                  role: "Dean Arts",
-                  name: "Mr. Kyeyune",
-                  img: "/pages/images/odeke.jpeg"
-                },
-                {
-                  role: "Dean Sciences",
-                  name: "Mr. Waiswa Adi",
-                  img: "/pages/images/odeke.jpeg"
-                },
-                {
-                  role: "DOS",
-                  name: "Mr. Kahesi Hillary",
-                  img: "/pages/images/odeke.jpeg"
-                },
-                {
-                  role: "UNSA President 2023",
-                  name: "Mr. Odeke Leonard",
-                  img: "/pages/images/odeke.jpeg"
-                },
-                {
-                  role: "UNSA President 2024",
-                  name: "Mr. Odeke Leonard",
-                  img: "/pages/images/odeke.jpeg"
-                },
-                {
-                  role: "UNSA President 2025",
-                  name: "Mr. Odeke Leonard",
-                  img: "/pages/images/odeke.jpeg"
-                },
-                {
-                  role: "UNSA President 2026",
-                  name: "Mr. Odeke Leonard",
-                  img: "/pages/images/odeke.jpeg"
-                },
-              ].map((leader, idx) => (
+              {LEADERS.map((leader, idx) => (
                 <div key={idx} className="bg-white rounded-3xl overflow-hidden shadow-md border border-slate-200 hover:shadow-xl transition flex flex-col">
                   <div className="relative w-full h-80 bg-slate-100 overflow-hidden">
                     <img 
@@ -710,7 +480,7 @@ export default function App() {
                     </div>
                     <div>
                       <h4 className="font-bold text-slate-800">Physical Location</h4>
-                      <p className="text-slate-600 text-sm">Along Entebbe Road, Zzana / Nyanama (≈8 km from Kampala city center)</p>
+                      <p className="text-slate-600 text-sm">{SCHOOL_CONTACTS.location}</p>
                     </div>
                   </div>
                   <div className="flex items-start gap-4">
@@ -719,7 +489,7 @@ export default function App() {
                     </div>
                     <div>
                       <h4 className="font-bold text-slate-800">Telephone Lines</h4>
-                      <p className="text-slate-600 text-sm">+256 772 831 704 / +256 782 316 838</p>
+                      <p className="text-slate-600 text-sm">{SCHOOL_CONTACTS.phone1} / {SCHOOL_CONTACTS.phone2}</p>
                     </div>
                   </div>
                   <div className="flex items-start gap-4">
@@ -728,7 +498,7 @@ export default function App() {
                     </div>
                     <div>
                       <h4 className="font-bold text-slate-800">Email Address</h4>
-                      <p className="text-slate-600 text-sm">stahiza2020@gmail.com</p>
+                      <p className="text-slate-600 text-sm">{SCHOOL_CONTACTS.email}</p>
                     </div>
                   </div>
                   <div className="flex items-start gap-4">
@@ -776,270 +546,16 @@ export default function App() {
       </main>
 
       {/* FOOTER */}
-      <footer className="bg-[#0A192F] text-slate-300 pt-16 pb-12 border-t border-slate-800">
-        <div className="max-w-7xl mx-auto px-4 sm:px-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 pb-12 border-b border-slate-800">
-          
-          {/* COLUMN 1: ADDRESS & CONTACT */}
-          <div className="space-y-4">
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-white rounded-xl shadow">
-                <SchoolBadgeImg size={38} className="w-9 h-9" />
-              </div>
-              <h3 className="font-extrabold text-lg text-white font-['Montserrat']">Standard High School Zzana</h3>
-            </div>
-            <p className="text-slate-400 text-sm leading-relaxed">
-              P.O. Box 22981<br />
-              Kampala - Uganda
-            </p>
-            <div className="space-y-2 text-sm text-slate-300">
-              <p className="flex items-center gap-2">
-                <Phone className="w-4 h-4 text-[#8A1C24]" /> +256 772 831 704
-              </p>
-              <p className="flex items-center gap-2">
-                <Phone className="w-4 h-4 text-[#8A1C24]" /> +256 782 316 838
-              </p>
-              <p className="flex items-center gap-2">
-                <Mail className="w-4 h-4 text-[#8A1C24]" /> stahiza2020@gmail.com
-              </p>
-            </div>
-          </div>
-
-          {/* COLUMN 2: QUICK LINKS */}
-          <div className="space-y-4">
-            <h4 className="font-bold text-white text-base font-['Montserrat']">Quick Links</h4>
-            <ul className="space-y-2.5 text-sm">
-              {[
-                { label: 'Home', tab: 'home' },
-                { label: 'About Leadership', tab: 'leadership' },
-                { label: 'Academics & Curriculum', tab: 'academics' },
-                { label: 'Admissions & Apply', modal: 'apply' },
-                { label: 'Sports & Talent', tab: 'sports' },
-                { label: 'Contact Us', tab: 'contact' },
-              ].map((link, idx) => (
-                <li key={idx}>
-                  <button
-                    onClick={() => {
-                      if (link.tab) setActiveTab(link.tab as any);
-                      if (link.modal === 'apply') setApplyModalOpen(true);
-                      window.scrollTo({ top: 0, behavior: 'smooth' });
-                    }}
-                    className="hover:text-amber-300 transition flex items-center gap-1.5"
-                  >
-                    <ChevronRight className="w-3.5 h-3.5 text-[#8A1C24]" />
-                    <span>{link.label}</span>
-                  </button>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          {/* COLUMN 3: HOW TO REACH US / LOCATION DIRECTIONS */}
-          <div className="space-y-4">
-            <h4 className="font-bold text-white text-base font-['Montserrat']">How to Reach Us</h4>
-            <p className="text-slate-400 text-sm leading-relaxed">
-              Located along Entebbe Road, Zzana/Nyanama (≈8 km from Kampala city center). Easily accessible by public and private transport.
-            </p>
-            <div className="space-y-1 text-xs text-slate-400 pt-2">
-              <p className="font-semibold text-slate-300">Office Hours:</p>
-              <p>Mon – Fri: 7:30 AM – 5:00 PM</p>
-              <p>Sat: 9:00 AM – 1:00 PM</p>
-            </div>
-            <div className="pt-2">
-              <a
-                href="https://maps.google.com/?q=Zzana+Entebbe+Road+Kampala"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 bg-[#800020] hover:bg-[#600018] text-white text-xs font-semibold px-4 py-2.5 rounded-xl shadow transition"
-              >
-                <MapPin className="w-3.5 h-3.5" />
-                <span>Find us on Google Maps</span>
-              </a>
-            </div>
-          </div>
-
-          {/* COLUMN 4: CONNECT & SOCIALS */}
-          <div className="space-y-4">
-            <h4 className="font-bold text-white text-base font-['Montserrat']">Connect & Socials</h4>
-            <p className="text-slate-400 text-sm">Follow our daily updates, sports matches, and school events.</p>
-            <div className="flex items-center gap-3 pt-2">
-              <a href="#" className="w-10 h-10 rounded-xl bg-slate-800 hover:bg-[#800020] text-white flex items-center justify-center transition">
-                <Facebook className="w-5 h-5" />
-              </a>
-              <a href="#" className="w-10 h-10 rounded-xl bg-slate-800 hover:bg-[#800020] text-white flex items-center justify-center transition">
-                <Twitter className="w-5 h-5" />
-              </a>
-              <a href="#" className="w-10 h-10 rounded-xl bg-slate-800 hover:bg-[#800020] text-white flex items-center justify-center transition">
-                <Instagram className="w-5 h-5" />
-              </a>
-              <a href="#" className="w-10 h-10 rounded-xl bg-slate-800 hover:bg-[#800020] text-white flex items-center justify-center transition">
-                <Youtube className="w-5 h-5" />
-              </a>
-            </div>
-            <div className="pt-2">
-              <form onSubmit={e => { e.preventDefault(); alert('Thank you for subscribing to STAHIZA newsletter!'); }} className="flex gap-2">
-                <input
-                  type="email"
-                  required
-                  placeholder="Your email address"
-                  className="bg-slate-800 text-white text-xs px-3 py-2 rounded-xl border border-slate-700 focus:outline-none flex-1"
-                />
-                <button type="submit" className="bg-[#800020] text-white text-xs font-bold px-4 py-2 rounded-xl">
-                  Join
-                </button>
-              </form>
-            </div>
-          </div>
-
-        </div>
-
-        {/* BOTTOM COPYRIGHT BAR */}
-        <div className="max-w-7xl mx-auto px-4 sm:px-8 pt-8 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-500 gap-4">
-          <p>© {new Date().getFullYear()} Standard High School Zzana (STAHIZA). All rights reserved.</p>
-          <p className="text-amber-400/90 font-serif italic font-medium">"Education Is The Way"</p>
-          <div className="flex items-center gap-6">
-            <a href="#" className="hover:text-white transition">Privacy Policy</a>
-            <a href="#" className="hover:text-white transition">Terms of Use</a>
-            <a href="#" className="hover:text-white transition">Office Admin</a>
-          </div>
-        </div>
-      </footer>
+      <Footer 
+        setActiveTab={setActiveTab} 
+        setApplyModalOpen={setApplyModalOpen} 
+      />
 
       {/* ADMISSIONS APPLICATION MODAL */}
-      {applyModalOpen && (
-        <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
-          <div className="bg-white rounded-3xl max-w-2xl w-full p-6 sm:p-10 shadow-2xl relative my-8 animate-fadeIn">
-            <button
-              onClick={() => { setApplyModalOpen(false); setApplySubmitted(false); }}
-              className="absolute top-6 right-6 p-2 text-slate-400 hover:text-slate-700 bg-slate-100 rounded-full"
-            >
-              <X className="w-5 h-5" />
-            </button>
-
-            {applySubmitted ? (
-              <div className="text-center py-12 space-y-6">
-                <div className="w-20 h-20 bg-emerald-100 text-emerald-600 rounded-full mx-auto flex items-center justify-center shadow-lg">
-                  <CheckCircle2 className="w-10 h-10" />
-                </div>
-                <h3 className="text-2xl sm:text-3xl font-extrabold text-[#0A192F] font-['Montserrat']">Application Received!</h3>
-                <p className="text-slate-600 text-base max-w-md mx-auto">
-                  Thank you, <span className="font-bold">{applyForm.parentName}</span>. Your application for <span className="font-bold">{applyForm.studentName}</span> has been securely submitted to STAHIZA Admissions Office. Our team will contact you via <span className="font-bold">{applyForm.phone}</span> within 24 hours.
-                </p>
-                <button
-                  onClick={() => { setApplyModalOpen(false); setApplySubmitted(false); }}
-                  className="px-8 py-3 bg-[#0A192F] text-white font-bold rounded-xl shadow"
-                >
-                  Close & Return Home
-                </button>
-              </div>
-            ) : (
-              <form onSubmit={handleApplySubmit} className="space-y-6">
-                <div className="flex items-center gap-4">
-                  <div className="p-2 bg-slate-100 rounded-xl">
-                    <SchoolBadgeImg size={42} />
-                  </div>
-                  <div>
-                    <span className="text-xs font-bold text-[#800020] uppercase tracking-wider">Admissions 2027</span>
-                    <h3 className="text-2xl font-extrabold text-[#0A192F] font-['Montserrat'] mt-0.5">Online Application Form</h3>
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-xs font-bold text-slate-700 mb-1">Student Full Name *</label>
-                    <input
-                      type="text"
-                      required
-                      value={applyForm.studentName}
-                      onChange={e => setApplyForm({ ...applyForm, studentName: e.target.value })}
-                      placeholder="e.g. Mukasa Junior"
-                      className="w-full px-4 py-2.5 rounded-xl border border-slate-300 text-sm focus:ring-2 focus:ring-[#0A192F]"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-xs font-bold text-slate-700 mb-1">Parent / Guardian Name *</label>
-                    <input
-                      type="text"
-                      required
-                      value={applyForm.parentName}
-                      onChange={e => setApplyForm({ ...applyForm, parentName: e.target.value })}
-                      placeholder="e.g. Mr. & Mrs. Mukasa"
-                      className="w-full px-4 py-2.5 rounded-xl border border-slate-300 text-sm focus:ring-2 focus:ring-[#0A192F]"
-                    />
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-xs font-bold text-slate-700 mb-1">Contact Phone Number *</label>
-                    <input
-                      type="tel"
-                      required
-                      value={applyForm.phone}
-                      onChange={e => setApplyForm({ ...applyForm, phone: e.target.value })}
-                      placeholder="e.g. +256 772 831 704"
-                      className="w-full px-4 py-2.5 rounded-xl border border-slate-300 text-sm focus:ring-2 focus:ring-[#0A192F]"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-xs font-bold text-slate-700 mb-1">Email Address</label>
-                    <input
-                      type="email"
-                      value={applyForm.email}
-                      onChange={e => setApplyForm({ ...applyForm, email: e.target.value })}
-                      placeholder="parent@gmail.com"
-                      className="w-full px-4 py-2.5 rounded-xl border border-slate-300 text-sm focus:ring-2 focus:ring-[#0A192F]"
-                    />
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-xs font-bold text-slate-700 mb-1">Class Level *</label>
-                    <select
-                      value={applyForm.level}
-                      onChange={e => setApplyForm({ ...applyForm, level: e.target.value })}
-                      className="w-full px-4 py-2.5 rounded-xl border border-slate-300 text-sm bg-white focus:ring-2 focus:ring-[#0A192F]"
-                    >
-                      <option value="o-level">O-Level (Senior One to Four)</option>
-                      <option value="a-level">A-Level (Senior Five & Six)</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label className="block text-xs font-bold text-slate-700 mb-1">Subject Combination / Stream</label>
-                    <select
-                      value={applyForm.combination}
-                      onChange={e => setApplyForm({ ...applyForm, combination: e.target.value })}
-                      className="w-full px-4 py-2.5 rounded-xl border border-slate-300 text-sm bg-white focus:ring-2 focus:ring-[#0A192F]"
-                    >
-                      <option value="pcm">PCM / BCM (Sciences)</option>
-                      <option value="arts">HEG / MEG / Arts Combination</option>
-                      <option value="olevel-general">O-Level General Curriculum</option>
-                    </select>
-                  </div>
-                </div>
-
-                <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1">Previous School Attended</label>
-                  <input
-                    type="text"
-                    value={applyForm.previousSchool}
-                    onChange={e => setApplyForm({ ...applyForm, previousSchool: e.target.value })}
-                    placeholder="Name of primary or secondary school"
-                    className="w-full px-4 py-2.5 rounded-xl border border-slate-300 text-sm focus:ring-2 focus:ring-[#0A192F]"
-                  />
-                </div>
-
-                <button
-                  type="submit"
-                  className="w-full py-4 bg-[#800020] hover:bg-[#600018] text-white font-bold rounded-xl shadow-lg transition text-base"
-                >
-                  Submit Application to STAHIZA
-                </button>
-              </form>
-            )}
-          </div>
-        </div>
-      )}
+      <ApplyModal 
+        isOpen={applyModalOpen} 
+        onClose={() => setApplyModalOpen(false)} 
+      />
 
     </div>
   );

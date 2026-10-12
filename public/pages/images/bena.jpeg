@@ -1,0 +1,6 @@
+<svg width="400" height="400" viewBox="0 0 400 400" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="400" height="400" fill="#0F2A4A"/>
+  <circle cx="200" cy="150" r="70" fill="#1e3a65" stroke="#800020" stroke-width="4"/>
+  <path d="M100 320 C100 250, 300 250, 300 320 Z" fill="#1e3a65" stroke="#800020" stroke-width="4"/>
+  <text x="200" y="370" fill="#ffffff" font-size="20" font-weight="800" text-anchor="middle" font-family="Montserrat">STAHIZA LEADERSHIP</text>
+</svg>
