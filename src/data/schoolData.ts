@@ -1,4 +1,4 @@
-import { supabase } from '../lib/supabase';
+import { supabase, getSupabasePublicUrl } from '../lib/supabase';
 
 export interface Leader {
   role: string;
@@ -10,52 +10,52 @@ export const FALLBACK_LEADERS: Leader[] = [
   {
     role: "Headteacher",
     name: "Mr. Kurahuka Ostricast",
-    img: "/pages/images/ostricast.jpeg"
+    img: getSupabasePublicUrl("ostricast.jpeg")
   },
   {
     role: "Deputy Headteacher",
     name: "Mrs. Mbabazi Bena",
-    img: "/pages/images/bena.jpeg"
+    img: getSupabasePublicUrl("bena.jpeg")
   },
   {
     role: "Deputy Headteacher (Academics)",
     name: "Mr. Odeke Leonard",
-    img: "/pages/images/odeke.jpeg"
+    img: getSupabasePublicUrl("odeke.jpeg")
   },
   {
     role: "Dean Arts",
     name: "Mr. Kyeyune",
-    img: "/pages/images/odeke.jpeg"
+    img: getSupabasePublicUrl("odeke.jpeg")
   },
   {
     role: "Dean Sciences",
     name: "Mr. Waiswa Adi",
-    img: "/pages/images/odeke.jpeg"
+    img: getSupabasePublicUrl("odeke.jpeg")
   },
   {
     role: "DOS",
     name: "Mr. Kahesi Hillary",
-    img: "/pages/images/odeke.jpeg"
+    img: getSupabasePublicUrl("odeke.jpeg")
   },
   {
     role: "UNSA President 2023",
     name: "Mr. Odeke Leonard",
-    img: "/pages/images/odeke.jpeg"
+    img: getSupabasePublicUrl("odeke.jpeg")
   },
   {
     role: "UNSA President 2024",
     name: "Mr. Odeke Leonard",
-    img: "/pages/images/odeke.jpeg"
+    img: getSupabasePublicUrl("odeke.jpeg")
   },
   {
     role: "UNSA President 2025",
     name: "Mr. Odeke Leonard",
-    img: "/pages/images/odeke.jpeg"
+    img: getSupabasePublicUrl("odeke.jpeg")
   },
   {
     role: "UNSA President 2026",
     name: "Mr. Odeke Leonard",
-    img: "/pages/images/odeke.jpeg"
+    img: getSupabasePublicUrl("odeke.jpeg")
   },
 ];
 
@@ -74,11 +74,16 @@ export async function fetchLeaders(): Promise<Leader[]> {
       return FALLBACK_LEADERS;
     }
 
-    return data.map((item: any) => ({
-      role: item.role,
-      name: item.name,
-      img: item.img_url || item.img || "/pages/images/odeke.jpeg"
-    }));
+    return data.map((item: any) => {
+      const rawImg = item.img_url || item.img || "odeke.jpeg";
+      // If rawImg is just a filename, convert it to Supabase public URL from IMAGES bucket
+      const imgUrl = rawImg.startsWith('http') ? rawImg : getSupabasePublicUrl(rawImg);
+      return {
+        role: item.role,
+        name: item.name,
+        img: imgUrl
+      };
+    });
   } catch (err) {
     console.error('Supabase exception, using fallback leaders:', err);
     return FALLBACK_LEADERS;
