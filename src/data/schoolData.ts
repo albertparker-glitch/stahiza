@@ -35,17 +35,17 @@ export const FALLBACK_LEADERS: Leader[] = [
   {
     role: "DOS",
     name: "Mr. Kahesi Hillary",
-    img: getSupabasePublicUrl("odeke.jpeg")
+    img: getSupabasePublicUrl("hillary.jpeg")
   },
   {
-    role: "UNSA President 2023",
-    name: "Mr. Odeke Leonard",
-    img: getSupabasePublicUrl("odeke.jpeg")
+    role: "Prefects",
+    name: "STAHIZA Cabinet 2025-2026",
+    img: getSupabasePublicUrl("prefects2025.jpeg")
   },
   {
-    role: "UNSA President 2024",
-    name: "Mr. Odeke Leonard",
-    img: getSupabasePublicUrl("odeke.jpeg")
+    role: "Top",
+    name: "Head Hrefects",
+    img: getSupabasePublicUrl("top.jpeg")
   },
   {
     role: "UNSA President 2025",
