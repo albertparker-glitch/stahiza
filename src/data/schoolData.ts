@@ -43,13 +43,13 @@ export const FALLBACK_LEADERS: Leader[] = [
     img: getSupabasePublicUrl("prefects2025.png")
   },
   {
-    role: "Top",
-    name: "Head Hrefects",
+    role: "#Top",
+    name: "Head Prefects",
     img: getSupabasePublicUrl("top.jpeg")
   },
   {
     role: "UNSA Presidents 2024, 2025, 2026, 2027",
-    name: "Kulture, Wasswa, Brian",
+    name: "Sharif, Wasswa, Brian, Mugisha",
     img: getSupabasePublicUrl("unsap.jpeg")
   },
 ];
