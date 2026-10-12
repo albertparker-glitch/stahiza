@@ -31,15 +31,16 @@ import {
   Youtube
 } from 'lucide-react';
 
-// Badge Component using badge.png with zoom/scale
+// Badge Component using badge.png with SVG fallback
 const SchoolBadgeImg = ({ className = "w-12 h-12", size = 48, zoom = 1.3 }: { className?: string; size?: number; zoom?: number }) => {
   const [hasError, setHasError] = useState(false);
 
   if (hasError) {
     return (
-      <div className={`flex items-center justify-center bg-[#0F2A4A] text-white rounded-xl font-bold font-['Montserrat'] shrink-0 shadow ${className}`} style={{ width: size, height: size }}>
-        STH
-      </div>
+      <svg width={size} height={size} viewBox="0 0 100 100" className={`shrink-0 drop-shadow-md ${className}`}>
+        <circle cx="50" cy="50" r="48" fill="#0F2A4A" stroke="#800020" strokeWidth="4" />
+        <text x="50" y="55" fill="#ffffff" fontSize="24" fontWeight="900" textAnchor="middle" fontFamily="Montserrat">STH</text>
+      </svg>
     );
   }
 
@@ -51,7 +52,6 @@ const SchoolBadgeImg = ({ className = "w-12 h-12", size = 48, zoom = 1.3 }: { cl
       height={Math.round(size * zoom)}
       className={`object-contain shrink-0 drop-shadow-md transform scale-125 hover:scale-135 transition duration-300 ${className}`}
       onError={(e) => {
-        // Fallback to /badge.png if /pages/images/badge.png fails
         const target = e.currentTarget;
         if (target.src.includes('/pages/images/badge.png')) {
           target.src = '/badge.png';
@@ -523,8 +523,14 @@ export default function App() {
                       onError={(e) => {
                         const target = e.currentTarget;
                         target.style.display = 'none';
+                        const fallback = target.nextElementSibling as HTMLElement;
+                        if (fallback) fallback.style.display = 'flex';
                       }}
                     />
+                    <div className="absolute inset-0 bg-gradient-to-br from-[#0A192F] to-[#800020] text-white flex-col items-center justify-center p-6 text-center" style={{ display: 'none' }}>
+                      <span className="text-4xl font-black font-['Montserrat']">{leader.name.split(' ')[1]?.[0] || 'S'}</span>
+                      <span className="text-xs text-amber-300 mt-2 font-semibold">{leader.name}</span>
+                    </div>
                     <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-md p-2 rounded-xl shadow-lg">
                       <SchoolBadgeImg size={34} />
                     </div>
