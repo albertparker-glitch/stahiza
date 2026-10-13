@@ -28,7 +28,7 @@ Key Facts about STAHIZA:
 Be polite, inspiring, professional, and helpful in answering prospective students and parents about admissions, fees, subject combinations, boarding life, and school culture.`;
 
     const chatModel = await ai.models.generateContent({
-      model: 'gemini-3.8-flash',
+      model: 'gemini-2.5-flash',
       contents: [
         ...((history || []).map((h: any) => ({ role: h.role, parts: [{ text: h.text }] }))),
         { role: 'user', parts: [{ text: message }] }

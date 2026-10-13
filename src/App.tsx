@@ -20,6 +20,7 @@ import { Navbar } from './components/Navbar';
 import { Footer } from './components/Footer';
 import { ApplyModal } from './components/ApplyModal';
 import { ContactSection } from './components/ContactSection';
+import { StaffMarquee } from './components/StaffMarquee';
 import { Leader, fetchLeaders, fetchMarqueeStaff, SCHOOL_CONTACTS } from './data/schoolData';
 import { getSupabasePublicUrl } from './lib/supabase';
 
@@ -196,55 +197,17 @@ export default function App() {
 
             {/* STAFF MARQUEE SECTION UNDER PILLARS */}
             <section className="py-16 bg-white overflow-hidden border-b border-slate-200">
-              <div className="max-w-7xl mx-auto px-4 sm:px-8 mb-8 text-center space-y-2">
-                <span className="text-[#800020] font-bold uppercase tracking-wider text-xs">_________</span>
+              <div className="max-w-7xl mx-auto px-4 sm:px-8 mb-6 text-center space-y-2">
+                <span className="text-[#800020] font-bold uppercase tracking-wider text-xs">Highlights & Faculty</span>
                 <h3 className="text-2xl sm:text-4xl font-extrabold font-['Montserrat'] text-[#0A192F]">
                   STAHIZA IN A BRIEF
                 </h3>
+                <p className="text-slate-600 text-sm max-w-xl mx-auto">
+                  A glimpse into our vibrant school community, championship sports teams, academic excellence, and modern facilities.
+                </p>
               </div>
 
-              <div className="relative w-full overflow-hidden py-4">
-                <style>{`
-                  @keyframes marquee {
-                    0% { transform: translateX(0); }
-                    100% { transform: translateX(-50%); }
-                  }
-                  .animate-marquee {
-                    display: flex;
-                    width: max-content;
-                    animation: marquee 70s linear infinite;
-                  }
-                  .animate-marquee:hover {
-                    animation-play-state: paused;
-                  }
-                `}</style>
-                <div className="animate-marquee flex gap-3 items-center">
-                  {[...marqueeStaff, ...marqueeStaff, ...marqueeStaff].map((staff, idx) => (
-                    <div key={idx} className="flex flex-col items-center group shrink-0 w-52">
-                      <div className="w-44 h-44 rounded-2xl overflow-hidden border-2 border-[#0A192F] shadow-[0_0_25px_rgba(10,25,47,0.35)] group-hover:shadow-[0_0_35px_rgba(128,0,32,0.5)] bg-slate-100 relative group-hover:scale-105 active:scale-105 transition duration-300">
-                        <img 
-                          src={staff.img} 
-                          alt={staff.name} 
-                          className="w-full h-full object-cover object-top shadow-md"
-                          onError={(e) => {
-                            const target = e.currentTarget;
-                            target.style.display = 'none';
-                            const fallback = target.nextElementSibling as HTMLElement;
-                            if (fallback) fallback.style.display = 'flex';
-                          }}
-                        />
-                        <div className="absolute inset-0 bg-gradient-to-br from-[#0A192F] to-[#800020] text-white flex-col items-center justify-center p-2 text-center" style={{ display: 'none' }}>
-                          <span className="text-2xl font-black font-['Montserrat']">{staff.name.split(' ')[1]?.[0] || 'S'}</span>
-                        </div>
-                      </div>
-                      {/* Blue Ribbon Name Tag at Bottom */}
-                      <div className="mt-3 bg-[#0A192F] text-white py-1 px-4 rounded-full text-xs font-bold shadow-md border border-slate-700 text-center max-w-[200px] truncate">
-                        {staff.name}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
+              <StaffMarquee staffList={marqueeStaff} />
             </section>
 
             {/* HEADTEACHER WELCOME BANNER */}

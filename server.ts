@@ -7,24 +7,26 @@ dotenv.config();
 
 async function startServer() {
   const app = express();
-  const PORT = process.env.PORT || 3000;
+  const PORT = Number(process.env.PORT) || 3000;
 
   app.use(express.json());
 
-  // Initialize Gemini AI
-  const apiKey = process.env.GEMINI_API_KEY;
-  const ai = new GoogleGenAI({ apiKey: apiKey || '' });
+  // Serve static assets from /pages directory (badges, images, videos)
+  app.use('/pages', express.static('pages'));
 
   // API endpoint for STAHIZA AI Admissions / Guidance Counselor
   app.post('/api/chat', async (req, res) => {
     try {
       const { message, history } = req.body;
+      const apiKey = process.env.GEMINI_API_KEY;
       
       if (!apiKey) {
-        return res.status(500).json({ 
+        return res.status(503).json({ 
           error: 'Gemini API key is not configured. Please add GEMINI_API_KEY in secrets.' 
         });
       }
+
+      const ai = new GoogleGenAI({ apiKey });
 
       const systemInstruction = `You are STAHIZA AI Assistant, the official virtual guidance counselor and admissions officer for Standard High School, Zzana (STAHIZA).
 Motto: "Education Is The Way".
@@ -38,8 +40,8 @@ Key Facts about STAHIZA:
 
 Be polite, inspiring, professional, and helpful in answering prospective students and parents about admissions, fees, subject combinations, boarding life, and school culture.`;
 
-      const chatModel = ai.models.generateContent({
-        model: 'gemini-3.8-flash',
+      const response = await ai.models.generateContent({
+        model: 'gemini-2.5-flash',
         contents: [
           ...((history || []).map((h: any) => ({ role: h.role, parts: [{ text: h.text }] }))),
           { role: 'user', parts: [{ text: message }] }
@@ -50,7 +52,6 @@ Be polite, inspiring, professional, and helpful in answering prospective student
         }
       });
 
-      const response = await chatModel;
       const reply = response.text || "Welcome to Standard High School Zzana! How can I assist you with admissions or academics today?";
 
       res.json({ reply });
