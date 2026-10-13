@@ -12,14 +12,14 @@ export const SchoolBadgeImg: React.FC<SchoolBadgeProps> = ({ className = "w-12 h
   const scaledSize = Math.round(size * zoom);
 
   // Fallback sequence: 
-  // 0: Supabase IMAGES bucket badge1.png
-  // 1: Supabase IMAGES bucket badge1.jpeg
+  // 0: Supabase IMAGES bucket badge.png
+  // 1: Supabase IMAGES bucket badge1.png
   // 2: Local /pages/images/badge.png
   // 3: Inline SVG Crest fallback
   const getBadgeSrc = (currentAttempt: number) => {
     switch (currentAttempt) {
-      case 0: return getSupabasePublicUrl('badge1.png');
-      case 1: return getSupabasePublicUrl('badge1.jpeg');
+      case 0: return getSupabasePublicUrl('badge.png');
+      case 1: return getSupabasePublicUrl('badge1.png');
       case 2: return '/pages/images/badge.png';
       default: return '';
     }

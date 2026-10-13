@@ -1,19 +1,14 @@
-# Implementation Plan - Fix Vercel Asset Loading (Images & Background Video)
+# Implementation Plan - Fix Badge Visibility Across All Devices
 
 ## Problem Analysis
-When hosted on Vercel, static assets referenced at `/pages/images/...` (such as `badge.png`, `ostricast.jpeg`, `bena.jpeg`, `odeke.jpeg`, and `back.mp4`) result in 404 errors if they are not present in Vite's `public/` directory during build time. Furthermore, if any media file fails to load or is missing, the UI should gracefully fall back to high-fidelity SVG/CSS graphics instead of showing broken image icons or missing videos.
+The user reported that badges are not visible anywhere on the site (PC or mobile). This happens because `SchoolBadgeImg` attempts to load external image files (`badge1.png`, `badge.png`) from Supabase or local paths which may 404 or fail to load, falling back through multiple error states or failing to render correctly.
 
 ## Proposed Changes
 
-### 1. Public Asset Directory Structure
-- Create `public/pages/images/` directory.
-- Mirror all required media assets into `public/pages/images/`.
-
-### 2. Robust Fallback Handlers in `src/App.tsx`
-- **SchoolBadgeImg**: Ensure that if `/pages/images/badge.png` fails to load, it automatically falls back to an inline SVG rendering of the official STAHIZA Crest.
-- **Background Video**: Provide a rich CSS gradient and animated background fallback if `back.mp4` fails to autoplay or load on mobile/Vercel.
-- **Leadership Photos**: Ensure robust `onError` fallbacks for `ostricast.jpeg`, `bena.jpeg`, and `odeke.jpeg`.
+### 1. Robust Vector SVG Crest in `SchoolBadgeImg.tsx`
+- Replace the image-loading and error-state looping logic in `SchoolBadgeImg.tsx` with a stunning, high-fidelity vector SVG rendering of the official STAHIZA Crest (Shield, Crown/Banner, "EDUCATION IS THE WAY", open book, pen, and ladder).
+- This guarantees 100% immediate visibility, crisp scaling across mobile and PC, zero network dependency, and zero broken image issues.
 
 ## Verification Plan
 - Run `npm run build` to verify clean compilation.
-- Verify asset paths match Vite public directory rules.
+- Verify badges appear instantly across all tabs and components.
