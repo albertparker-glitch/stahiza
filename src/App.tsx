@@ -42,24 +42,24 @@ export default function App() {
         setApplyModalOpen={setApplyModalOpen} 
       />
 
-      {/* FULL BLEED 100% WIDTH VIDEO BANNER (Below Header, margin=0, padding=0, width=100% to edges) */}
-      <div className="w-full m-0 p-0 bg-black overflow-hidden leading-none block">
-        <video 
-          autoPlay 
-          loop 
-          muted 
-          playsInline 
-          className="w-full h-auto max-h-[600px] object-contain m-0 p-0 block pointer-events-none"
-        >
-          <source src={getSupabasePublicUrl('back.mp4')} type="video/mp4" />
-          Your browser does not support the video tag.
-        </video>
-      </div>
-
       {/* MAIN CONTENT AREA */}
       <main>
         {activeTab === 'home' && (
           <div>
+            {/* FULL BLEED 100% WIDTH VIDEO BANNER (Home page only) */}
+            <div className="w-full m-0 p-0 bg-black overflow-hidden leading-none block">
+              <video 
+                autoPlay 
+                loop 
+                muted 
+                playsInline 
+                className="w-full h-auto max-h-[600px] object-contain m-0 p-0 block pointer-events-none"
+              >
+                <source src={getSupabasePublicUrl('back.mp4')} type="video/mp4" />
+                Your browser does not support the video tag.
+              </video>
+            </div>
+
             {/* HERO SECTION */}
             <section className="relative text-white py-12 sm:py-16 overflow-hidden bg-gradient-to-br from-[#0A192F] via-[#0F2A4A] to-[#173860]">
               <div className="max-w-7xl mx-auto px-4 sm:px-8 relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
