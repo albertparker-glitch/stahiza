@@ -216,10 +216,10 @@ export default function App() {
                     animation-play-state: paused;
                   }
                 `}</style>
-                <div className="animate-marquee flex gap-8 items-center">
+                <div className="animate-marquee flex gap-3 items-center">
                   {[...leaders, ...leaders, ...leaders].map((staff, idx) => (
-                    <div key={idx} className="flex flex-col items-center group shrink-0 w-44">
-                      <div className="w-32 h-32 rounded-2xl overflow-hidden border-2 border-[#0A192F] shadow-[0_0_25px_rgba(10,25,47,0.35)] group-hover:shadow-[0_0_35px_rgba(128,0,32,0.5)] bg-slate-100 relative group-hover:scale-105 active:scale-105 transition duration-300">
+                    <div key={idx} className="flex flex-col items-center group shrink-0 w-52">
+                      <div className="w-44 h-44 rounded-2xl overflow-hidden border-2 border-[#0A192F] shadow-[0_0_25px_rgba(10,25,47,0.35)] group-hover:shadow-[0_0_35px_rgba(128,0,32,0.5)] bg-slate-100 relative group-hover:scale-105 active:scale-105 transition duration-300">
                         <img 
                           src={staff.img} 
                           alt={staff.name} 
@@ -232,11 +232,11 @@ export default function App() {
                           }}
                         />
                         <div className="absolute inset-0 bg-gradient-to-br from-[#0A192F] to-[#800020] text-white flex-col items-center justify-center p-2 text-center" style={{ display: 'none' }}>
-                          <span className="text-xl font-black font-['Montserrat']">{staff.name.split(' ')[1]?.[0] || 'S'}</span>
+                          <span className="text-2xl font-black font-['Montserrat']">{staff.name.split(' ')[1]?.[0] || 'S'}</span>
                         </div>
                       </div>
                       {/* Blue Ribbon Name Tag at Bottom */}
-                      <div className="mt-3 bg-[#0A192F] text-white py-1 px-4 rounded-full text-xs font-bold shadow-md border border-slate-700 text-center max-w-[180px] truncate">
+                      <div className="mt-3 bg-[#0A192F] text-white py-1 px-4 rounded-full text-xs font-bold shadow-md border border-slate-700 text-center max-w-[200px] truncate">
                         {staff.name}
                       </div>
                     </div>
