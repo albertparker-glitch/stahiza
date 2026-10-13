@@ -1,6 +1,6 @@
 {
-  "summary": "Plan to fix badge visibility across all devices by updating SchoolBadgeImg to render the high-fidelity vector SVG STAHIZA crest directly without depending on external network images or fallback loops.",
-  "updatedAt": "2026-10-13T13:59:34.106650277Z",
+  "summary": "Plan to decouple marquee staff from leadership data by creating an explicit filename-to-name mapping for images stored in the others folder of the IMAGES Supabase bucket.",
+  "updatedAt": "2026-10-13T14:17:45.446561690Z",
   "requestFeedback": true,
   "userFacing": true
 }

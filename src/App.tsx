@@ -20,16 +20,18 @@ import { Navbar } from './components/Navbar';
 import { Footer } from './components/Footer';
 import { ApplyModal } from './components/ApplyModal';
 import { ContactSection } from './components/ContactSection';
-import { Leader, fetchLeaders, SCHOOL_CONTACTS } from './data/schoolData';
+import { Leader, fetchLeaders, fetchMarqueeStaff, SCHOOL_CONTACTS } from './data/schoolData';
 import { getSupabasePublicUrl } from './lib/supabase';
 
 export default function App() {
   const [activeTab, setActiveTab] = useState<'home' | 'leadership' | 'academics' | 'sports' | 'campus' | 'contact'>('home');
   const [applyModalOpen, setApplyModalOpen] = useState(false);
   const [leaders, setLeaders] = useState<Leader[]>([]);
+  const [marqueeStaff, setMarqueeStaff] = useState<Leader[]>([]);
 
   useEffect(() => {
     fetchLeaders().then(data => setLeaders(data));
+    fetchMarqueeStaff().then(data => setMarqueeStaff(data));
   }, []);
 
   return (
@@ -217,7 +219,7 @@ export default function App() {
                   }
                 `}</style>
                 <div className="animate-marquee flex gap-3 items-center">
-                  {[...leaders, ...leaders, ...leaders].map((staff, idx) => (
+                  {[...marqueeStaff, ...marqueeStaff, ...marqueeStaff].map((staff, idx) => (
                     <div key={idx} className="flex flex-col items-center group shrink-0 w-52">
                       <div className="w-44 h-44 rounded-2xl overflow-hidden border-2 border-[#0A192F] shadow-[0_0_25px_rgba(10,25,47,0.35)] group-hover:shadow-[0_0_35px_rgba(128,0,32,0.5)] bg-slate-100 relative group-hover:scale-105 active:scale-105 transition duration-300">
                         <img 
