@@ -42,6 +42,20 @@ export default function App() {
         setApplyModalOpen={setApplyModalOpen} 
       />
 
+      {/* FULL BLEED 100% WIDTH VIDEO BANNER (Below Header, margin=0, padding=0, width=100% to edges) */}
+      <div className="w-full m-0 p-0 bg-black overflow-hidden leading-none block">
+        <video 
+          autoPlay 
+          loop 
+          muted 
+          playsInline 
+          className="w-full h-auto max-h-[600px] object-contain m-0 p-0 block pointer-events-none"
+        >
+          <source src={getSupabasePublicUrl('back.mp4')} type="video/mp4" />
+          Your browser does not support the video tag.
+        </video>
+      </div>
+
       {/* MAIN CONTENT AREA */}
       <main>
         {activeTab === 'home' && (
@@ -60,21 +74,6 @@ export default function App() {
                   <p className="text-xl sm:text-2xl font-medium text-amber-200 italic font-serif">
                     "Education Is The Way"
                   </p>
-
-                  {/* RESPONSIVE VIDEO BANNER (width 100%) */}
-                  <div className="w-full rounded-2xl overflow-hidden shadow-2xl bg-black border border-slate-700 my-4">
-                    <video 
-                      autoPlay 
-                      loop 
-                      muted 
-                      playsInline 
-                      className="w-full h-auto max-h-[450px] object-contain mx-auto pointer-events-none"
-                    >
-                      <source src={getSupabasePublicUrl('back.mp4')} type="video/mp4" />
-                      Your browser does not support the video tag.
-                    </video>
-                  </div>
-
                   <p className="text-slate-300 text-base sm:text-lg leading-relaxed max-w-2xl">
                     When the horizon seems uncertain, remember that education is the ultimate guide. It equips you with the strength to rise, the wisdom to choose, and the power to succeed. Walk boldly—because education is the way.
                   </p>
@@ -190,6 +189,59 @@ export default function App() {
                     </div>
                   </div>
                 ))}
+              </div>
+            </section>
+
+            {/* STAFF MARQUEE SECTION UNDER PILLARS */}
+            <section className="py-16 bg-white overflow-hidden border-b border-slate-200">
+              <div className="max-w-7xl mx-auto px-4 sm:px-8 mb-8 text-center space-y-2">
+                <span className="text-[#800020] font-bold uppercase tracking-wider text-xs">_________</span>
+                <h3 className="text-2xl sm:text-4xl font-extrabold font-['Montserrat'] text-[#0A192F]">
+                  STAHIZA IN A BRIEF
+                </h3>
+              </div>
+
+              <div className="relative w-full overflow-hidden py-4">
+                <style>{`
+                  @keyframes marquee {
+                    0% { transform: translateX(0); }
+                    100% { transform: translateX(-50%); }
+                  }
+                  .animate-marquee {
+                    display: flex;
+                    width: max-content;
+                    animation: marquee 70s linear infinite;
+                  }
+                  .animate-marquee:hover {
+                    animation-play-state: paused;
+                  }
+                `}</style>
+                <div className="animate-marquee flex gap-8 items-center">
+                  {[...leaders, ...leaders, ...leaders].map((staff, idx) => (
+                    <div key={idx} className="flex flex-col items-center group shrink-0 w-44">
+                      <div className="w-32 h-32 rounded-2xl overflow-hidden border-2 border-[#0A192F] shadow-[0_0_25px_rgba(10,25,47,0.35)] group-hover:shadow-[0_0_35px_rgba(128,0,32,0.5)] bg-slate-100 relative group-hover:scale-105 active:scale-105 transition duration-300">
+                        <img 
+                          src={staff.img} 
+                          alt={staff.name} 
+                          className="w-full h-full object-cover object-top shadow-md"
+                          onError={(e) => {
+                            const target = e.currentTarget;
+                            target.style.display = 'none';
+                            const fallback = target.nextElementSibling as HTMLElement;
+                            if (fallback) fallback.style.display = 'flex';
+                          }}
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-br from-[#0A192F] to-[#800020] text-white flex-col items-center justify-center p-2 text-center" style={{ display: 'none' }}>
+                          <span className="text-xl font-black font-['Montserrat']">{staff.name.split(' ')[1]?.[0] || 'S'}</span>
+                        </div>
+                      </div>
+                      {/* Blue Ribbon Name Tag at Bottom */}
+                      <div className="mt-3 bg-[#0A192F] text-white py-1 px-4 rounded-full text-xs font-bold shadow-md border border-slate-700 text-center max-w-[180px] truncate">
+                        {staff.name}
+                      </div>
+                    </div>
+                  ))}
+                </div>
               </div>
             </section>
 
