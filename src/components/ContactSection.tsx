@@ -226,6 +226,37 @@ export const ContactSection: React.FC = () => {
         </div>
 
       </div>
+
+      {/* LIVE GOOGLE MAP EMBED SECTION */}
+      <div className="bg-white rounded-[32px] shadow-2xl border border-slate-200 overflow-hidden p-6 sm:p-8 space-y-4">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 px-2">
+          <div>
+            <span className="text-xs font-bold text-[#800020] uppercase tracking-wider">Interactive Location</span>
+            <h3 className="text-2xl sm:text-3xl font-extrabold font-['Montserrat'] text-[#0A192F]">Live Google Map - STAHIZA Zzana</h3>
+            <p className="text-slate-500 text-sm">Entebbe Road, Zzana / Nyanama, Kampala - Uganda</p>
+          </div>
+          <a
+            href="https://maps.google.com/?q=Standard+High+School+Zzana+Entebbe+Road+Kampala"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 px-5 py-3 bg-[#0A192F] hover:bg-[#163c6c] text-white text-xs font-bold rounded-xl shadow-lg transition whitespace-nowrap"
+          >
+            <MapPin className="w-4 h-4 text-amber-300" /> Open Larger Map in Google
+          </a>
+        </div>
+        <div className="w-full h-[450px] rounded-2xl overflow-hidden shadow-inner border border-slate-200">
+          <iframe
+            title="Standard High School Zzana Map Location"
+            src="https://maps.google.com/maps?q=Standard+High+School+Zzana+Entebbe+Road+Kampala&t=&z=15&ie=UTF8&iwloc=&output=embed"
+            width="100%"
+            height="100%"
+            style={{ border: 0 }}
+            allowFullScreen={false}
+            loading="lazy"
+            referrerPolicy="no-referrer-when-downgrade"
+          ></iframe>
+        </div>
+      </div>
     </div>
   );
 };
