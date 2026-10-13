@@ -81,6 +81,21 @@ export const FALLBACK_MARQUEE_STAFF: Leader[] = [
     name: "Muslims Success to S4",
     img: getSupabaseOthersUrl("mus.jpeg")
   },
+    {
+    role: "Staff / Teacher",
+    name: "Computer Lab",
+    img: getSupabaseOthersUrl("complab.jpeg")
+  },
+    {
+    role: "Staff / Teacher",
+    name: "Food $ Nutrition",
+    img: getSupabaseOthersUrl("fnst.jpeg")
+  },
+    {
+    role: "Staff / Teacher",
+    name: "Music Dance $ Drama",
+    img: getSupabaseOthersUrl("mdd.jpeg")
+  },
 ];
 
 export async function fetchLeaders(): Promise<Leader[]> {
