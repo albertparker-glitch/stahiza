@@ -21,6 +21,7 @@ import { Footer } from './components/Footer';
 import { ApplyModal } from './components/ApplyModal';
 import { ContactSection } from './components/ContactSection';
 import { Leader, fetchLeaders, SCHOOL_CONTACTS } from './data/schoolData';
+import { getSupabasePublicUrl } from './lib/supabase';
 
 export default function App() {
   const [activeTab, setActiveTab] = useState<'home' | 'leadership' | 'academics' | 'sports' | 'campus' | 'contact'>('home');
@@ -46,20 +47,7 @@ export default function App() {
         {activeTab === 'home' && (
           <div>
             {/* HERO SECTION */}
-            <section className="relative text-white py-12 sm:py-16 overflow-hidden bg-[#0A192F]">
-              {/* Background Video */}
-              <video 
-                autoPlay 
-                loop 
-                muted 
-                playsInline 
-                className="absolute inset-0 w-full h-full object-cover z-0"
-              >
-                <source src="/pages/images/back.mp4" type="video/mp4" />
-              </video>
-              {/* Lighter Overlay for Clarity */}
-              <div className="absolute inset-0 bg-[#0A192F]/35 z-0"></div>
-
+            <section className="relative text-white py-12 sm:py-16 overflow-hidden bg-gradient-to-br from-[#0A192F] via-[#0F2A4A] to-[#173860]">
               <div className="max-w-7xl mx-auto px-4 sm:px-8 relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
                 <div className="lg:col-span-7 space-y-6">
                   <div className="inline-flex items-center gap-3 bg-[#8A1C24]/30 border border-[#8A1C24]/50 px-4 py-2 rounded-full text-rose-200 text-xs sm:text-sm font-semibold tracking-wide">
@@ -132,6 +120,22 @@ export default function App() {
                 </button>
               </div>
             </div>
+
+            {/* DEDICATED RESPONSIVE VIDEO BANNER (back.mp4 FROM SUPABASE) */}
+            <section className="py-12 px-4 sm:px-8 max-w-7xl mx-auto">
+              <div className="relative w-full rounded-3xl overflow-hidden shadow-2xl bg-black border border-slate-800 flex items-center justify-center p-2 sm:p-4">
+                <video 
+                  autoPlay 
+                  loop 
+                  muted 
+                  playsInline 
+                  className="w-full h-auto max-h-[550px] object-contain mx-auto pointer-events-none rounded-2xl"
+                >
+                  <source src={getSupabasePublicUrl('back.mp4')} type="video/mp4" />
+                  Your browser does not support the video tag.
+                </video>
+              </div>
+            </section>
 
             {/* CORE PILLARS */}
             <section className="py-20 px-4 sm:px-8 max-w-7xl mx-auto">
