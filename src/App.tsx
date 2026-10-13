@@ -60,6 +60,21 @@ export default function App() {
                   <p className="text-xl sm:text-2xl font-medium text-amber-200 italic font-serif">
                     "Education Is The Way"
                   </p>
+
+                  {/* RESPONSIVE VIDEO BANNER (width 100%) */}
+                  <div className="w-full rounded-2xl overflow-hidden shadow-2xl bg-black border border-slate-700 my-4">
+                    <video 
+                      autoPlay 
+                      loop 
+                      muted 
+                      playsInline 
+                      className="w-full h-auto max-h-[450px] object-contain mx-auto pointer-events-none"
+                    >
+                      <source src={getSupabasePublicUrl('back.mp4')} type="video/mp4" />
+                      Your browser does not support the video tag.
+                    </video>
+                  </div>
+
                   <p className="text-slate-300 text-base sm:text-lg leading-relaxed max-w-2xl">
                     When the horizon seems uncertain, remember that education is the ultimate guide. It equips you with the strength to rise, the wisdom to choose, and the power to succeed. Walk boldly—because education is the way.
                   </p>
@@ -120,22 +135,6 @@ export default function App() {
                 </button>
               </div>
             </div>
-
-            {/* DEDICATED RESPONSIVE VIDEO BANNER (back.mp4 FROM SUPABASE) */}
-            <section className="py-12 px-4 sm:px-8 max-w-7xl mx-auto">
-              <div className="relative w-full rounded-3xl overflow-hidden shadow-2xl bg-black border border-slate-800 flex items-center justify-center p-2 sm:p-4">
-                <video 
-                  autoPlay 
-                  loop 
-                  muted 
-                  playsInline 
-                  className="w-full h-auto max-h-[550px] object-contain mx-auto pointer-events-none rounded-2xl"
-                >
-                  <source src={getSupabasePublicUrl('back.mp4')} type="video/mp4" />
-                  Your browser does not support the video tag.
-                </video>
-              </div>
-            </section>
 
             {/* CORE PILLARS */}
             <section className="py-20 px-4 sm:px-8 max-w-7xl mx-auto">
