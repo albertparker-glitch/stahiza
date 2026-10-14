@@ -173,6 +173,109 @@ export async function fetchMarqueeStaff(): Promise<Leader[]> {
   }
 }
 
+export interface CampusVideo {
+  id: string;
+  title: string;
+  tag: string;
+  duration?: string;
+  videoUrl: string;
+  thumbnailUrl?: string;
+}
+
+export const FALLBACK_CAMPUS_VIDEOS: CampusVideo[] = [
+  {
+    id: 'back-tour',
+    title: 'STAHIZA Campus Tour & Aerial Highlights',
+    tag: 'Campus Overview',
+    duration: '0:45',
+    videoUrl: getSupabasePublicUrl('back.mp4'),
+    thumbnailUrl: getSupabasePublicUrl('ostricast.jpeg')
+  },
+  {
+    id: 'sports-usssa',
+    title: 'USSSA National Champions in Action',
+    tag: 'USSSA Champions',
+    duration: '1:15',
+    videoUrl: getSupabaseOthersUrl('hand.jpeg') ? getSupabasePublicUrl('back.mp4') : '/pages/images/back.mp4',
+    thumbnailUrl: getSupabaseOthersUrl('hand.jpeg')
+  },
+  {
+    id: 'sciences-lab',
+    title: 'Modern Science Labs & UNEB Practicals',
+    tag: 'Academics',
+    duration: '0:50',
+    videoUrl: getSupabasePublicUrl('back.mp4'),
+    thumbnailUrl: getSupabaseOthersUrl('complab.jpeg')
+  },
+  {
+    id: 'mdd-showcase',
+    title: 'Music, Dance & Drama Cultural Festival',
+    tag: 'Co-Curricular',
+    duration: '1:30',
+    videoUrl: getSupabasePublicUrl('back.mp4'),
+    thumbnailUrl: getSupabaseOthersUrl('mdd.jpeg')
+  },
+  {
+    id: 'best-students',
+    title: 'Academic Distinction & UNEB Achievers',
+    tag: 'Excellence',
+    duration: '0:40',
+    videoUrl: getSupabasePublicUrl('back.mp4'),
+    thumbnailUrl: getSupabaseOthersUrl('best st.jpeg')
+  },
+  {
+    id: 'scrabble-club',
+    title: 'STAHIZA National Scrabble Champions',
+    tag: 'Talent & Games',
+    duration: '0:35',
+    videoUrl: getSupabasePublicUrl('back.mp4'),
+    thumbnailUrl: getSupabaseOthersUrl('scrablle.jpeg')
+  }
+];
+
+export async function fetchCampusVideos(): Promise<CampusVideo[]> {
+  if (!supabase) {
+    return FALLBACK_CAMPUS_VIDEOS;
+  }
+
+  try {
+    const { data: files, error } = await supabase.storage
+      .from('IMAGES')
+      .list('others', {
+        limit: 50,
+        offset: 0,
+        sortBy: { column: 'name', order: 'asc' }
+      });
+
+    if (error || !files || files.length === 0) {
+      return FALLBACK_CAMPUS_VIDEOS;
+    }
+
+    const videoFiles = files.filter(f => f.name && /\.(mp4|webm|mov|m4v)$/i.test(f.name));
+
+    if (videoFiles.length > 0) {
+      return videoFiles.map(file => {
+        const fileName = file.name;
+        const cleanName = fileName.replace(/\.[^/.]+$/, "").replace(/[-_]/g, " ");
+        const formattedName = cleanName.charAt(0).toUpperCase() + cleanName.slice(1);
+        return {
+          id: fileName,
+          title: formattedName,
+          tag: 'Campus Reel',
+          duration: '1:00',
+          videoUrl: getSupabaseOthersUrl(fileName),
+          thumbnailUrl: getSupabaseOthersUrl(fileName.replace(/\.[^/.]+$/, ".jpeg"))
+        };
+      });
+    }
+
+    return FALLBACK_CAMPUS_VIDEOS;
+  } catch (err) {
+    console.error('Fetch campus videos error:', err);
+    return FALLBACK_CAMPUS_VIDEOS;
+  }
+}
+
 export const SCHOOL_CONTACTS = {
   phone1: "+256 772 831 704",
   phone2: "+256 782 316 838",

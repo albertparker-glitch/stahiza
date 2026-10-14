@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { X, CheckCircle2 } from 'lucide-react';
+import { motion, AnimatePresence } from 'motion/react';
+import { X, CheckCircle2, ArrowRight } from 'lucide-react';
 import { SchoolBadgeImg } from './SchoolBadgeImg';
 import { SCHOOL_CONTACTS } from '../data/schoolData';
 
@@ -21,146 +22,204 @@ export const ApplyModal: React.FC<ApplyModalProps> = ({ isOpen, onClose }) => {
   });
   const [applySubmitted, setApplySubmitted] = useState(false);
 
-  if (!isOpen) return null;
-
   const handleApplySubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setApplySubmitted(true);
   };
 
+  const handleClose = () => {
+    onClose();
+    setTimeout(() => setApplySubmitted(false), 300);
+  };
+
   return (
-    <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
-      <div className="bg-white rounded-3xl max-w-2xl w-full p-6 sm:p-10 shadow-2xl relative my-8 animate-fadeIn">
-        <button
-          onClick={() => { onClose(); setApplySubmitted(false); }}
-          className="absolute top-6 right-6 p-2 text-slate-400 hover:text-slate-700 bg-slate-100 rounded-full"
-        >
-          <X className="w-5 h-5" />
-        </button>
+    <AnimatePresence>
+      {isOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 overflow-y-auto">
+          {/* Backdrop Blur */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.25 }}
+            onClick={handleClose}
+            className="fixed inset-0 bg-black/70 backdrop-blur-sm"
+          />
 
-        {applySubmitted ? (
-          <div className="text-center py-12 space-y-6">
-            <div className="w-20 h-20 bg-emerald-100 text-emerald-600 rounded-full mx-auto flex items-center justify-center shadow-lg">
-              <CheckCircle2 className="w-10 h-10" />
-            </div>
-            <h3 className="text-2xl sm:text-3xl font-extrabold text-[#0A192F] font-['Montserrat']">Application Received!</h3>
-            <p className="text-slate-600 text-base max-w-md mx-auto">
-              Thank you, <span className="font-bold">{applyForm.parentName}</span>. Your application for <span className="font-bold">{applyForm.studentName}</span> has been securely submitted to STAHIZA Admissions Office. Our team will contact you via <span className="font-bold">{applyForm.phone}</span> or office desk ({SCHOOL_CONTACTS.phone1}) within 24 hours.
-            </p>
-            <button
-              onClick={() => { onClose(); setApplySubmitted(false); }}
-              className="px-8 py-3 bg-[#0A192F] text-white font-bold rounded-xl shadow"
+          {/* Modal Container */}
+          <motion.div
+            initial={{ opacity: 0, scale: 0.94, y: 24 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.94, y: 24 }}
+            transition={{ type: "spring", damping: 25, stiffness: 320 }}
+            className="bg-white rounded-3xl max-w-2xl w-full p-6 sm:p-10 shadow-2xl relative my-8 z-10"
+          >
+            <motion.button
+              whileHover={{ scale: 1.1, rotate: 90 }}
+              whileTap={{ scale: 0.9 }}
+              onClick={handleClose}
+              className="absolute top-6 right-6 p-2 text-slate-400 hover:text-slate-700 bg-slate-100 rounded-full transition-colors"
+              aria-label="Close modal"
             >
-              Close & Return Home
-            </button>
-          </div>
-        ) : (
-          <form onSubmit={handleApplySubmit} className="space-y-6">
-            <div className="flex items-center gap-4">
-              <div className="p-2 bg-slate-100 rounded-xl">
-                <SchoolBadgeImg size={42} />
-              </div>
-              <div>
-                <span className="text-xs font-bold text-[#800020] uppercase tracking-wider">Admissions 2027</span>
-                <h3 className="text-2xl font-extrabold text-[#0A192F] font-['Montserrat'] mt-0.5">Online Application Form</h3>
-              </div>
-            </div>
+              <X className="w-5 h-5" />
+            </motion.button>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">Student Full Name *</label>
-                <input
-                  type="text"
-                  required
-                  value={applyForm.studentName}
-                  onChange={e => setApplyForm({ ...applyForm, studentName: e.target.value })}
-                  placeholder="e.g. Mukasa Junior"
-                  className="w-full px-4 py-2.5 rounded-xl border border-slate-300 text-sm focus:ring-2 focus:ring-[#0A192F]"
-                />
-              </div>
-              <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">Parent / Guardian Name *</label>
-                <input
-                  type="text"
-                  required
-                  value={applyForm.parentName}
-                  onChange={e => setApplyForm({ ...applyForm, parentName: e.target.value })}
-                  placeholder="e.g. Mr. & Mrs. Mukasa"
-                  className="w-full px-4 py-2.5 rounded-xl border border-slate-300 text-sm focus:ring-2 focus:ring-[#0A192F]"
-                />
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">Contact Phone Number *</label>
-                <input
-                  type="tel"
-                  required
-                  value={applyForm.phone}
-                  onChange={e => setApplyForm({ ...applyForm, phone: e.target.value })}
-                  placeholder="e.g. +256 772 831 704"
-                  className="w-full px-4 py-2.5 rounded-xl border border-slate-300 text-sm focus:ring-2 focus:ring-[#0A192F]"
-                />
-              </div>
-              <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">Email Address</label>
-                <input
-                  type="email"
-                  value={applyForm.email}
-                  onChange={e => setApplyForm({ ...applyForm, email: e.target.value })}
-                  placeholder="parent@gmail.com"
-                  className="w-full px-4 py-2.5 rounded-xl border border-slate-300 text-sm focus:ring-2 focus:ring-[#0A192F]"
-                />
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">Class Level *</label>
-                <select
-                  value={applyForm.level}
-                  onChange={e => setApplyForm({ ...applyForm, level: e.target.value })}
-                  className="w-full px-4 py-2.5 rounded-xl border border-slate-300 text-sm bg-white focus:ring-2 focus:ring-[#0A192F]"
+            <AnimatePresence mode="wait">
+              {applySubmitted ? (
+                <motion.div
+                  key="submitted"
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.9 }}
+                  transition={{ type: "spring", damping: 20, stiffness: 300 }}
+                  className="text-center py-10 space-y-6"
                 >
-                  <option value="o-level">O-Level (Senior One to Four)</option>
-                  <option value="a-level">A-Level (Senior Five & Six)</option>
-                </select>
-              </div>
-              <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">Subject Combination / Stream</label>
-                <select
-                  value={applyForm.combination}
-                  onChange={e => setApplyForm({ ...applyForm, combination: e.target.value })}
-                  className="w-full px-4 py-2.5 rounded-xl border border-slate-300 text-sm bg-white focus:ring-2 focus:ring-[#0A192F]"
+                  <motion.div
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1 }}
+                    transition={{ type: "spring", delay: 0.1, damping: 12, stiffness: 200 }}
+                    className="w-20 h-20 bg-emerald-100 text-emerald-600 rounded-full mx-auto flex items-center justify-center shadow-lg"
+                  >
+                    <CheckCircle2 className="w-10 h-10" />
+                  </motion.div>
+                  <h3 className="text-2xl sm:text-3xl font-extrabold text-[#0A192F] font-['Montserrat']">
+                    Application Received!
+                  </h3>
+                  <p className="text-slate-600 text-base max-w-md mx-auto leading-relaxed">
+                    Thank you, <span className="font-bold text-[#0A192F]">{applyForm.parentName}</span>. Your application for <span className="font-bold text-[#800020]">{applyForm.studentName}</span> has been securely submitted to the STAHIZA Admissions Office. Our team will contact you via <span className="font-bold">{applyForm.phone}</span> or office desk ({SCHOOL_CONTACTS.phone1}) within 24 hours.
+                  </p>
+                  <motion.button
+                    whileHover={{ scale: 1.03 }}
+                    whileTap={{ scale: 0.97 }}
+                    onClick={handleClose}
+                    className="px-8 py-3.5 bg-[#0A192F] text-white font-bold rounded-xl shadow-lg hover:bg-[#163c6c] transition"
+                  >
+                    Close & Return to Portal
+                  </motion.button>
+                </motion.div>
+              ) : (
+                <motion.form
+                  key="form"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  onSubmit={handleApplySubmit} 
+                  className="space-y-6"
                 >
-                  <option value="pcm">PCM / BCM (Sciences)</option>
-                  <option value="arts">HEG / MEG / Arts Combination</option>
-                  <option value="olevel-general">O-Level General Curriculum</option>
-                </select>
-              </div>
-            </div>
+                  <div className="flex items-center gap-4">
+                    <motion.div 
+                      whileHover={{ scale: 1.08, rotate: 5 }}
+                      className="p-2 bg-slate-100 rounded-xl"
+                    >
+                      <SchoolBadgeImg size={42} />
+                    </motion.div>
+                    <div>
+                      <span className="text-xs font-bold text-[#800020] uppercase tracking-wider">Admissions 2027</span>
+                      <h3 className="text-2xl font-extrabold text-[#0A192F] font-['Montserrat'] mt-0.5">Online Application Form</h3>
+                    </div>
+                  </div>
 
-            <div>
-              <label className="block text-xs font-bold text-slate-700 mb-1">Previous School Attended</label>
-              <input
-                type="text"
-                value={applyForm.previousSchool}
-                onChange={e => setApplyForm({ ...applyForm, previousSchool: e.target.value })}
-                placeholder="Name of primary or secondary school"
-                className="w-full px-4 py-2.5 rounded-xl border border-slate-300 text-sm focus:ring-2 focus:ring-[#0A192F]"
-              />
-            </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-xs font-bold text-slate-700 mb-1">Student Full Name *</label>
+                      <input
+                        type="text"
+                        required
+                        value={applyForm.studentName}
+                        onChange={e => setApplyForm({ ...applyForm, studentName: e.target.value })}
+                        placeholder="e.g. Mukasa Junior"
+                        className="w-full px-4 py-2.5 rounded-xl border border-slate-300 text-sm focus:ring-2 focus:ring-[#0A192F] focus:outline-none transition"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-bold text-slate-700 mb-1">Parent / Guardian Name *</label>
+                      <input
+                        type="text"
+                        required
+                        value={applyForm.parentName}
+                        onChange={e => setApplyForm({ ...applyForm, parentName: e.target.value })}
+                        placeholder="e.g. Mr. & Mrs. Mukasa"
+                        className="w-full px-4 py-2.5 rounded-xl border border-slate-300 text-sm focus:ring-2 focus:ring-[#0A192F] focus:outline-none transition"
+                      />
+                    </div>
+                  </div>
 
-            <button
-              type="submit"
-              className="w-full py-4 bg-[#800020] hover:bg-[#600018] text-white font-bold rounded-xl shadow-lg transition text-base"
-            >
-              Submit Application to STAHIZA
-            </button>
-          </form>
-        )}
-      </div>
-    </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-xs font-bold text-slate-700 mb-1">Contact Phone Number *</label>
+                      <input
+                        type="tel"
+                        required
+                        value={applyForm.phone}
+                        onChange={e => setApplyForm({ ...applyForm, phone: e.target.value })}
+                        placeholder="e.g. +256 772 831 704"
+                        className="w-full px-4 py-2.5 rounded-xl border border-slate-300 text-sm focus:ring-2 focus:ring-[#0A192F] focus:outline-none transition"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-bold text-slate-700 mb-1">Email Address</label>
+                      <input
+                        type="email"
+                        value={applyForm.email}
+                        onChange={e => setApplyForm({ ...applyForm, email: e.target.value })}
+                        placeholder="parent@gmail.com"
+                        className="w-full px-4 py-2.5 rounded-xl border border-slate-300 text-sm focus:ring-2 focus:ring-[#0A192F] focus:outline-none transition"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-xs font-bold text-slate-700 mb-1">Class Level *</label>
+                      <select
+                        value={applyForm.level}
+                        onChange={e => setApplyForm({ ...applyForm, level: e.target.value })}
+                        className="w-full px-4 py-2.5 rounded-xl border border-slate-300 text-sm bg-white focus:ring-2 focus:ring-[#0A192F] focus:outline-none transition"
+                      >
+                        <option value="o-level">O-Level (Senior One to Four)</option>
+                        <option value="a-level">A-Level (Senior Five & Six)</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label className="block text-xs font-bold text-slate-700 mb-1">Subject Combination / Stream</label>
+                      <select
+                        value={applyForm.combination}
+                        onChange={e => setApplyForm({ ...applyForm, combination: e.target.value })}
+                        className="w-full px-4 py-2.5 rounded-xl border border-slate-300 text-sm bg-white focus:ring-2 focus:ring-[#0A192F] focus:outline-none transition"
+                      >
+                        <option value="pcm">PCM / BCM (Sciences)</option>
+                        <option value="arts">HEG / MEG / Arts Combination</option>
+                        <option value="olevel-general">O-Level General Curriculum</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-bold text-slate-700 mb-1">Previous School Attended</label>
+                    <input
+                      type="text"
+                      value={applyForm.previousSchool}
+                      onChange={e => setApplyForm({ ...applyForm, previousSchool: e.target.value })}
+                      placeholder="Name of primary or secondary school"
+                      className="w-full px-4 py-2.5 rounded-xl border border-slate-300 text-sm focus:ring-2 focus:ring-[#0A192F] focus:outline-none transition"
+                    />
+                  </div>
+
+                  <motion.button
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    type="submit"
+                    className="w-full py-4 bg-[#800020] hover:bg-[#600018] text-white font-bold rounded-xl shadow-lg transition text-base flex items-center justify-center gap-2"
+                  >
+                    <span>Submit Application to STAHIZA</span>
+                    <ArrowRight className="w-5 h-5" />
+                  </motion.button>
+                </motion.form>
+              )}
+            </AnimatePresence>
+          </motion.div>
+        </div>
+      )}
+    </AnimatePresence>
   );
 };
