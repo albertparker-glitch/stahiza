@@ -59,6 +59,24 @@ export const VideoGallery: React.FC = () => {
           title: 'Campus Cleaning & Environment'
         });
 
+        videoItems.push({
+          name: 'cleaning.mp4',
+          url: cleaningVideoUrl,
+          title: 'Campus Cleaning & Environment'
+        });
+
+        videoItems.push({
+          name: 'cleaning.mp4',
+          url: cleaningVideoUrl,
+          title: 'Campus Cleaning & Environment'
+        });
+        
+        videoItems.push({
+          name: 'cleaning.mp4',
+          url: cleaningVideoUrl,
+          title: 'Campus Cleaning & Environment'
+        });
+
         if (!error && files && files.length > 0) {
           const mp4Files = files.filter(f => 
             f.name && 
