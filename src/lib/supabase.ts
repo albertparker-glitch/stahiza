@@ -19,3 +19,9 @@ export function getSupabaseOthersUrl(fileName: string): string {
   const cleanName = fileName.startsWith('/') ? fileName.slice(1) : fileName;
   return `${supabaseUrl}/storage/v1/object/public/IMAGES/others/${cleanName}`;
 }
+
+export function getSupabaseVideosUrl(fileName: string): string {
+  if (!supabaseUrl) return `/pages/images/${fileName}`;
+  const cleanName = fileName.startsWith('/') ? fileName.slice(1) : fileName;
+  return `${supabaseUrl}/storage/v1/object/public/IMAGES/videos/${cleanName}`;
+}

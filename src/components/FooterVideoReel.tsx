@@ -26,12 +26,6 @@ export const FooterVideoReel: React.FC = () => {
         
         {/* REEL HEADER */}
         <div className="text-center max-w-2xl mx-auto space-y-3">
-          <div className="inline-flex items-center gap-2 bg-[#800020]/30 border border-[#800020]/50 px-3.5 py-1 rounded-full text-rose-200 text-xs sm:text-sm font-semibold">
-            <Film className="w-3.5 h-3.5 text-amber-300" />
-            <span>Campus Video Archive</span>
-            <span className="text-slate-400">·</span>
-            <span className="text-amber-300/90 font-mono text-[11px]">IMAGES/others</span>
-          </div>
           <h3 className="text-3xl sm:text-5xl font-extrabold font-['Montserrat'] tracking-tight">
             Stahiza in <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-300 to-rose-400">Motion</span>
           </h3>

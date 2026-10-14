@@ -1,4 +1,4 @@
-import { supabase, getSupabasePublicUrl, getSupabaseOthersUrl } from '../lib/supabase';
+import { supabase, getSupabasePublicUrl, getSupabaseOthersUrl, getSupabaseVideosUrl } from '../lib/supabase';
 
 export interface Leader {
   role: string;
@@ -54,7 +54,7 @@ export const FALLBACK_LEADERS: Leader[] = [
   },
 ];
 
-// Dedicated marquee  data completely independent of leadership data, extracting images from 'others' folder in IMAGES bucket
+// Dedicated marquee staff data completely independent of leadership data, extracting images from 'others' folder in IMAGES bucket
 export const FALLBACK_MARQUEE_STAFF: Leader[] = [
   {
     role: "Staff / Teacher",
@@ -188,7 +188,7 @@ export const FALLBACK_CAMPUS_VIDEOS: CampusVideo[] = [
     title: 'STAHIZA Campus Tour & Aerial Highlights',
     tag: 'Campus Overview',
     duration: '0:45',
-    videoUrl: getSupabasePublicUrl('back.mp4'),
+    videoUrl: getSupabaseVideosUrl('back.mp4'),
     thumbnailUrl: getSupabasePublicUrl('ostricast.jpeg')
   },
   {
@@ -196,7 +196,7 @@ export const FALLBACK_CAMPUS_VIDEOS: CampusVideo[] = [
     title: 'USSSA National Champions in Action',
     tag: 'USSSA Champions',
     duration: '1:15',
-    videoUrl: getSupabaseOthersUrl('hand.jpeg') ? getSupabasePublicUrl('back.mp4') : '/pages/images/back.mp4',
+    videoUrl: getSupabaseVideosUrl('back.mp4'),
     thumbnailUrl: getSupabaseOthersUrl('hand.jpeg')
   },
   {
@@ -204,7 +204,7 @@ export const FALLBACK_CAMPUS_VIDEOS: CampusVideo[] = [
     title: 'Modern Science Labs & UNEB Practicals',
     tag: 'Academics',
     duration: '0:50',
-    videoUrl: getSupabasePublicUrl('back.mp4'),
+    videoUrl: getSupabaseVideosUrl('back.mp4'),
     thumbnailUrl: getSupabaseOthersUrl('complab.jpeg')
   },
   {
@@ -212,7 +212,7 @@ export const FALLBACK_CAMPUS_VIDEOS: CampusVideo[] = [
     title: 'Music, Dance & Drama Cultural Festival',
     tag: 'Co-Curricular',
     duration: '1:30',
-    videoUrl: getSupabasePublicUrl('back.mp4'),
+    videoUrl: getSupabaseVideosUrl('back.mp4'),
     thumbnailUrl: getSupabaseOthersUrl('mdd.jpeg')
   },
   {
@@ -220,7 +220,7 @@ export const FALLBACK_CAMPUS_VIDEOS: CampusVideo[] = [
     title: 'Academic Distinction & UNEB Achievers',
     tag: 'Excellence',
     duration: '0:40',
-    videoUrl: getSupabasePublicUrl('back.mp4'),
+    videoUrl: getSupabaseVideosUrl('back.mp4'),
     thumbnailUrl: getSupabaseOthersUrl('best st.jpeg')
   },
   {
@@ -228,7 +228,7 @@ export const FALLBACK_CAMPUS_VIDEOS: CampusVideo[] = [
     title: 'STAHIZA National Scrabble Champions',
     tag: 'Talent & Games',
     duration: '0:35',
-    videoUrl: getSupabasePublicUrl('back.mp4'),
+    videoUrl: getSupabaseVideosUrl('back.mp4'),
     thumbnailUrl: getSupabaseOthersUrl('scrablle.jpeg')
   }
 ];
@@ -241,7 +241,7 @@ export async function fetchCampusVideos(): Promise<CampusVideo[]> {
   try {
     const { data: files, error } = await supabase.storage
       .from('IMAGES')
-      .list('others', {
+      .list('videos', {
         limit: 50,
         offset: 0,
         sortBy: { column: 'name', order: 'asc' }
@@ -263,7 +263,7 @@ export async function fetchCampusVideos(): Promise<CampusVideo[]> {
           title: formattedName,
           tag: 'Campus Reel',
           duration: '1:00',
-          videoUrl: getSupabaseOthersUrl(fileName),
+          videoUrl: getSupabaseVideosUrl(fileName),
           thumbnailUrl: getSupabaseOthersUrl(fileName.replace(/\.[^/.]+$/, ".jpeg"))
         };
       });
