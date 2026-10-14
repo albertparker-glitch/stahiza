@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Phone, Mail, MapPin, Menu, X, ArrowRight } from 'lucide-react';
+import React, { useState, useRef, useEffect } from 'react';
+import { Phone, Mail, MapPin, Menu, X, ArrowRight, Search } from 'lucide-react';
 import { SchoolBadgeImg } from './SchoolBadgeImg';
 import { SCHOOL_CONTACTS } from '../data/schoolData';
 
@@ -11,6 +11,38 @@ interface NavbarProps {
 
 export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, setApplyModalOpen }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [searchOpen, setSearchOpen] = useState(false);
+  const searchRef = useRef<HTMLDivElement>(null);
+
+  const searchItems = [
+    { title: 'Admissions 2027 / Apply Online', category: 'Admissions', tab: 'home', action: () => setApplyModalOpen(true) },
+    { title: 'Academics & UNEB Programs (Arts & Sciences)', category: 'Academics', tab: 'academics' },
+    { title: 'O-Level & A-Level Curriculum', category: 'Academics', tab: 'academics' },
+    { title: 'USSSA Football & Sports Champions', category: 'Sports', tab: 'sports' },
+    { title: 'Basketball & Netball Teams', category: 'Sports', tab: 'sports' },
+    { title: 'Music, Dance & Drama (MDD)', category: 'Sports', tab: 'sports' },
+    { title: 'School Leadership & Administration', category: 'Leadership', tab: 'leadership' },
+    { title: 'Headteacher Mr. Kurahuka Ostricast', category: 'Leadership', tab: 'leadership' },
+    { title: 'Campus Facilities & Computer Lab', category: 'Campus', tab: 'campus' },
+    { title: 'Contact Us & Office Desk', category: 'Contact', tab: 'contact' },
+    { title: 'Location along Entebbe Road Zzana', category: 'Contact', tab: 'contact' },
+  ];
+
+  const filteredSearch = searchQuery.trim() === '' ? [] : searchItems.filter(item => 
+    item.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    item.category.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  useEffect(() => {
+    function handleClickOutside(e: MouseEvent) {
+      if (searchRef.current && !searchRef.current.contains(e.target as Node)) {
+        setSearchOpen(false);
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   return (
     <>
@@ -41,12 +73,12 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, setAppl
 
       {/* HEADER & NAVIGATION */}
       <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md shadow-sm border-b border-slate-100">
-        <div className="max-w-7xl mx-auto px-4 sm:px-8 h-20 flex items-center justify-between">
+        <div className="max-w-7xl mx-auto px-4 sm:px-8 h-20 flex items-center justify-between gap-4">
           
           {/* LOGO & BRANDING */}
           <div 
             onClick={() => setActiveTab('home')} 
-            className="flex items-center gap-3 cursor-pointer group"
+            className="flex items-center gap-3 cursor-pointer group shrink-0"
           >
             <SchoolBadgeImg size={46} className="transition group-hover:scale-105" />
             <div>
@@ -83,24 +115,82 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, setAppl
             ))}
           </nav>
 
-          {/* CTA APPLY BUTTON */}
-          <div className="hidden sm:flex items-center gap-3">
-            <button
-              onClick={() => setApplyModalOpen(true)}
-              className="bg-[#800020] hover:bg-[#600018] text-white font-semibold px-5 py-2.5 rounded-xl shadow-md hover:shadow-lg transition transform hover:-translate-y-0.5 text-sm flex items-center gap-2"
+          {/* GLOBAL SEARCH & CTA APPLY */}
+          <div className="flex items-center gap-3">
+            {/* Global Search Bar */}
+            <div className="relative" ref={searchRef}>
+              <div className="flex items-center bg-slate-100 rounded-xl px-3 py-2 border border-slate-200 focus-within:ring-2 focus-within:ring-[#0A192F] transition w-44 sm:w-60">
+                <Search className="w-4 h-4 text-slate-400 shrink-0 mr-2" />
+                <input
+                  type="text"
+                  placeholder="Search programs, sports..."
+                  value={searchQuery}
+                  onChange={(e) => {
+                    setSearchQuery(e.target.value);
+                    setSearchOpen(true);
+                  }}
+                  onFocus={() => setSearchOpen(true)}
+                  className="bg-transparent text-xs text-slate-800 placeholder-slate-400 focus:outline-none w-full"
+                />
+                {searchQuery && (
+                  <button onClick={() => setSearchQuery('')} className="text-slate-400 hover:text-slate-600 text-xs">
+                    <X className="w-3.5 h-3.5" />
+                  </button>
+                )}
+              </div>
+
+              {/* Search Dropdown Results */}
+              {searchOpen && filteredSearch.length > 0 && (
+                <div className="absolute right-0 mt-2 w-80 bg-white rounded-2xl shadow-2xl border border-slate-200 py-2 z-50 animate-fadeIn overflow-hidden">
+                  <div className="px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider text-slate-400 border-b border-slate-100">
+                    Search Results ({filteredSearch.length})
+                  </div>
+                  <div className="max-h-64 overflow-y-auto divide-y divide-slate-100">
+                    {filteredSearch.map((res, idx) => (
+                      <button
+                        key={idx}
+                        onClick={() => {
+                          setActiveTab(res.tab);
+                          if (res.action) res.action();
+                          setSearchOpen(false);
+                          setSearchQuery('');
+                        }}
+                        className="w-full text-left px-4 py-2.5 hover:bg-slate-50 transition flex items-center justify-between group"
+                      >
+                        <div>
+                          <div className="text-xs font-semibold text-[#0A192F] group-hover:text-[#800020] transition">
+                            {res.title}
+                          </div>
+                          <span className="text-[10px] text-slate-400 bg-slate-100 px-2 py-0.5 rounded-full inline-block mt-0.5">
+                            {res.category}
+                          </span>
+                        </div>
+                        <ArrowRight className="w-3.5 h-3.5 text-slate-300 group-hover:text-[#0A192F] group-hover:translate-x-0.5 transition shrink-0" />
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+
+            <div className="hidden sm:flex items-center">
+              <button
+                onClick={() => setApplyModalOpen(true)}
+                className="bg-[#800020] hover:bg-[#600018] text-white font-semibold px-4 py-2.5 rounded-xl shadow-md hover:shadow-lg transition transform hover:-translate-y-0.5 text-xs sm:text-sm flex items-center gap-2"
+              >
+                <SchoolBadgeImg size={20} className="w-5 h-5" />
+                <span>Apply Now</span>
+              </button>
+            </div>
+
+            {/* MOBILE BURGER TOGGLE */}
+            <button 
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              className="lg:hidden p-2 text-slate-700 hover:text-[#0A192F]"
             >
-              <SchoolBadgeImg size={22} className="w-5 h-5" />
-              <span>Apply Now</span>
+              {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
             </button>
           </div>
-
-          {/* MOBILE BURGER TOGGLE */}
-          <button 
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="lg:hidden p-2 text-slate-700 hover:text-[#0A192F]"
-          >
-            {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-          </button>
         </div>
 
         {/* MOBILE MENU DROPDOWN */}

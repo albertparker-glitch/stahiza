@@ -1,4 +1,4 @@
-import { supabase, getSupabasePublicUrl, getSupabaseOthersUrl, getSupabaseVideosUrl } from '../lib/supabase';
+import { supabase, getSupabasePublicUrl, getSupabaseOthersUrl } from '../lib/supabase';
 
 export interface Leader {
   role: string;
@@ -54,7 +54,6 @@ export const FALLBACK_LEADERS: Leader[] = [
   },
 ];
 
-// Dedicated marquee staff data completely independent of leadership data, extracting images from 'others' folder in IMAGES bucket
 export const FALLBACK_MARQUEE_STAFF: Leader[] = [
   {
     role: "Staff / Teacher",
@@ -81,17 +80,22 @@ export const FALLBACK_MARQUEE_STAFF: Leader[] = [
     name: "Muslims Success to S4",
     img: getSupabaseOthersUrl("mus.jpeg")
   },
-    {
+  {
+    role: "Staff / Teacher",
+    name: "Coding Championns",
+    img: getSupabaseOthersUrl("code.jpg")
+  },
+  {
     role: "Staff / Teacher",
     name: "Computer Lab",
     img: getSupabaseOthersUrl("complab.jpeg")
   },
-    {
+  {
     role: "Staff / Teacher",
     name: "Food $ Nutrition",
     img: getSupabaseOthersUrl("fnst.jpeg")
   },
-    {
+  {
     role: "Staff / Teacher",
     name: "Music Dance $ Drama",
     img: getSupabaseOthersUrl("mdd.jpeg")
@@ -170,109 +174,6 @@ export async function fetchMarqueeStaff(): Promise<Leader[]> {
   } catch (err) {
     console.error('Fetch marquee staff storage error:', err);
     return FALLBACK_MARQUEE_STAFF;
-  }
-}
-
-export interface CampusVideo {
-  id: string;
-  title: string;
-  tag: string;
-  duration?: string;
-  videoUrl: string;
-  thumbnailUrl?: string;
-}
-
-export const FALLBACK_CAMPUS_VIDEOS: CampusVideo[] = [
-  {
-    id: 'back-tour',
-    title: 'STAHIZA Campus Tour & Aerial Highlights',
-    tag: 'Campus Overview',
-    duration: '0:45',
-    videoUrl: getSupabaseVideosUrl('back.mp4'),
-    thumbnailUrl: getSupabasePublicUrl('ostricast.jpeg')
-  },
-  {
-    id: 'sports-usssa',
-    title: 'USSSA National Champions in Action',
-    tag: 'USSSA Champions',
-    duration: '1:15',
-    videoUrl: getSupabaseVideosUrl('back.mp4'),
-    thumbnailUrl: getSupabaseOthersUrl('hand.jpeg')
-  },
-  {
-    id: 'sciences-lab',
-    title: 'Modern Science Labs & UNEB Practicals',
-    tag: 'Academics',
-    duration: '0:50',
-    videoUrl: getSupabaseVideosUrl('back.mp4'),
-    thumbnailUrl: getSupabaseOthersUrl('complab.jpeg')
-  },
-  {
-    id: 'mdd-showcase',
-    title: 'Music, Dance & Drama Cultural Festival',
-    tag: 'Co-Curricular',
-    duration: '1:30',
-    videoUrl: getSupabaseVideosUrl('back.mp4'),
-    thumbnailUrl: getSupabaseOthersUrl('mdd.jpeg')
-  },
-  {
-    id: 'best-students',
-    title: 'Academic Distinction & UNEB Achievers',
-    tag: 'Excellence',
-    duration: '0:40',
-    videoUrl: getSupabaseVideosUrl('back.mp4'),
-    thumbnailUrl: getSupabaseOthersUrl('best st.jpeg')
-  },
-  {
-    id: 'scrabble-club',
-    title: 'STAHIZA National Scrabble Champions',
-    tag: 'Talent & Games',
-    duration: '0:35',
-    videoUrl: getSupabaseVideosUrl('back.mp4'),
-    thumbnailUrl: getSupabaseOthersUrl('scrablle.jpeg')
-  }
-];
-
-export async function fetchCampusVideos(): Promise<CampusVideo[]> {
-  if (!supabase) {
-    return FALLBACK_CAMPUS_VIDEOS;
-  }
-
-  try {
-    const { data: files, error } = await supabase.storage
-      .from('IMAGES')
-      .list('videos', {
-        limit: 50,
-        offset: 0,
-        sortBy: { column: 'name', order: 'asc' }
-      });
-
-    if (error || !files || files.length === 0) {
-      return FALLBACK_CAMPUS_VIDEOS;
-    }
-
-    const videoFiles = files.filter(f => f.name && /\.(mp4|webm|mov|m4v)$/i.test(f.name));
-
-    if (videoFiles.length > 0) {
-      return videoFiles.map(file => {
-        const fileName = file.name;
-        const cleanName = fileName.replace(/\.[^/.]+$/, "").replace(/[-_]/g, " ");
-        const formattedName = cleanName.charAt(0).toUpperCase() + cleanName.slice(1);
-        return {
-          id: fileName,
-          title: formattedName,
-          tag: 'Campus Reel',
-          duration: '1:00',
-          videoUrl: getSupabaseVideosUrl(fileName),
-          thumbnailUrl: getSupabaseOthersUrl(fileName.replace(/\.[^/.]+$/, ".jpeg"))
-        };
-      });
-    }
-
-    return FALLBACK_CAMPUS_VIDEOS;
-  } catch (err) {
-    console.error('Fetch campus videos error:', err);
-    return FALLBACK_CAMPUS_VIDEOS;
   }
 }
 

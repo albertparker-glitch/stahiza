@@ -54,9 +54,9 @@ export const VideoGallery: React.FC = () => {
         });
 
         videoItems.push({
-          name: 'cleaning.mp4',
-          url: cleaningVideoUrl,
-          title: 'Campus Cleaning & Environment'
+          name: 'back4.mp4',
+          url: back4VideoUrl,
+          title: 'STAHIZA Campus Highlight'
         });
 
         videoItems.push({
@@ -70,7 +70,13 @@ export const VideoGallery: React.FC = () => {
           url: cleaningVideoUrl,
           title: 'Campus Cleaning & Environment'
         });
-        
+
+        videoItems.push({
+          name: 'cleaning.mp4',
+          url: cleaningVideoUrl,
+          title: 'Campus Cleaning & Environment'
+        });
+
         videoItems.push({
           name: 'cleaning.mp4',
           url: cleaningVideoUrl,
