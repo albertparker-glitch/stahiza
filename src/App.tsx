@@ -25,7 +25,7 @@ import { ApplyModal } from './components/ApplyModal';
 import { ContactSection } from './components/ContactSection';
 import { VideoGallery } from './components/VideoGallery';
 import { Leader, TopStudent, fetchLeaders, fetchMarqueeStaff, fetchTopStudents, SCHOOL_CONTACTS } from './data/schoolData';
-import { getSupabasePublicUrl } from './lib/supabase';
+import { getSupabasePublicUrl, getSupabaseOthersUrl } from './lib/supabase';
 import { motion, AnimatePresence } from 'motion/react';
 
 export default function App() {
@@ -44,11 +44,19 @@ export default function App() {
     }
     window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
 
+    // Ensure initial scroll position stays at top even if dynamic content loads
+    const timer1 = setTimeout(() => window.scrollTo({ top: 0, left: 0, behavior: 'instant' }), 50);
+    const timer2 = setTimeout(() => window.scrollTo({ top: 0, left: 0, behavior: 'instant' }), 250);
+
     const handleScroll = () => {
       setShowBackToTop(window.scrollY > 300);
     };
     window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
+    return () => {
+      clearTimeout(timer1);
+      clearTimeout(timer2);
+      window.removeEventListener('scroll', handleScroll);
+    };
   }, []);
 
   useEffect(() => {
@@ -732,12 +740,48 @@ export default function App() {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                   {[
-                    { title: "Modern Science Labs", desc: "Fully equipped Physics, Chemistry and Biology laboratories for practical mastery." },
-                    { title: "Computer Laboratory", desc: "High-speed internet and modern desktop terminals for ICT research." },
-                    { title: "Comfortable Dormitories", desc: "Secure, spacious boarding facilities with 24/7 warden supervision." },
-                    { title: "Spacious Dining Hall", desc: "Nutritious, well-prepared meals served in a clean hygienic environment." },
-                    { title: "Sports Grounds", desc: "Standard football pitch, basketball and netball courts for athletics and championships." },
-                    { title: "School Library", desc: "Extensive collection of textbooks, UNEB past papers, and reading quiet zones." },
+                    { 
+                      title: "Modern Science Labs", 
+                      desc: "Fully equipped Physics, Chemistry and Biology laboratories with specialized apparatus for practical mastery and UNEB national exams.",
+                      tag: "Physics, Chem & Biology",
+                      img: "https://images.unsplash.com/photo-1532094349884-543bc11b234d?auto=format&fit=crop&w=800&q=80",
+                      fallbackImg: "/pages/images/odeke.jpeg"
+                    },
+                    { 
+                      title: "Computer Laboratory", 
+                      desc: "High-speed internet and modern desktop terminals for ICT lessons, coding, research, and national UNEB ICT examinations.",
+                      tag: "ICT & Digital Research",
+                      img: getSupabaseOthersUrl("complab.jpeg"),
+                      fallbackImg: "https://images.unsplash.com/photo-1581092921461-eab62e97a780?auto=format&fit=crop&w=800&q=80"
+                    },
+                    { 
+                      title: "Comfortable Dormitories", 
+                      desc: "Secure, spacious boarding facilities for boys and girls with 24/7 warden supervision, running water, and study spaces.",
+                      tag: "Boarding & Resident Life",
+                      img: "https://images.unsplash.com/photo-1555854877-bab0e564b8d5?auto=format&fit=crop&w=800&q=80",
+                      fallbackImg: "/pages/images/bena.jpeg"
+                    },
+                    { 
+                      title: "Spacious Dining Hall", 
+                      desc: "Nutritious, well-balanced meals prepared under high culinary hygiene standards to fuel active learning and athletics.",
+                      tag: "Food & Nutrition Center",
+                      img: getSupabaseOthersUrl("fnst.jpeg"),
+                      fallbackImg: "https://images.unsplash.com/photo-1577495508048-b635879837f1?auto=format&fit=crop&w=800&q=80"
+                    },
+                    { 
+                      title: "Sports Grounds & Courts", 
+                      desc: "Full-size football pitch, championship basketball & netball courts where national championship talents are groomed.",
+                      tag: "Football, Netball & Courts",
+                      img: getSupabaseOthersUrl("hand.jpeg"),
+                      fallbackImg: "https://images.unsplash.com/photo-1574629810360-7efbbe195018?auto=format&fit=crop&w=800&q=80"
+                    },
+                    { 
+                      title: "School Library & Resource Center", 
+                      desc: "Extensive archive of syllabi textbooks, encyclopedias, past UNEB examination papers, and quiet revision zones.",
+                      tag: "Quiet Study & Archives",
+                      img: getSupabaseOthersUrl("dedication 2026 s4.jpeg"),
+                      fallbackImg: "https://images.unsplash.com/photo-1521587760476-6c12a4b040da?auto=format&fit=crop&w=800&q=80"
+                    },
                   ].map((fac, idx) => (
                     <motion.div 
                       key={idx} 
@@ -745,16 +789,41 @@ export default function App() {
                       whileInView={{ opacity: 1, y: 0 }}
                       viewport={{ once: true, margin: "-40px" }}
                       transition={{ duration: 0.45, delay: (idx % 3) * 0.1, ease: "easeOut" }}
-                      className="bg-white rounded-2xl p-6 shadow-sm border border-slate-200 space-y-3 hover:shadow-md transition hover:-translate-y-1"
+                      className="bg-white rounded-2xl overflow-hidden shadow-sm border border-slate-200 flex flex-col hover:shadow-xl transition-all duration-300 hover:-translate-y-1 group"
                     >
-                      <div className="flex items-center justify-between">
-                        <div className="w-10 h-10 rounded-xl bg-[#0A192F]/15 text-[#0A192F] flex items-center justify-center">
-                          <Building2 className="w-5 h-5" />
+                      <div className="relative w-full h-48 sm:h-52 bg-slate-100 overflow-hidden">
+                        <img 
+                          src={fac.img} 
+                          alt={fac.title}
+                          onError={(e) => {
+                            if (fac.fallbackImg && (e.currentTarget.src !== fac.fallbackImg)) {
+                              e.currentTarget.src = fac.fallbackImg;
+                            }
+                          }}
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" 
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-[#0A192F]/85 via-black/20 to-transparent" />
+                        <div className="absolute top-3 right-3 bg-white/95 backdrop-blur-sm p-1.5 rounded-xl shadow-md">
+                          <SchoolBadgeImg size={24} />
                         </div>
-                        <SchoolBadgeImg size={30} />
+                        <div className="absolute bottom-3 left-3 bg-[#0A192F]/90 backdrop-blur-sm text-amber-300 text-xs font-bold px-3 py-1 rounded-full border border-amber-300/30 shadow-md">
+                          {fac.tag}
+                        </div>
                       </div>
-                      <h4 className="font-bold text-lg font-['Montserrat'] text-[#0A192F]">{fac.title}</h4>
-                      <p className="text-slate-600 text-sm leading-relaxed">{fac.desc}</p>
+                      <div className="p-5 sm:p-6 flex-1 flex flex-col justify-between space-y-3">
+                        <div>
+                          <h4 className="font-bold text-lg font-['Montserrat'] text-[#0A192F] group-hover:text-[#800020] transition-colors">
+                            {fac.title}
+                          </h4>
+                          <p className="text-slate-600 text-sm leading-relaxed mt-2">{fac.desc}</p>
+                        </div>
+                        <div className="pt-3 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500 font-medium">
+                          <span className="flex items-center gap-1.5 text-[#800020] font-semibold">
+                            <Sparkles className="w-3.5 h-3.5" /> STAHIZA Standard
+                          </span>
+                          <span className="bg-slate-100 px-2.5 py-0.5 rounded-md font-mono text-[11px] text-slate-600">Facility</span>
+                        </div>
+                      </div>
                     </motion.div>
                   ))}
                 </div>
@@ -775,7 +844,7 @@ export default function App() {
                         Clubs & Societies
                       </h3>
                       <span className="text-[10px] sm:text-xs text-slate-500 font-semibold uppercase tracking-wider">
-                        5 Active Co-Curricular & Championship Teams
+                        Active Co-Curricular & Championship Teams
                       </span>
                     </div>
                   </div>
@@ -790,13 +859,50 @@ export default function App() {
                   </button>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                   {[
-                    { title: "Scrabble & Board Games Club", desc: "National champions in competitive scrabble, sharpening cognitive agility." },
-                    { title: "Music, Dance & Drama (MDD)", desc: "Cultural preservation, choral music, traditional dance, and theatrical plays." },
-                    { title: "Debate & Writers Society", desc: "Developing eloquent speakers and analytical thinkers for national debate circuits." },
-                    { title: "Science & Innovation Club", desc: "Hands-on projects, coding, robotics, and scientific experiments." },
-                    { title: "Scouts & Girl Guides", desc: "Leadership, survival skills, community service, and discipline." },
+                    { 
+                      title: "Scrabble & Board Games Club", 
+                      desc: "National champions in competitive Ugandan scrabble, developing advanced vocabulary, strategic calculation, and tournament grit.",
+                      tag: "National Champions",
+                      img: getSupabaseOthersUrl("scrablle.jpeg"),
+                      fallbackImg: "https://images.unsplash.com/photo-1610890716171-6b1bb98ffd09?auto=format&fit=crop&w=800&q=80"
+                    },
+                    { 
+                      title: "Music, Dance & Drama (MDD)", 
+                      desc: "Cultural heritage preservation through traditional folklore dances, instrumental orchestra, choral singing, and stage theatre.",
+                      tag: "Gold Medalists 2025",
+                      img: getSupabaseOthersUrl("mdd.jpeg"),
+                      fallbackImg: "https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?auto=format&fit=crop&w=800&q=80"
+                    },
+                    { 
+                      title: "Science, Tech & Coding Club", 
+                      desc: "Hands-on software development, robotics, circuitry experiments, and science fair innovations led by passionate student innovators.",
+                      tag: "Coding & Tech Champions",
+                      img: getSupabaseOthersUrl("code.jpg"),
+                      fallbackImg: "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?auto=format&fit=crop&w=800&q=80"
+                    },
+                    { 
+                      title: "Debate & Writers Society", 
+                      desc: "Eloquent public speaking, argumentative discourse, essay writing, and analytical reasoning preparing future leaders for national circuits.",
+                      tag: "National Debate Circuit",
+                      img: "https://images.unsplash.com/photo-1524178232363-1fb2b075b655?auto=format&fit=crop&w=800&q=80",
+                      fallbackImg: "/pages/images/odeke.jpeg"
+                    },
+                    { 
+                      title: "Scouts, Guides & Religious Fellowships", 
+                      desc: "Character formation, outdoor campcraft, community volunteer service, moral integrity, and leadership discipline.",
+                      tag: "Leadership & Discipline",
+                      img: getSupabaseOthersUrl("mus.jpeg"),
+                      fallbackImg: "https://images.unsplash.com/photo-1529156069898-49953e39b3ac?auto=format&fit=crop&w=800&q=80"
+                    },
+                    { 
+                      title: "Sports Academy & Girls FC", 
+                      desc: "Premier sports training in football, athletics, and basketball, creating avenues for international scout trials and national championships.",
+                      tag: "USSSA Powerhouse",
+                      img: getSupabaseOthersUrl("hand.jpeg"),
+                      fallbackImg: "https://images.unsplash.com/photo-1508098682722-e99c43a406b2?auto=format&fit=crop&w=800&q=80"
+                    },
                   ].map((club, idx) => (
                     <motion.div 
                       key={idx} 
@@ -804,13 +910,41 @@ export default function App() {
                       whileInView={{ opacity: 1, y: 0 }}
                       viewport={{ once: true, margin: "-40px" }}
                       transition={{ duration: 0.45, delay: (idx % 3) * 0.1, ease: "easeOut" }}
-                      className="bg-white rounded-2xl p-6 shadow-sm border border-slate-200 space-y-3 hover:shadow-md transition hover:-translate-y-1"
+                      className="bg-white rounded-2xl overflow-hidden shadow-sm border border-slate-200 flex flex-col hover:shadow-xl transition-all duration-300 hover:-translate-y-1 group"
                     >
-                      <div className="w-10 h-10 rounded-xl bg-[#800020]/10 text-[#800020] flex items-center justify-center font-bold">
-                        {idx + 1}
+                      <div className="relative w-full h-48 sm:h-52 bg-slate-100 overflow-hidden">
+                        <img 
+                          src={club.img} 
+                          alt={club.title}
+                          onError={(e) => {
+                            if (club.fallbackImg && (e.currentTarget.src !== club.fallbackImg)) {
+                              e.currentTarget.src = club.fallbackImg;
+                            }
+                          }}
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" 
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-[#0A192F]/85 via-black/20 to-transparent" />
+                        <div className="absolute top-3 right-3 bg-white/95 backdrop-blur-sm p-1.5 rounded-xl shadow-md">
+                          <SchoolBadgeImg size={24} />
+                        </div>
+                        <div className="absolute bottom-3 left-3 bg-[#800020]/90 backdrop-blur-sm text-amber-200 text-xs font-bold px-3 py-1 rounded-full border border-amber-300/30 shadow-md">
+                          {club.tag}
+                        </div>
                       </div>
-                      <h4 className="font-bold text-lg font-['Montserrat'] text-[#0A192F]">{club.title}</h4>
-                      <p className="text-slate-600 text-sm leading-relaxed">{club.desc}</p>
+                      <div className="p-5 sm:p-6 flex-1 flex flex-col justify-between space-y-3">
+                        <div>
+                          <h4 className="font-bold text-lg font-['Montserrat'] text-[#0A192F] group-hover:text-[#800020] transition-colors">
+                            {club.title}
+                          </h4>
+                          <p className="text-slate-600 text-sm leading-relaxed mt-2">{club.desc}</p>
+                        </div>
+                        <div className="pt-3 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500 font-medium">
+                          <span className="flex items-center gap-1.5 text-[#800020] font-semibold">
+                            <Trophy className="w-3.5 h-3.5" /> STAHIZA Co-Curricular
+                          </span>
+                          <span className="bg-rose-50 text-[#800020] px-2.5 py-0.5 rounded-md font-mono text-[11px] font-semibold">Club #{idx + 1}</span>
+                        </div>
+                      </div>
                     </motion.div>
                   ))}
                 </div>

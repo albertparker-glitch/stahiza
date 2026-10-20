@@ -2,7 +2,6 @@ import React from 'react';
 import { Phone, Mail, MapPin, ChevronRight, Facebook, Twitter, Instagram, Youtube } from 'lucide-react';
 import { SchoolBadgeImg } from './SchoolBadgeImg';
 import { SCHOOL_CONTACTS } from '../data/schoolData';
-import { FooterVideoShowcase } from './FooterVideoShowcase';
 
 interface FooterProps {
   setActiveTab: (tab: any) => void;
@@ -12,9 +11,6 @@ interface FooterProps {
 export const Footer: React.FC<FooterProps> = ({ setActiveTab, setApplyModalOpen }) => {
   return (
     <footer className="bg-[#0A192F] text-slate-300 border-t border-slate-800">
-      {/* TOP DIV: VIDEOS FROM SUPABASE (IMAGES/OTHERS) WITH HOVER AUTO-PLAY & THUMB SCROLL */}
-      <FooterVideoShowcase />
-
       <div className="max-w-7xl mx-auto px-4 sm:px-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 pt-16 pb-12 border-b border-slate-800">
         
         {/* COLUMN 1: ADDRESS & CONTACT */}
