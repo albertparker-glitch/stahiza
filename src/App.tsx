@@ -31,6 +31,7 @@ export default function App() {
   const [leaders, setLeaders] = useState<Leader[]>([]);
   const [marqueeStaff, setMarqueeStaff] = useState<Leader[]>([]);
   const [topStudents, setTopStudents] = useState<TopStudent[]>([]);
+  const [campusSection, setCampusSection] = useState<'all' | 'facilities' | 'clubs' | 'prefects' | 'teachers' | 'staff' | 'gallery'>('all');
 
   useEffect(() => {
     fetchLeaders().then(data => setLeaders(data));
@@ -645,32 +646,163 @@ export default function App() {
               <SchoolBadgeImg size={56} className="mx-auto" />
               <span className="text-[#800020] font-bold uppercase tracking-wider text-sm block">Life at STAHIZA</span>
               <h2 className="text-3xl sm:text-5xl font-extrabold font-['Montserrat'] text-[#0A192F]">
-                Campus & Boarding Facilities
+                Campus Life & Directory
               </h2>
               <p className="text-slate-600 text-base">
-                A serene, secure, and conducive learning environment along Entebbe Road.
+                Explore campus facilities, student clubs, prefects cabinet, teachers, staff, and photo gallery.
               </p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              {[
-                { title: "Modern Science Labs", desc: "Fully equipped Physics, Chemistry and Biology laboratories for practical mastery." },
-                { title: "Computer Laboratory", desc: "High-speed internet and modern desktop terminals for ICT research." },
-                { title: "Comfortable Dormitories", desc: "Secure, spacious boarding facilities with 24/7 warden supervision." },
-                { title: "Spacious Dining Hall", desc: "Nutritious, well-prepared meals served in a clean hygienic environment." },
-              ].map((fac, idx) => (
-                <div key={idx} className="bg-white rounded-2xl p-6 shadow-sm border border-slate-200 space-y-3">
-                  <div className="flex items-center justify-between">
-                    <div className="w-10 h-10 rounded-xl bg-[#0A192F]/15 text-[#0A192F] flex items-center justify-center">
-                      <Building2 className="w-5 h-5" />
-                    </div>
-                    <SchoolBadgeImg size={30} />
-                  </div>
-                  <h3 className="font-bold text-lg font-['Montserrat'] text-[#0A192F]">{fac.title}</h3>
-                  <p className="text-slate-600 text-sm leading-relaxed">{fac.desc}</p>
-                </div>
-              ))}
+            {/* CAMPUS SECTION DROPDOWN / FILTER SELECTOR */}
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-3 bg-white p-4 rounded-2xl shadow-md border border-slate-200 max-w-xl mx-auto">
+              <label className="text-xs font-bold uppercase tracking-wider text-slate-500 whitespace-nowrap">Campus Section:</label>
+              <select
+                value={campusSection}
+                onChange={(e) => setCampusSection(e.target.value as any)}
+                className="bg-slate-100 border border-slate-300 rounded-xl px-4 py-2.5 text-sm font-bold text-[#0A192F] focus:outline-none focus:ring-2 focus:ring-[#0A192F] w-full sm:w-auto"
+              >
+                <option value="all">All Sections (Overview)</option>
+                <option value="facilities">Facilities</option>
+                <option value="clubs">Clubs & Societies</option>
+                <option value="prefects">Prefects Cabinet</option>
+                <option value="teachers">Teachers & Administration</option>
+                <option value="staff">Staff Members</option>
+                <option value="gallery">Photo Gallery</option>
+              </select>
             </div>
+
+            {/* FACILITIES SECTION */}
+            {(campusSection === 'all' || campusSection === 'facilities') && (
+              <div className="space-y-6">
+                <h3 className="text-2xl font-extrabold font-['Montserrat'] text-[#0A192F] border-b pb-2">Campus Facilities</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {[
+                    { title: "Modern Science Labs", desc: "Fully equipped Physics, Chemistry and Biology laboratories for practical mastery." },
+                    { title: "Computer Laboratory", desc: "High-speed internet and modern desktop terminals for ICT research." },
+                    { title: "Comfortable Dormitories", desc: "Secure, spacious boarding facilities with 24/7 warden supervision." },
+                    { title: "Spacious Dining Hall", desc: "Nutritious, well-prepared meals served in a clean hygienic environment." },
+                    { title: "Sports Grounds", desc: "Standard football pitch, basketball and netball courts for athletics and championships." },
+                    { title: "School Library", desc: "Extensive collection of textbooks, UNEB past papers, and reading quiet zones." },
+                  ].map((fac, idx) => (
+                    <div key={idx} className="bg-white rounded-2xl p-6 shadow-sm border border-slate-200 space-y-3 hover:shadow-md transition">
+                      <div className="flex items-center justify-between">
+                        <div className="w-10 h-10 rounded-xl bg-[#0A192F]/15 text-[#0A192F] flex items-center justify-center">
+                          <Building2 className="w-5 h-5" />
+                        </div>
+                        <SchoolBadgeImg size={30} />
+                      </div>
+                      <h4 className="font-bold text-lg font-['Montserrat'] text-[#0A192F]">{fac.title}</h4>
+                      <p className="text-slate-600 text-sm leading-relaxed">{fac.desc}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* CLUBS SECTION */}
+            {(campusSection === 'all' || campusSection === 'clubs') && (
+              <div className="space-y-6">
+                <h3 className="text-2xl font-extrabold font-['Montserrat'] text-[#0A192F] border-b pb-2">Clubs & Societies</h3>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  {[
+                    { title: "Scrabble & Board Games Club", desc: "National champions in competitive scrabble, sharpening cognitive agility." },
+                    { title: "Music, Dance & Drama (MDD)", desc: "Cultural preservation, choral music, traditional dance, and theatrical plays." },
+                    { title: "Debate & Writers Society", desc: "Developing eloquent speakers and analytical thinkers for national debate circuits." },
+                    { title: "Science & Innovation Club", desc: "Hands-on projects, coding, robotics, and scientific experiments." },
+                    { title: "Scouts & Girl Guides", desc: "Leadership, survival skills, community service, and discipline." },
+                  ].map((club, idx) => (
+                    <div key={idx} className="bg-white rounded-2xl p-6 shadow-sm border border-slate-200 space-y-3 hover:shadow-md transition">
+                      <div className="w-10 h-10 rounded-xl bg-[#800020]/10 text-[#800020] flex items-center justify-center font-bold">
+                        {idx + 1}
+                      </div>
+                      <h4 className="font-bold text-lg font-['Montserrat'] text-[#0A192F]">{club.title}</h4>
+                      <p className="text-slate-600 text-sm leading-relaxed">{club.desc}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* PREFECTS SECTION */}
+            {(campusSection === 'all' || campusSection === 'prefects') && (
+              <div className="space-y-6">
+                <h3 className="text-2xl font-extrabold font-['Montserrat'] text-[#0A192F] border-b pb-2">Prefects Cabinet & Student Leadership</h3>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  {leaders.filter(l => l.role.toLowerCase().includes('prefect') || l.role.toLowerCase().includes('cabinet') || l.role.toLowerCase().includes('unsa') || l.role.toLowerCase().includes('top')).map((pref, idx) => (
+                    <div key={idx} className="bg-white rounded-2xl overflow-hidden shadow-sm border border-slate-200 flex flex-col">
+                      <div className="relative w-full h-72 bg-slate-100 overflow-hidden">
+                        <img src={pref.img} alt={pref.name} className="w-full h-full object-cover object-top" />
+                        <div className="absolute top-3 right-3 bg-white p-2 rounded-xl shadow"><SchoolBadgeImg size={24} /></div>
+                        <div className="absolute bottom-3 left-3 bg-[#800020] text-white text-xs font-bold px-3 py-1 rounded-full">
+                          {pref.role}
+                        </div>
+                      </div>
+                      <div className="p-4 bg-white text-center">
+                        <h4 className="font-extrabold text-base font-['Montserrat'] text-[#0A192F]">{pref.name}</h4>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* TEACHERS SECTION */}
+            {(campusSection === 'all' || campusSection === 'teachers') && (
+              <div className="space-y-6">
+                <h3 className="text-2xl font-extrabold font-['Montserrat'] text-[#0A192F] border-b pb-2">Teachers & Administration</h3>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  {leaders.map((teacher, idx) => (
+                    <div key={idx} className="bg-white rounded-2xl overflow-hidden shadow-sm border border-slate-200 flex flex-col">
+                      <div className="relative w-full h-72 bg-slate-100 overflow-hidden">
+                        <img src={teacher.img} alt={teacher.name} className="w-full h-full object-cover object-top" />
+                        <div className="absolute top-3 right-3 bg-white p-2 rounded-xl shadow"><SchoolBadgeImg size={24} /></div>
+                        <div className="absolute bottom-3 left-3 bg-[#0A192F] text-white text-xs font-bold px-3 py-1 rounded-full">
+                          {teacher.role}
+                        </div>
+                      </div>
+                      <div className="p-4 bg-white text-center">
+                        <h4 className="font-extrabold text-base font-['Montserrat'] text-[#0A192F]">{teacher.name}</h4>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* STAFF SECTION */}
+            {(campusSection === 'all' || campusSection === 'staff') && (
+              <div className="space-y-6">
+                <h3 className="text-2xl font-extrabold font-['Montserrat'] text-[#0A192F] border-b pb-2">Staff Members</h3>
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-6">
+                  {marqueeStaff.map((st, idx) => (
+                    <div key={idx} className="bg-white rounded-2xl overflow-hidden shadow-sm border border-slate-200 flex flex-col">
+                      <div className="relative w-full h-44 bg-slate-100 overflow-hidden">
+                        <img src={st.img} alt={st.name} className="w-full h-full object-cover object-top" />
+                      </div>
+                      <div className="p-3 bg-white text-center">
+                        <h4 className="font-bold text-xs sm:text-sm text-[#0A192F] truncate">{st.name}</h4>
+                        <span className="text-[10px] text-slate-500">{st.role}</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* GALLERY SECTION */}
+            {(campusSection === 'all' || campusSection === 'gallery') && (
+              <div className="space-y-6">
+                <h3 className="text-2xl font-extrabold font-['Montserrat'] text-[#0A192F] border-b pb-2">Photo Gallery</h3>
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+                  {[...marqueeStaff, ...leaders].map((item, idx) => (
+                    <div key={idx} className="rounded-2xl overflow-hidden shadow border border-slate-200 group h-48 bg-slate-100">
+                      <img src={item.img} alt={item.name} className="w-full h-full object-cover group-hover:scale-110 transition duration-500" />
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
           </div>
         )}
 
