@@ -256,6 +256,153 @@ export async function fetchTopStudents(): Promise<TopStudent[]> {
   }
 }
 
+export interface CampusVideo {
+  id: string;
+  title: string;
+  videoUrl: string;
+  thumbnailUrl: string;
+  tag: string;
+}
+
+export interface SchoolVideoItem {
+  id: string;
+  title: string;
+  category: string;
+  url: string;
+  thumbnail?: string;
+  duration?: string;
+}
+
+export const FALLBACK_CAMPUS_VIDEOS: CampusVideo[] = [
+  {
+    id: "vid-campus-aerial",
+    title: "STAHIZA Campus & Gate Aerial Tour",
+    videoUrl: getSupabaseOthersUrl("back.mp4"),
+    thumbnailUrl: getSupabasePublicUrl("badge.png"),
+    tag: "Campus Life"
+  },
+  {
+    id: "vid-sports-champions",
+    title: "USSSA National Soccer & Sports Champions",
+    videoUrl: getSupabaseOthersUrl("sports.mp4"),
+    thumbnailUrl: getSupabaseOthersUrl("hand.jpeg"),
+    tag: "Sports Excellence"
+  },
+  {
+    id: "vid-science-labs",
+    title: "UNEB Science Practical Experiments",
+    videoUrl: getSupabaseOthersUrl("labs.mp4"),
+    thumbnailUrl: getSupabaseOthersUrl("complab.jpeg"),
+    tag: "Academics"
+  }
+];
+
+export async function fetchCampusVideos(): Promise<CampusVideo[]> {
+  const videos = await fetchSchoolVideos();
+  return videos.map(v => ({
+    id: v.id,
+    title: v.title,
+    videoUrl: v.url,
+    thumbnailUrl: v.thumbnail || getSupabasePublicUrl("badge.png"),
+    tag: v.category
+  }));
+}
+
+export const FALLBACK_VIDEOS: SchoolVideoItem[] = [
+  {
+    id: "vid-campus-aerial",
+    title: "STAHIZA Campus & Gate Aerial Tour",
+    category: "Campus Life",
+    url: getSupabaseOthersUrl("back.mp4"),
+    thumbnail: getSupabasePublicUrl("badge.png"),
+    duration: "0:45"
+  },
+  {
+    id: "vid-sports-champions",
+    title: "USSSA National Soccer & Sports Champions",
+    category: "Sports Excellence",
+    url: getSupabaseOthersUrl("sports.mp4"),
+    thumbnail: getSupabaseOthersUrl("hand.jpeg"),
+    duration: "1:20"
+  },
+  {
+    id: "vid-science-labs",
+    title: "UNEB Science Practical Experiments",
+    category: "Academics",
+    url: getSupabaseOthersUrl("labs.mp4"),
+    thumbnail: getSupabaseOthersUrl("complab.jpeg"),
+    duration: "1:05"
+  },
+  {
+    id: "vid-mdd-gala",
+    title: "Music, Dance & Drama Cultural Festival",
+    category: "Talents & Culture",
+    url: getSupabaseOthersUrl("mdd.mp4"),
+    thumbnail: getSupabaseOthersUrl("mdd.jpeg"),
+    duration: "2:10"
+  },
+  {
+    id: "vid-speech-day",
+    title: "Annual Dedication & Speech Day Assembly",
+    category: "School Traditions",
+    url: getSupabaseOthersUrl("assembly.mp4"),
+    thumbnail: getSupabaseOthersUrl("dedication 2026 s4.jpeg"),
+    duration: "1:40"
+  }
+];
+
+export async function fetchSchoolVideos(): Promise<SchoolVideoItem[]> {
+  if (!supabase) {
+    return FALLBACK_VIDEOS;
+  }
+
+  try {
+    // Check both 'others' and 'videos' folders in IMAGES bucket
+    const { data: files, error } = await supabase.storage
+      .from('IMAGES')
+      .list('others', {
+        limit: 50,
+        offset: 0,
+        sortBy: { column: 'name', order: 'asc' }
+      });
+
+    if (error || !files || files.length === 0) {
+      return FALLBACK_VIDEOS;
+    }
+
+    const videoExts = ['.mp4', '.webm', '.mov', '.m4v'];
+    const videoFiles = files.filter(f => 
+      f.name && 
+      f.name !== '.emptyFolderPlaceholder' && 
+      videoExts.some(ext => f.name.toLowerCase().endsWith(ext))
+    );
+
+    if (videoFiles.length === 0) {
+      // If no mp4 found directly in 'others', check if 'back.mp4' is accessible
+      return FALLBACK_VIDEOS;
+    }
+
+    const list: SchoolVideoItem[] = videoFiles.map((file, idx) => {
+      const fileName = file.name;
+      const cleanName = fileName.replace(/\.[^/.]+$/, "").replace(/[-_]/g, " ");
+      const formattedTitle = cleanName.charAt(0).toUpperCase() + cleanName.slice(1);
+      return {
+        id: `supabase-vid-${idx}`,
+        title: formattedTitle,
+        category: "STAHIZA Media",
+        url: getSupabaseOthersUrl(fileName),
+        thumbnail: getSupabasePublicUrl("badge.png"),
+        duration: "Live Clip"
+      };
+    });
+
+    return list.length > 0 ? list : FALLBACK_VIDEOS;
+  } catch (err) {
+    console.error('Fetch school videos storage error:', err);
+    return FALLBACK_VIDEOS;
+  }
+}
+
 export const SCHOOL_CONTACTS = {
   phone1: "+256 772 831 704",
   phone2: "+256 782 316 838",
@@ -264,3 +411,4 @@ export const SCHOOL_CONTACTS = {
   box: "P.O. Box 22981 Kampala - Uganda",
   hours: "Mon – Fri: 7:30 AM – 5:00 PM, Sat: 9:00 AM – 1:00 PM"
 };
+

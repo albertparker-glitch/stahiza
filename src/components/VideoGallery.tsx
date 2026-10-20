@@ -67,18 +67,21 @@ export const VideoGallery: React.FC = () => {
             f.name.toLowerCase() !== 'back4.mp4'
           );
           
-          mp4Files.forEach(file => {
-            const { data } = supabase.storage.from('IMAGES').getPublicUrl(`videos/${file.name}`);
-            const cleanTitle = file.name
-              .replace(/\.[^/.]+$/, '')
-              .replace(/[-_]/g, ' ')
-              .replace(/\b\w/g, c => c.toUpperCase());
-            videoItems.push({
-              name: file.name,
-              url: data.publicUrl,
-              title: cleanTitle
+          if (supabase) {
+            const client = supabase;
+            mp4Files.forEach(file => {
+              const { data } = client.storage.from('IMAGES').getPublicUrl(`videos/${file.name}`);
+              const cleanTitle = file.name
+                .replace(/\.[^/.]+$/, '')
+                .replace(/[-_]/g, ' ')
+                .replace(/\b\w/g, c => c.toUpperCase());
+              videoItems.push({
+                name: file.name,
+                url: data.publicUrl,
+                title: cleanTitle
+              });
             });
-          });
+          }
         }
 
         setVideos(videoItems);

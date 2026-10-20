@@ -13,7 +13,12 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, setAppl
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [searchOpen, setSearchOpen] = useState(false);
+  const [isSearchHovered, setIsSearchHovered] = useState(false);
+  const [isSearchFocused, setIsSearchFocused] = useState(false);
   const searchRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  const isExpanded = isSearchFocused || isSearchHovered || searchOpen || searchQuery.trim().length > 0;
 
   const searchItems = [
     { title: 'Admissions 2027 / Apply Online', category: 'Admissions', tab: 'home', action: () => setApplyModalOpen(true) },
@@ -91,8 +96,8 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, setAppl
             </div>
           </div>
 
-          {/* DESKTOP NAV LINKS */}
-          <nav className="hidden lg:flex items-center gap-1 font-medium text-sm text-slate-700">
+          {/* DESKTOP NAV LINKS (SINGLE LINE, PREVENTS WRAPPING) */}
+          <nav className="hidden lg:flex items-center gap-0.5 xl:gap-1 font-medium text-xs xl:text-sm text-slate-700 whitespace-nowrap flex-nowrap shrink-0">
             {[
               { id: 'home', label: 'Home' },
               { id: 'leadership', label: 'Leadership' },
@@ -104,7 +109,7 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, setAppl
               <button
                 key={item.id}
                 onClick={() => setActiveTab(item.id)}
-                className={`px-4 py-2 rounded-lg transition ${
+                className={`px-3 xl:px-4 py-2 rounded-lg transition whitespace-nowrap ${
                   activeTab === item.id 
                     ? 'bg-[#0A192F] text-white font-semibold shadow-sm' 
                     : 'hover:bg-slate-100 hover:text-[#0A192F]'
@@ -117,23 +122,63 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, setAppl
 
           {/* GLOBAL SEARCH & CTA APPLY */}
           <div className="flex items-center gap-2 sm:gap-3 shrink-0">
-            {/* Global Search Bar */}
-            <div className="relative" ref={searchRef}>
-              <div className="flex items-center bg-slate-100 rounded-xl px-2.5 sm:px-3 py-1.5 sm:py-2 border border-slate-200 focus-within:ring-2 focus-within:ring-[#0A192F] transition w-28 sm:w-44 lg:w-60">
-                <Search className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-slate-400 shrink-0 mr-1.5 sm:mr-2" />
+            {/* MINIMIZED SEARCH COMPONENT: EXPANDS ON TAP OR HOVER */}
+            <div 
+              className="relative" 
+              ref={searchRef}
+              onMouseEnter={() => setIsSearchHovered(true)}
+              onMouseLeave={() => {
+                if (!isSearchFocused && !searchQuery) {
+                  setIsSearchHovered(false);
+                }
+              }}
+            >
+              <div 
+                onClick={() => {
+                  setIsSearchFocused(true);
+                  setSearchOpen(true);
+                  setTimeout(() => inputRef.current?.focus(), 50);
+                }}
+                className={`flex items-center bg-slate-100 rounded-xl border border-slate-200 focus-within:ring-2 focus-within:ring-[#0A192F] transition-all duration-300 ease-out cursor-pointer h-10 ${
+                  isExpanded 
+                    ? 'w-44 sm:w-56 lg:w-64 px-3 bg-white shadow-md' 
+                    : 'w-10 px-0 justify-center hover:bg-slate-200/80 hover:scale-105'
+                }`}
+              >
+                <Search className={`w-4 h-4 text-slate-500 shrink-0 transition-transform ${isExpanded ? 'mr-2' : ''}`} />
                 <input
+                  ref={inputRef}
                   type="text"
-                  placeholder="Search..."
+                  placeholder="Search STAHIZA..."
                   value={searchQuery}
                   onChange={(e) => {
                     setSearchQuery(e.target.value);
                     setSearchOpen(true);
                   }}
-                  onFocus={() => setSearchOpen(true)}
-                  className="bg-transparent text-[11px] sm:text-xs text-slate-800 placeholder-slate-400 focus:outline-none w-full"
+                  onFocus={() => {
+                    setIsSearchFocused(true);
+                    setSearchOpen(true);
+                  }}
+                  onBlur={() => {
+                    setTimeout(() => {
+                      setIsSearchFocused(false);
+                      if (!searchQuery) setIsSearchHovered(false);
+                    }, 200);
+                  }}
+                  className={`bg-transparent text-xs text-slate-800 placeholder-slate-400 focus:outline-none transition-all duration-200 ${
+                    isExpanded ? 'w-full opacity-100' : 'w-0 opacity-0 pointer-events-none'
+                  }`}
                 />
-                {searchQuery && (
-                  <button onClick={() => setSearchQuery('')} className="text-slate-400 hover:text-slate-600 text-xs">
+                {isExpanded && searchQuery && (
+                  <button 
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setSearchQuery('');
+                      inputRef.current?.focus();
+                    }} 
+                    className="text-slate-400 hover:text-slate-600 text-xs shrink-0 ml-1 p-0.5"
+                    aria-label="Clear search"
+                  >
                     <X className="w-3.5 h-3.5" />
                   </button>
                 )}
@@ -176,7 +221,7 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, setAppl
             <div className="hidden sm:flex items-center">
               <button
                 onClick={() => setApplyModalOpen(true)}
-                className="bg-[#800020] hover:bg-[#600018] text-white font-semibold px-4 py-2.5 rounded-xl shadow-md hover:shadow-lg transition transform hover:-translate-y-0.5 text-xs sm:text-sm flex items-center gap-2"
+                className="bg-[#800020] hover:bg-[#600018] text-white font-semibold px-4 py-2.5 rounded-xl shadow-md hover:shadow-lg transition transform hover:-translate-y-0.5 text-xs sm:text-sm flex items-center gap-2 whitespace-nowrap"
               >
                 <SchoolBadgeImg size={20} className="w-5 h-5" />
                 <span>Apply Now</span>

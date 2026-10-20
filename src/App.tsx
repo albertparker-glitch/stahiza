@@ -13,7 +13,10 @@ import {
   Award,
   CheckCircle2,
   Building2,
-  ArrowRight
+  ArrowRight,
+  ChevronUp,
+  Camera,
+  Sparkles
 } from 'lucide-react';
 import { SchoolBadgeImg } from './components/SchoolBadgeImg';
 import { Navbar } from './components/Navbar';
@@ -23,7 +26,7 @@ import { ContactSection } from './components/ContactSection';
 import { VideoGallery } from './components/VideoGallery';
 import { Leader, TopStudent, fetchLeaders, fetchMarqueeStaff, fetchTopStudents, SCHOOL_CONTACTS } from './data/schoolData';
 import { getSupabasePublicUrl } from './lib/supabase';
-import { motion } from 'motion/react';
+import { motion, AnimatePresence } from 'motion/react';
 
 export default function App() {
   const [activeTab, setActiveTab] = useState<'home' | 'leadership' | 'academics' | 'sports' | 'campus' | 'contact'>('home');
@@ -32,6 +35,30 @@ export default function App() {
   const [marqueeStaff, setMarqueeStaff] = useState<Leader[]>([]);
   const [topStudents, setTopStudents] = useState<TopStudent[]>([]);
   const [campusSection, setCampusSection] = useState<'all' | 'facilities' | 'clubs' | 'prefects' | 'teachers' | 'staff' | 'gallery'>('all');
+  const [showBackToTop, setShowBackToTop] = useState(false);
+
+  useEffect(() => {
+    // Disable automatic browser scroll restoration to prevent landing at the bottom
+    if ('scrollRestoration' in history) {
+      history.scrollRestoration = 'manual';
+    }
+    window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+
+    const handleScroll = () => {
+      setShowBackToTop(window.scrollY > 300);
+    };
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  useEffect(() => {
+    // Always reset window scroll position to top whenever active tab changes
+    window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+  }, [activeTab]);
+
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
 
   useEffect(() => {
     fetchLeaders().then(data => setLeaders(data));
@@ -654,27 +681,55 @@ export default function App() {
             </div>
 
             {/* CAMPUS SECTION DROPDOWN / FILTER SELECTOR */}
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-3 bg-white p-4 rounded-2xl shadow-md border border-slate-200 max-w-xl mx-auto">
-              <label className="text-xs font-bold uppercase tracking-wider text-slate-500 whitespace-nowrap">Campus Section:</label>
+            <div id="campus-section-filter" className="flex flex-col sm:flex-row items-center justify-between gap-3 bg-white p-4 sm:p-5 rounded-2xl shadow-md border border-slate-200 max-w-2xl mx-auto">
+              <div className="flex items-center gap-2">
+                <Sparkles className="w-4 h-4 text-[#800020]" />
+                <label className="text-xs font-bold uppercase tracking-wider text-slate-500 whitespace-nowrap">Filter Directory:</label>
+              </div>
               <select
                 value={campusSection}
                 onChange={(e) => setCampusSection(e.target.value as any)}
-                className="bg-slate-100 border border-slate-300 rounded-xl px-4 py-2.5 text-sm font-bold text-[#0A192F] focus:outline-none focus:ring-2 focus:ring-[#0A192F] w-full sm:w-auto"
+                className="bg-slate-50 border border-slate-300 rounded-xl px-4 py-2.5 text-sm font-bold text-[#0A192F] focus:outline-none focus:ring-2 focus:ring-[#0A192F] w-full sm:w-auto shadow-sm cursor-pointer"
               >
-                <option value="all">All Sections (Overview)</option>
-                <option value="facilities">Facilities</option>
-                <option value="clubs">Clubs & Societies</option>
-                <option value="prefects">Prefects Cabinet</option>
+                <option value="all">All Sections (Full Overview)</option>
+                <option value="facilities">Campus Facilities (Labs, Dorms, Library)</option>
+                <option value="clubs">Clubs & Societies (Scrabble, MDD, Debate)</option>
+                <option value="prefects">Prefects Cabinet & Student Leaders</option>
                 <option value="teachers">Teachers & Administration</option>
                 <option value="staff">Staff Members</option>
-                <option value="gallery">Photo Gallery</option>
+                <option value="gallery">Campus Photo Gallery</option>
               </select>
             </div>
 
             {/* FACILITIES SECTION */}
             {(campusSection === 'all' || campusSection === 'facilities') && (
-              <div className="space-y-6">
-                <h3 className="text-2xl font-extrabold font-['Montserrat'] text-[#0A192F] border-b pb-2">Campus Facilities</h3>
+              <div className="space-y-6 pt-2">
+                {/* STICKY CATEGORY HEADER */}
+                <div className="sticky top-20 z-20 -mx-4 sm:-mx-8 px-4 sm:px-8 py-3 bg-[#F8FAFC]/95 backdrop-blur-md border-y border-slate-200/90 shadow-sm flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-xl bg-[#0A192F] text-amber-300 flex items-center justify-center font-bold shadow-sm">
+                      <Building2 className="w-4 h-4" />
+                    </div>
+                    <div>
+                      <h3 className="text-lg sm:text-xl font-extrabold font-['Montserrat'] text-[#0A192F]">
+                        Campus Facilities
+                      </h3>
+                      <span className="text-[10px] sm:text-xs text-slate-500 font-semibold uppercase tracking-wider">
+                        6 Specialized Learning & Boarding Environments
+                      </span>
+                    </div>
+                  </div>
+                  <button 
+                    onClick={() => {
+                      const el = document.getElementById('campus-section-filter');
+                      if (el) el.scrollIntoView({ behavior: 'smooth' });
+                    }}
+                    className="text-xs font-bold text-[#800020] hover:text-[#600018] bg-rose-50 border border-rose-200 px-3 py-1.5 rounded-full transition flex items-center gap-1 shadow-sm shrink-0"
+                  >
+                    <span>Change Section</span>
+                  </button>
+                </div>
+
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                   {[
                     { title: "Modern Science Labs", desc: "Fully equipped Physics, Chemistry and Biology laboratories for practical mastery." },
@@ -684,7 +739,14 @@ export default function App() {
                     { title: "Sports Grounds", desc: "Standard football pitch, basketball and netball courts for athletics and championships." },
                     { title: "School Library", desc: "Extensive collection of textbooks, UNEB past papers, and reading quiet zones." },
                   ].map((fac, idx) => (
-                    <div key={idx} className="bg-white rounded-2xl p-6 shadow-sm border border-slate-200 space-y-3 hover:shadow-md transition">
+                    <motion.div 
+                      key={idx} 
+                      initial={{ opacity: 0, y: 30 }}
+                      whileInView={{ opacity: 1, y: 0 }}
+                      viewport={{ once: true, margin: "-40px" }}
+                      transition={{ duration: 0.45, delay: (idx % 3) * 0.1, ease: "easeOut" }}
+                      className="bg-white rounded-2xl p-6 shadow-sm border border-slate-200 space-y-3 hover:shadow-md transition hover:-translate-y-1"
+                    >
                       <div className="flex items-center justify-between">
                         <div className="w-10 h-10 rounded-xl bg-[#0A192F]/15 text-[#0A192F] flex items-center justify-center">
                           <Building2 className="w-5 h-5" />
@@ -693,7 +755,7 @@ export default function App() {
                       </div>
                       <h4 className="font-bold text-lg font-['Montserrat'] text-[#0A192F]">{fac.title}</h4>
                       <p className="text-slate-600 text-sm leading-relaxed">{fac.desc}</p>
-                    </div>
+                    </motion.div>
                   ))}
                 </div>
               </div>
@@ -701,8 +763,33 @@ export default function App() {
 
             {/* CLUBS SECTION */}
             {(campusSection === 'all' || campusSection === 'clubs') && (
-              <div className="space-y-6">
-                <h3 className="text-2xl font-extrabold font-['Montserrat'] text-[#0A192F] border-b pb-2">Clubs & Societies</h3>
+              <div className="space-y-6 pt-2">
+                {/* STICKY CATEGORY HEADER */}
+                <div className="sticky top-20 z-20 -mx-4 sm:-mx-8 px-4 sm:px-8 py-3 bg-[#F8FAFC]/95 backdrop-blur-md border-y border-slate-200/90 shadow-sm flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-xl bg-[#800020] text-amber-200 flex items-center justify-center font-bold shadow-sm">
+                      <Trophy className="w-4 h-4" />
+                    </div>
+                    <div>
+                      <h3 className="text-lg sm:text-xl font-extrabold font-['Montserrat'] text-[#0A192F]">
+                        Clubs & Societies
+                      </h3>
+                      <span className="text-[10px] sm:text-xs text-slate-500 font-semibold uppercase tracking-wider">
+                        5 Active Co-Curricular & Championship Teams
+                      </span>
+                    </div>
+                  </div>
+                  <button 
+                    onClick={() => {
+                      const el = document.getElementById('campus-section-filter');
+                      if (el) el.scrollIntoView({ behavior: 'smooth' });
+                    }}
+                    className="text-xs font-bold text-[#800020] hover:text-[#600018] bg-rose-50 border border-rose-200 px-3 py-1.5 rounded-full transition flex items-center gap-1 shadow-sm shrink-0"
+                  >
+                    <span>Change Section</span>
+                  </button>
+                </div>
+
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                   {[
                     { title: "Scrabble & Board Games Club", desc: "National champions in competitive scrabble, sharpening cognitive agility." },
@@ -711,13 +798,20 @@ export default function App() {
                     { title: "Science & Innovation Club", desc: "Hands-on projects, coding, robotics, and scientific experiments." },
                     { title: "Scouts & Girl Guides", desc: "Leadership, survival skills, community service, and discipline." },
                   ].map((club, idx) => (
-                    <div key={idx} className="bg-white rounded-2xl p-6 shadow-sm border border-slate-200 space-y-3 hover:shadow-md transition">
+                    <motion.div 
+                      key={idx} 
+                      initial={{ opacity: 0, y: 30 }}
+                      whileInView={{ opacity: 1, y: 0 }}
+                      viewport={{ once: true, margin: "-40px" }}
+                      transition={{ duration: 0.45, delay: (idx % 3) * 0.1, ease: "easeOut" }}
+                      className="bg-white rounded-2xl p-6 shadow-sm border border-slate-200 space-y-3 hover:shadow-md transition hover:-translate-y-1"
+                    >
                       <div className="w-10 h-10 rounded-xl bg-[#800020]/10 text-[#800020] flex items-center justify-center font-bold">
                         {idx + 1}
                       </div>
                       <h4 className="font-bold text-lg font-['Montserrat'] text-[#0A192F]">{club.title}</h4>
                       <p className="text-slate-600 text-sm leading-relaxed">{club.desc}</p>
-                    </div>
+                    </motion.div>
                   ))}
                 </div>
               </div>
@@ -725,22 +819,54 @@ export default function App() {
 
             {/* PREFECTS SECTION */}
             {(campusSection === 'all' || campusSection === 'prefects') && (
-              <div className="space-y-6">
-                <h3 className="text-2xl font-extrabold font-['Montserrat'] text-[#0A192F] border-b pb-2">Prefects Cabinet & Student Leadership</h3>
+              <div className="space-y-6 pt-2">
+                {/* STICKY CATEGORY HEADER */}
+                <div className="sticky top-20 z-20 -mx-4 sm:-mx-8 px-4 sm:px-8 py-3 bg-[#F8FAFC]/95 backdrop-blur-md border-y border-slate-200/90 shadow-sm flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-xl bg-[#0A192F] text-amber-300 flex items-center justify-center font-bold shadow-sm">
+                      <Award className="w-4 h-4" />
+                    </div>
+                    <div>
+                      <h3 className="text-lg sm:text-xl font-extrabold font-['Montserrat'] text-[#0A192F]">
+                        Prefects Cabinet & Student Leadership
+                      </h3>
+                      <span className="text-[10px] sm:text-xs text-slate-500 font-semibold uppercase tracking-wider">
+                        Cabinet Executives & UNSA Representatives
+                      </span>
+                    </div>
+                  </div>
+                  <button 
+                    onClick={() => {
+                      const el = document.getElementById('campus-section-filter');
+                      if (el) el.scrollIntoView({ behavior: 'smooth' });
+                    }}
+                    className="text-xs font-bold text-[#800020] hover:text-[#600018] bg-rose-50 border border-rose-200 px-3 py-1.5 rounded-full transition flex items-center gap-1 shadow-sm shrink-0"
+                  >
+                    <span>Change Section</span>
+                  </button>
+                </div>
+
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                   {leaders.filter(l => l.role.toLowerCase().includes('prefect') || l.role.toLowerCase().includes('cabinet') || l.role.toLowerCase().includes('unsa') || l.role.toLowerCase().includes('top')).map((pref, idx) => (
-                    <div key={idx} className="bg-white rounded-2xl overflow-hidden shadow-sm border border-slate-200 flex flex-col">
+                    <motion.div 
+                      key={idx} 
+                      initial={{ opacity: 0, y: 30 }}
+                      whileInView={{ opacity: 1, y: 0 }}
+                      viewport={{ once: true, margin: "-40px" }}
+                      transition={{ duration: 0.45, delay: (idx % 3) * 0.1, ease: "easeOut" }}
+                      className="bg-white rounded-2xl overflow-hidden shadow-sm border border-slate-200 flex flex-col hover:shadow-md transition hover:-translate-y-1"
+                    >
                       <div className="relative w-full h-72 bg-slate-100 overflow-hidden">
                         <img src={pref.img} alt={pref.name} className="w-full h-full object-cover object-top" />
                         <div className="absolute top-3 right-3 bg-white p-2 rounded-xl shadow"><SchoolBadgeImg size={24} /></div>
-                        <div className="absolute bottom-3 left-3 bg-[#800020] text-white text-xs font-bold px-3 py-1 rounded-full">
+                        <div className="absolute bottom-3 left-3 bg-[#800020] text-white text-xs font-bold px-3 py-1 rounded-full shadow">
                           {pref.role}
                         </div>
                       </div>
                       <div className="p-4 bg-white text-center">
                         <h4 className="font-extrabold text-base font-['Montserrat'] text-[#0A192F]">{pref.name}</h4>
                       </div>
-                    </div>
+                    </motion.div>
                   ))}
                 </div>
               </div>
@@ -748,22 +874,54 @@ export default function App() {
 
             {/* TEACHERS SECTION */}
             {(campusSection === 'all' || campusSection === 'teachers') && (
-              <div className="space-y-6">
-                <h3 className="text-2xl font-extrabold font-['Montserrat'] text-[#0A192F] border-b pb-2">Teachers & Administration</h3>
+              <div className="space-y-6 pt-2">
+                {/* STICKY CATEGORY HEADER */}
+                <div className="sticky top-20 z-20 -mx-4 sm:-mx-8 px-4 sm:px-8 py-3 bg-[#F8FAFC]/95 backdrop-blur-md border-y border-slate-200/90 shadow-sm flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-xl bg-[#0A192F] text-amber-300 flex items-center justify-center font-bold shadow-sm">
+                      <GraduationCap className="w-4 h-4" />
+                    </div>
+                    <div>
+                      <h3 className="text-lg sm:text-xl font-extrabold font-['Montserrat'] text-[#0A192F]">
+                        Teachers & Administration
+                      </h3>
+                      <span className="text-[10px] sm:text-xs text-slate-500 font-semibold uppercase tracking-wider">
+                        Experienced Academic Faculty & Deans
+                      </span>
+                    </div>
+                  </div>
+                  <button 
+                    onClick={() => {
+                      const el = document.getElementById('campus-section-filter');
+                      if (el) el.scrollIntoView({ behavior: 'smooth' });
+                    }}
+                    className="text-xs font-bold text-[#800020] hover:text-[#600018] bg-rose-50 border border-rose-200 px-3 py-1.5 rounded-full transition flex items-center gap-1 shadow-sm shrink-0"
+                  >
+                    <span>Change Section</span>
+                  </button>
+                </div>
+
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                   {leaders.map((teacher, idx) => (
-                    <div key={idx} className="bg-white rounded-2xl overflow-hidden shadow-sm border border-slate-200 flex flex-col">
+                    <motion.div 
+                      key={idx} 
+                      initial={{ opacity: 0, y: 30 }}
+                      whileInView={{ opacity: 1, y: 0 }}
+                      viewport={{ once: true, margin: "-40px" }}
+                      transition={{ duration: 0.45, delay: (idx % 3) * 0.1, ease: "easeOut" }}
+                      className="bg-white rounded-2xl overflow-hidden shadow-sm border border-slate-200 flex flex-col hover:shadow-md transition hover:-translate-y-1"
+                    >
                       <div className="relative w-full h-72 bg-slate-100 overflow-hidden">
                         <img src={teacher.img} alt={teacher.name} className="w-full h-full object-cover object-top" />
                         <div className="absolute top-3 right-3 bg-white p-2 rounded-xl shadow"><SchoolBadgeImg size={24} /></div>
-                        <div className="absolute bottom-3 left-3 bg-[#0A192F] text-white text-xs font-bold px-3 py-1 rounded-full">
+                        <div className="absolute bottom-3 left-3 bg-[#0A192F] text-white text-xs font-bold px-3 py-1 rounded-full shadow">
                           {teacher.role}
                         </div>
                       </div>
                       <div className="p-4 bg-white text-center">
                         <h4 className="font-extrabold text-base font-['Montserrat'] text-[#0A192F]">{teacher.name}</h4>
                       </div>
-                    </div>
+                    </motion.div>
                   ))}
                 </div>
               </div>
@@ -771,11 +929,43 @@ export default function App() {
 
             {/* STAFF SECTION */}
             {(campusSection === 'all' || campusSection === 'staff') && (
-              <div className="space-y-6">
-                <h3 className="text-2xl font-extrabold font-['Montserrat'] text-[#0A192F] border-b pb-2">Staff Members</h3>
+              <div className="space-y-6 pt-2">
+                {/* STICKY CATEGORY HEADER */}
+                <div className="sticky top-20 z-20 -mx-4 sm:-mx-8 px-4 sm:px-8 py-3 bg-[#F8FAFC]/95 backdrop-blur-md border-y border-slate-200/90 shadow-sm flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-xl bg-[#800020] text-white flex items-center justify-center font-bold shadow-sm">
+                      <Users className="w-4 h-4" />
+                    </div>
+                    <div>
+                      <h3 className="text-lg sm:text-xl font-extrabold font-['Montserrat'] text-[#0A192F]">
+                        Staff Members & Department Heads
+                      </h3>
+                      <span className="text-[10px] sm:text-xs text-slate-500 font-semibold uppercase tracking-wider">
+                        Dedicated Academic & Co-Curricular Team
+                      </span>
+                    </div>
+                  </div>
+                  <button 
+                    onClick={() => {
+                      const el = document.getElementById('campus-section-filter');
+                      if (el) el.scrollIntoView({ behavior: 'smooth' });
+                    }}
+                    className="text-xs font-bold text-[#800020] hover:text-[#600018] bg-rose-50 border border-rose-200 px-3 py-1.5 rounded-full transition flex items-center gap-1 shadow-sm shrink-0"
+                  >
+                    <span>Change Section</span>
+                  </button>
+                </div>
+
                 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-6">
                   {marqueeStaff.map((st, idx) => (
-                    <div key={idx} className="bg-white rounded-2xl overflow-hidden shadow-sm border border-slate-200 flex flex-col">
+                    <motion.div 
+                      key={idx} 
+                      initial={{ opacity: 0, y: 25 }}
+                      whileInView={{ opacity: 1, y: 0 }}
+                      viewport={{ once: true, margin: "-40px" }}
+                      transition={{ duration: 0.4, delay: (idx % 4) * 0.08, ease: "easeOut" }}
+                      className="bg-white rounded-2xl overflow-hidden shadow-sm border border-slate-200 flex flex-col hover:shadow-md transition hover:-translate-y-1"
+                    >
                       <div className="relative w-full h-44 bg-slate-100 overflow-hidden">
                         <img src={st.img} alt={st.name} className="w-full h-full object-cover object-top" />
                       </div>
@@ -783,7 +973,7 @@ export default function App() {
                         <h4 className="font-bold text-xs sm:text-sm text-[#0A192F] truncate">{st.name}</h4>
                         <span className="text-[10px] text-slate-500">{st.role}</span>
                       </div>
-                    </div>
+                    </motion.div>
                   ))}
                 </div>
               </div>
@@ -791,13 +981,45 @@ export default function App() {
 
             {/* GALLERY SECTION */}
             {(campusSection === 'all' || campusSection === 'gallery') && (
-              <div className="space-y-6">
-                <h3 className="text-2xl font-extrabold font-['Montserrat'] text-[#0A192F] border-b pb-2">Photo Gallery</h3>
+              <div className="space-y-6 pt-2">
+                {/* STICKY CATEGORY HEADER */}
+                <div className="sticky top-20 z-20 -mx-4 sm:-mx-8 px-4 sm:px-8 py-3 bg-[#F8FAFC]/95 backdrop-blur-md border-y border-slate-200/90 shadow-sm flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-xl bg-[#0A192F] text-amber-300 flex items-center justify-center font-bold shadow-sm">
+                      <Camera className="w-4 h-4" />
+                    </div>
+                    <div>
+                      <h3 className="text-lg sm:text-xl font-extrabold font-['Montserrat'] text-[#0A192F]">
+                        Campus Photo Gallery
+                      </h3>
+                      <span className="text-[10px] sm:text-xs text-slate-500 font-semibold uppercase tracking-wider">
+                        Moments of Excellence & Boarding Life
+                      </span>
+                    </div>
+                  </div>
+                  <button 
+                    onClick={() => {
+                      const el = document.getElementById('campus-section-filter');
+                      if (el) el.scrollIntoView({ behavior: 'smooth' });
+                    }}
+                    className="text-xs font-bold text-[#800020] hover:text-[#600018] bg-rose-50 border border-rose-200 px-3 py-1.5 rounded-full transition flex items-center gap-1 shadow-sm shrink-0"
+                  >
+                    <span>Change Section</span>
+                  </button>
+                </div>
+
                 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
                   {[...marqueeStaff, ...leaders].map((item, idx) => (
-                    <div key={idx} className="rounded-2xl overflow-hidden shadow border border-slate-200 group h-48 bg-slate-100">
+                    <motion.div 
+                      key={idx} 
+                      initial={{ opacity: 0, scale: 0.95, y: 20 }}
+                      whileInView={{ opacity: 1, scale: 1, y: 0 }}
+                      viewport={{ once: true, margin: "-40px" }}
+                      transition={{ duration: 0.4, delay: (idx % 4) * 0.08, ease: "easeOut" }}
+                      className="rounded-2xl overflow-hidden shadow border border-slate-200 group h-48 bg-slate-100 hover:shadow-lg transition"
+                    >
                       <img src={item.img} alt={item.name} className="w-full h-full object-cover group-hover:scale-110 transition duration-500" />
-                    </div>
+                    </motion.div>
                   ))}
                 </div>
               </div>
@@ -823,6 +1045,24 @@ export default function App() {
         isOpen={applyModalOpen} 
         onClose={() => setApplyModalOpen(false)} 
       />
+
+      {/* FLOATING BACK TO TOP BUTTON (ALL PAGES) */}
+      <AnimatePresence>
+        {showBackToTop && (
+          <motion.button
+            initial={{ opacity: 0, scale: 0.7, y: 20 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.7, y: 20 }}
+            transition={{ duration: 0.25, ease: "easeOut" }}
+            onClick={scrollToTop}
+            aria-label="Back to Top"
+            className="fixed bottom-6 right-6 z-50 p-3.5 sm:p-4 rounded-full bg-[#800020] hover:bg-[#600018] text-white shadow-2xl border-2 border-amber-300/80 flex items-center justify-center group hover:scale-110 active:scale-95 transition transform"
+          >
+            <ChevronUp className="w-5 h-5 text-amber-300 group-hover:-translate-y-0.5 transition-transform" />
+            <span className="sr-only">Back to top</span>
+          </motion.button>
+        )}
+      </AnimatePresence>
 
     </div>
   );
