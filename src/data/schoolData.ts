@@ -1,8 +1,16 @@
-import { supabase, getSupabasePublicUrl, getSupabaseOthersUrl } from '../lib/supabase';
+import { supabase, getSupabasePublicUrl, getSupabaseOthersUrl, getSupabaseAcademicsUrl } from '../lib/supabase';
 
 export interface Leader {
   role: string;
   name: string;
+  img: string;
+}
+
+export interface TopStudent {
+  name: string;
+  level: 'O-Level' | 'A-Level';
+  combinationOrStream: string;
+  pointsOrAs: string;
   img: string;
 }
 
@@ -102,6 +110,32 @@ export const FALLBACK_MARQUEE_STAFF: Leader[] = [
   },
 ];
 
+export const FALLBACK_TOP_STUDENTS: TopStudent[] = [
+  // A-Level Top 10 (Maroon Theme)
+  { name: "Nanteza Mary", level: "A-Level", combinationOrStream: "PEM/ICT", pointsOrAs: "20 Points (20/20)", img: getSupabaseAcademicsUrl("student1.jpeg") },
+  { name: "Mwesigwa Ronald", level: "A-Level", combinationOrStream: "BCM/ICT", pointsOrAs: "19 Points", img: getSupabaseAcademicsUrl("student2.jpeg") },
+  { name: "Akwero Patricia", level: "A-Level", combinationOrStream: "HEG/ICT", pointsOrAs: "19 Points", img: getSupabaseAcademicsUrl("student3.jpeg") },
+  { name: "Kigozi Brian", level: "A-Level", combinationOrStream: "PEM/M", pointsOrAs: "18 Points", img: getSupabaseAcademicsUrl("student4.jpeg") },
+  { name: "Nakato Shamim", level: "A-Level", combinationOrStream: "BCM/P", pointsOrAs: "18 Points", img: getSupabaseAcademicsUrl("student5.jpeg") },
+  { name: "Okello Emmanuel", level: "A-Level", combinationOrStream: "PCM/ICT", pointsOrAs: "17 Points", img: getSupabaseAcademicsUrl("student6.jpeg") },
+  { name: "Namubiru Joan", level: "A-Level", combinationOrStream: "PEM/ICT", pointsOrAs: "17 Points", img: getSupabaseAcademicsUrl("student7.jpeg") },
+  { name: "Byaruhanga Denis", level: "A-Level", combinationOrStream: "HEG/E", pointsOrAs: "17 Points", img: getSupabaseAcademicsUrl("student8.jpeg") },
+  { name: "Atuhaire Brenda", level: "A-Level", combinationOrStream: "BCM/ICT", pointsOrAs: "16 Points", img: getSupabaseAcademicsUrl("student9.jpeg") },
+  { name: "Ssemwogerere Ivan", level: "A-Level", combinationOrStream: "PEM/M", pointsOrAs: "16 Points", img: getSupabaseAcademicsUrl("student10.jpeg") },
+
+  // O-Level Top 10 (Navy Blue Theme)
+  { name: "Mukasa Joshua", level: "O-Level", combinationOrStream: "Senior Four West", pointsOrAs: "9 D1s (Aggregate 8)", img: getSupabaseAcademicsUrl("ostricast.jpeg") },
+  { name: "Tusiime Carol", level: "O-Level", combinationOrStream: "Senior Four East", pointsOrAs: "9 D1s (Aggregate 9)", img: getSupabaseAcademicsUrl("bena.jpeg") },
+  { name: "Kibirige Simon", level: "O-Level", combinationOrStream: "Senior Four North", pointsOrAs: "8 D1s, 1 D2", img: getSupabaseAcademicsUrl("odeke.jpeg") },
+  { name: "Najjuma Diana", level: "O-Level", combinationOrStream: "Senior Four South", pointsOrAs: "8 D1s, 1 D2", img: getSupabaseAcademicsUrl("hillary.jpeg") },
+  { name: "Lubega Aaron", level: "O-Level", combinationOrStream: "Senior Four West", pointsOrAs: "7 D1s, 2 D2s", img: getSupabaseAcademicsUrl("top.jpeg") },
+  { name: "Namukasa Prossy", level: "O-Level", combinationOrStream: "Senior Four East", pointsOrAs: "7 D1s, 2 D2s", img: getSupabaseAcademicsUrl("unsap.jpeg") },
+  { name: "Wasswa Frank", level: "O-Level", combinationOrStream: "Senior Four North", pointsOrAs: "6 D1s, 3 D2s", img: getSupabaseAcademicsUrl("student1.jpeg") },
+  { name: "Nambatya Sumaya", level: "O-Level", combinationOrStream: "Senior Four South", pointsOrAs: "6 D1s, 3 D2s", img: getSupabaseAcademicsUrl("student2.jpeg") },
+  { name: "Mugerwa Eric", level: "O-Level", combinationOrStream: "Senior Four West", pointsOrAs: "6 D1s, 2 D2s", img: getSupabaseAcademicsUrl("student3.jpeg") },
+  { name: "Apio Rachel", level: "O-Level", combinationOrStream: "Senior Four East", pointsOrAs: "5 D1s, 4 D2s", img: getSupabaseAcademicsUrl("student4.jpeg") },
+];
+
 export async function fetchLeaders(): Promise<Leader[]> {
   if (!supabase) {
     return FALLBACK_LEADERS;
@@ -174,6 +208,51 @@ export async function fetchMarqueeStaff(): Promise<Leader[]> {
   } catch (err) {
     console.error('Fetch marquee staff storage error:', err);
     return FALLBACK_MARQUEE_STAFF;
+  }
+}
+
+export async function fetchTopStudents(): Promise<TopStudent[]> {
+  if (!supabase) {
+    return FALLBACK_TOP_STUDENTS;
+  }
+
+  try {
+    const { data: files, error } = await supabase.storage
+      .from('IMAGES')
+      .list('academics', {
+        limit: 50,
+        offset: 0,
+        sortBy: { column: 'name', order: 'asc' }
+      });
+
+    if (error || !files || files.length === 0) {
+      return FALLBACK_TOP_STUDENTS;
+    }
+
+    const validFiles = files.filter(f => f.name && f.name !== '.emptyFolderPlaceholder');
+    if (validFiles.length === 0) {
+      return FALLBACK_TOP_STUDENTS;
+    }
+
+    return validFiles.map((file, idx) => {
+      const fileName = file.name;
+      const matched = FALLBACK_TOP_STUDENTS.find(s => s.img.includes(fileName));
+      if (matched) return matched;
+
+      const cleanName = fileName.replace(/\.[^/.]+$/, "").replace(/[-_]/g, " ");
+      const formattedName = cleanName.charAt(0).toUpperCase() + cleanName.slice(1);
+      const level = idx < 10 ? 'A-Level' : 'O-Level';
+      return {
+        name: formattedName,
+        level,
+        combinationOrStream: level === 'A-Level' ? 'PEM/ICT' : 'Senior Four West',
+        pointsOrAs: level === 'A-Level' ? '18 Points' : '8 D1s',
+        img: getSupabaseAcademicsUrl(fileName)
+      };
+    });
+  } catch (err) {
+    console.error('Fetch top students storage error:', err);
+    return FALLBACK_TOP_STUDENTS;
   }
 }
 

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { supabase, getSupabasePublicUrl } from '../lib/supabase';
 import { SchoolBadgeImg } from './SchoolBadgeImg';
 import { Film, Play } from 'lucide-react';
+import { motion } from 'motion/react';
 
 interface VideoItem {
   name: string;
@@ -46,35 +47,10 @@ export const VideoGallery: React.FC = () => {
 
         let videoItems: VideoItem[] = [];
 
-        // Always ensure back4.mp4 and cleaning.mp4 are included
         videoItems.push({
           name: 'back4.mp4',
           url: back4VideoUrl,
           title: 'STAHIZA Campus Highlight'
-        });
-
-        videoItems.push({
-          name: 'back4.mp4',
-          url: back4VideoUrl,
-          title: 'STAHIZA Campus Highlight'
-        });
-
-        videoItems.push({
-          name: 'cleaning.mp4',
-          url: cleaningVideoUrl,
-          title: 'Campus Cleaning & Environment'
-        });
-
-        videoItems.push({
-          name: 'cleaning.mp4',
-          url: cleaningVideoUrl,
-          title: 'Campus Cleaning & Environment'
-        });
-
-        videoItems.push({
-          name: 'cleaning.mp4',
-          url: cleaningVideoUrl,
-          title: 'Campus Cleaning & Environment'
         });
 
         videoItems.push({
@@ -129,11 +105,17 @@ export const VideoGallery: React.FC = () => {
   }, []);
 
   return (
-    <section className="py-16 bg-[#0A192F] text-white border-t border-slate-800">
+    <section className="py-16 bg-[#0A192F] text-white border-t border-slate-800 overflow-hidden">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10">
         
         {/* Section Header */}
-        <div className="text-center max-w-2xl mx-auto space-y-3">
+        <motion.div 
+          initial={{ opacity: 0, y: 25 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6 }}
+          className="text-center max-w-2xl mx-auto space-y-3"
+        >
           <div className="inline-flex items-center gap-2 bg-[#800020]/40 border border-[#800020]/60 px-4 py-1.5 rounded-full text-rose-200 text-xs font-bold uppercase tracking-wider">
             <Film className="w-4 h-4 text-amber-300" />
             <span>STAHIZA Video Highlights</span>
@@ -144,7 +126,7 @@ export const VideoGallery: React.FC = () => {
           <p className="text-slate-300 text-sm">
             Explore recent highlights from academics, sports championships, and campus life at Standard High School Zzana.
           </p>
-        </div>
+        </motion.div>
 
         {/* Loading State / Skeletons */}
         {loading ? (
@@ -164,8 +146,12 @@ export const VideoGallery: React.FC = () => {
           /* Responsive Grid */
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {videos.map((vid, idx) => (
-              <div 
+              <motion.div 
                 key={idx}
+                initial={{ opacity: 0, scale: 0.95, y: 20 }}
+                whileInView={{ opacity: 1, scale: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: idx * 0.1 }}
                 className="rounded-2xl overflow-hidden bg-slate-900 shadow-xl border border-slate-800/80 group hover:border-amber-300/40 transition duration-300 flex flex-col justify-between"
               >
                 <div className="relative aspect-video w-full bg-black overflow-hidden">
@@ -196,7 +182,7 @@ export const VideoGallery: React.FC = () => {
                     HD
                   </span>
                 </div>
-              </div>
+              </motion.div>
             ))}
           </div>
         )}

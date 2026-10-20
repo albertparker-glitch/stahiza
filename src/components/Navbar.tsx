@@ -73,7 +73,7 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, setAppl
 
       {/* HEADER & NAVIGATION */}
       <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md shadow-sm border-b border-slate-100">
-        <div className="max-w-7xl mx-auto px-4 sm:px-8 h-20 flex items-center justify-between gap-4">
+        <div className="max-w-7xl mx-auto px-4 sm:px-8 h-auto sm:h-20 py-2 sm:py-0 flex flex-row flex-wrap justify-center sm:justify-between items-center gap-2 sm:gap-4 w-full text-center sm:text-left">
           
           {/* LOGO & BRANDING */}
           <div 
@@ -116,21 +116,21 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, setAppl
           </nav>
 
           {/* GLOBAL SEARCH & CTA APPLY */}
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 sm:gap-3 shrink-0">
             {/* Global Search Bar */}
             <div className="relative" ref={searchRef}>
-              <div className="flex items-center bg-slate-100 rounded-xl px-3 py-2 border border-slate-200 focus-within:ring-2 focus-within:ring-[#0A192F] transition w-44 sm:w-60">
-                <Search className="w-4 h-4 text-slate-400 shrink-0 mr-2" />
+              <div className="flex items-center bg-slate-100 rounded-xl px-2.5 sm:px-3 py-1.5 sm:py-2 border border-slate-200 focus-within:ring-2 focus-within:ring-[#0A192F] transition w-28 sm:w-44 lg:w-60">
+                <Search className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-slate-400 shrink-0 mr-1.5 sm:mr-2" />
                 <input
                   type="text"
-                  placeholder="Search programs, sports..."
+                  placeholder="Search..."
                   value={searchQuery}
                   onChange={(e) => {
                     setSearchQuery(e.target.value);
                     setSearchOpen(true);
                   }}
                   onFocus={() => setSearchOpen(true)}
-                  className="bg-transparent text-xs text-slate-800 placeholder-slate-400 focus:outline-none w-full"
+                  className="bg-transparent text-[11px] sm:text-xs text-slate-800 placeholder-slate-400 focus:outline-none w-full"
                 />
                 {searchQuery && (
                   <button onClick={() => setSearchQuery('')} className="text-slate-400 hover:text-slate-600 text-xs">
@@ -195,7 +195,7 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, setAppl
 
         {/* MOBILE MENU DROPDOWN */}
         {mobileMenuOpen && (
-          <div className="lg:hidden bg-white border-b border-slate-200 px-4 pt-2 pb-6 space-y-2 shadow-xl animate-fadeIn">
+          <div className="lg:hidden absolute top-full left-0 right-0 bg-white border-b border-slate-200 px-6 py-6 space-y-3 shadow-2xl z-50">
             {[
               { id: 'home', label: 'Home' },
               { id: 'leadership', label: 'Leadership' },
@@ -207,8 +207,8 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, setAppl
               <button
                 key={item.id}
                 onClick={() => { setActiveTab(item.id); setMobileMenuOpen(false); }}
-                className={`w-full text-left px-4 py-3 rounded-lg font-medium transition ${
-                  activeTab === item.id ? 'bg-[#0A192F] text-white' : 'hover:bg-slate-50'
+                className={`w-full text-left px-4 py-3 rounded-xl font-bold transition text-sm sm:text-base ${
+                  activeTab === item.id ? 'bg-[#0A192F] text-white shadow' : 'text-slate-700 hover:bg-slate-100'
                 }`}
               >
                 {item.label}
@@ -217,7 +217,7 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, setAppl
             <div className="pt-2 flex flex-col gap-2">
               <button
                 onClick={() => { setApplyModalOpen(true); setMobileMenuOpen(false); }}
-                className="w-full text-center py-2.5 rounded-lg bg-[#800020] text-white font-semibold shadow"
+                className="w-full text-center py-3 rounded-xl bg-[#800020] text-white font-bold shadow-md text-sm sm:text-base"
               >
                 Apply Now 2027
               </button>
