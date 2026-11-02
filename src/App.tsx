@@ -197,26 +197,23 @@ export default function App() {
           >
           {activeTab === 'home' && (
           <div>
-            {/* HERO SECTION WITH BRENTWOOD ACADEMY BACKGROUND VIDEO POSITIONING */}
-            <section className="relative py-16 sm:py-24 overflow-hidden bg-[#F5F2EB] border-b border-stone-200 min-h-[580px] sm:min-h-[640px] flex items-center">
-              {/* ABSOLUTE BACKGROUND VIDEO LAYER */}
-              <div className="absolute inset-0 w-full h-full overflow-hidden pointer-events-none z-0">
-                <video 
-                  autoPlay 
-                  loop 
-                  muted 
-                  playsInline 
-                  className="w-full h-full object-cover object-center scale-105 pointer-events-none"
-                >
-                  <source src={getSupabasePublicUrl('back.mp4')} type="video/mp4" />
-                  Your browser does not support the video tag.
-                </video>
-                {/* SEMI-TRANSPARENT BEIGE TINT OVERLAY FOR CONTRAST & LEGIBILITY */}
-                <div className="absolute inset-0 bg-[#F5F2EB]/85 backdrop-blur-[1.5px]" />
-              </div>
+            {/* FULL BLEED 100% WIDTH VIDEO BANNER (Home page only) */}
+            <div className="w-full m-0 p-0 bg-black overflow-hidden leading-none block">
+              <video 
+                autoPlay 
+                loop 
+                muted 
+                playsInline 
+                className="w-full h-auto max-h-[600px] object-contain m-0 p-0 block pointer-events-none"
+              >
+                <source src={getSupabasePublicUrl('back.mp4')} type="video/mp4" />
+                Your browser does not support the video tag.
+              </video>
+            </div>
 
-              {/* FOREGROUND HERO CONTENT */}
-              <div className="max-w-7xl mx-auto px-4 sm:px-8 relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-12 items-center w-full">
+            {/* HERO SECTION */}
+            <section className="relative py-12 sm:py-16 overflow-hidden bg-[#F5F2EB] border-b border-stone-200">
+              <div className="max-w-7xl mx-auto px-4 sm:px-8 relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
                 <motion.div 
                   initial={{ opacity: 0, y: 25 }}
                   animate={{ opacity: 1, y: 0 }}
