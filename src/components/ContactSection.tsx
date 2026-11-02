@@ -15,7 +15,6 @@ import {
   BarChart3, 
   Leaf, 
   Globe2,
-  Sparkles,
   ExternalLink,
   GraduationCap,
   Trophy,
@@ -24,6 +23,7 @@ import {
 } from 'lucide-react';
 import { SchoolBadgeImg } from './SchoolBadgeImg';
 import { SCHOOL_CONTACTS } from '../data/schoolData';
+import { motion } from 'motion/react';
 
 export const ContactSection: React.FC = () => {
   const [formData, setFormData] = useState({
@@ -42,9 +42,14 @@ export const ContactSection: React.FC = () => {
   };
 
   return (
-    <div className="w-full bg-[#EAECE6] py-10 sm:py-16 px-3 sm:px-6 lg:px-8 font-['Inter',sans-serif] text-slate-800 animate-fadeIn">
+    <motion.div 
+      initial={{ opacity: 0, y: 15 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.4 }}
+      className="w-full bg-[#EAECE6] py-10 sm:py-16 px-3 sm:px-6 lg:px-8 font-['Inter',sans-serif] text-slate-800"
+    >
       
-      {/* MASTER CARD CONTAINER - LEAVING EXACT OUTLINE AND STYLING FROM REFERENCE */}
+      {/* MASTER CARD CONTAINER */}
       <div className="max-w-6xl mx-auto bg-white rounded-[28px] sm:rounded-[36px] shadow-2xl border border-slate-200/90 p-4 sm:p-6 lg:p-7 space-y-5">
         
         {/* TOP BRAND & NAVIGATION BAR */}
@@ -99,7 +104,13 @@ export const ContactSection: React.FC = () => {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
           
           {/* LEFT PANEL: DARK FOREST GREEN CONTACT FORM */}
-          <div className="lg:col-span-6 bg-[#0D2B20] rounded-[24px] sm:rounded-[28px] p-6 sm:p-9 text-white relative overflow-hidden flex flex-col justify-between shadow-lg">
+          <motion.div 
+            initial={{ opacity: 0, x: -20 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.45 }}
+            className="lg:col-span-6 bg-[#0D2B20] rounded-[24px] sm:rounded-[28px] p-6 sm:p-9 text-white relative overflow-hidden flex flex-col justify-between shadow-lg"
+          >
             
             {/* SUBTLE TOPOGRAPHIC CONTOUR WATERMARK IN BACKGROUND */}
             <svg 
@@ -127,7 +138,7 @@ export const ContactSection: React.FC = () => {
                   Get in Touch
                 </h3>
                 <p className="text-[#9DB8AC] text-xs sm:text-[13px] leading-relaxed max-w-md">
-                  Have questions regarding S.1 – S.6 admissions, school fees, UNEB curriculum, boarding requirements, or visiting our campus? We're here to help.
+                  Inquire about admissions, fees, subject combinations, or book a campus visit.
                 </p>
               </div>
 
@@ -252,10 +263,16 @@ export const ContactSection: React.FC = () => {
               )}
             </div>
 
-          </div>
+          </motion.div>
 
           {/* RIGHT PANEL: WARM CREAM CONTACT INFO WITH ARCH-CUTOUT RELEVANT IMAGE */}
-          <div className="lg:col-span-6 bg-[#F8F9F5] border border-slate-200/60 rounded-[24px] sm:rounded-[28px] p-6 sm:p-9 flex flex-col justify-between shadow-sm relative overflow-hidden">
+          <motion.div 
+            initial={{ opacity: 0, x: 20 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.45 }}
+            className="lg:col-span-6 bg-[#F8F9F5] border border-slate-200/60 rounded-[24px] sm:rounded-[28px] p-6 sm:p-9 flex flex-col justify-between shadow-sm relative overflow-hidden"
+          >
             
             <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-center">
               
@@ -272,7 +289,7 @@ export const ContactSection: React.FC = () => {
                     <span className="italic">Building Character</span>
                   </h3>
                   <p className="text-slate-600 text-xs sm:text-[13px] leading-relaxed">
-                    Our administrative and admissions team is always available to welcome parents, visitors, and prospective students to our Zzana campus.
+                    Our admissions team is available to assist parents and prospective learners.
                   </p>
                 </div>
 
@@ -340,7 +357,7 @@ export const ContactSection: React.FC = () => {
                         {SCHOOL_CONTACTS.hours}
                       </p>
                       <span className="text-[10px] text-slate-500 font-medium block mt-0.5">
-                        Sunday: Closed for Services
+                        Sunday: Closed
                       </span>
                     </div>
                   </div>
@@ -366,7 +383,7 @@ export const ContactSection: React.FC = () => {
                   {/* FLOATING BADGE INSIDE ARCH */}
                   <div className="absolute bottom-3 left-3 right-3 text-center">
                     <span className="inline-block bg-black/60 backdrop-blur-md text-white text-[10px] font-bold px-3 py-1 rounded-full border border-white/20 shadow">
-                      🏫 STAHIZA Campus, Zzana
+                      STAHIZA Campus, Zzana
                     </span>
                   </div>
 
@@ -378,23 +395,29 @@ export const ContactSection: React.FC = () => {
             {/* MAP EXPAND LINK */}
             <div className="pt-4 mt-6 border-t border-slate-200/80 flex items-center justify-between">
               <span className="text-[11px] text-slate-500 font-medium">
-                Entebbe Road Campus, Zzana / Nyanama
+                Entebbe Road Campus, Zzana
               </span>
               <button
                 onClick={() => setShowMap(!showMap)}
                 className="text-xs font-bold text-[#0D2B20] hover:underline flex items-center gap-1.5"
               >
-                <span>{showMap ? 'Hide Campus Map' : 'View Campus Map'}</span>
+                <span>{showMap ? 'Hide Map' : 'View Campus Map'}</span>
                 <ExternalLink className="w-3.5 h-3.5" />
               </button>
             </div>
 
-          </div>
+          </motion.div>
 
         </div>
 
         {/* BOTTOM FULL-WIDTH 4-FEATURE PILL BAR */}
-        <div className="bg-[#0D2B20] text-white rounded-[20px] sm:rounded-[24px] p-4 sm:p-5 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 shadow-md">
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.45 }}
+          className="bg-[#0D2B20] text-white rounded-[20px] sm:rounded-[24px] p-4 sm:p-5 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 shadow-md"
+        >
           
           {/* ITEM 1 */}
           <div className="flex items-center gap-3.5 px-2">
@@ -421,7 +444,7 @@ export const ContactSection: React.FC = () => {
                 Academic Mentorship
               </h5>
               <p className="text-[11px] text-[#8EAFA0]">
-                Deans & UNEB distinction coaches
+                Experienced UNEB examiners
               </p>
             </div>
           </div>
@@ -436,7 +459,7 @@ export const ContactSection: React.FC = () => {
                 Boarding & Discipline
               </h5>
               <p className="text-[11px] text-[#8EAFA0]">
-                24/7 warden-supervised hostels
+                Supervised student hostels
               </p>
             </div>
           </div>
@@ -448,15 +471,15 @@ export const ContactSection: React.FC = () => {
             </div>
             <div>
               <h5 className="font-bold text-xs text-white">
-                USSSA Sports Powerhouse
+                USSSA Champions
               </h5>
               <p className="text-[11px] text-[#8EAFA0]">
-                National football & athletics champions
+                National sports powerhouses
               </p>
             </div>
           </div>
 
-        </div>
+        </motion.div>
 
         {/* EXPANDABLE GOOGLE MAP SECTION */}
         {showMap && (
@@ -491,6 +514,6 @@ export const ContactSection: React.FC = () => {
 
       </div>
 
-    </div>
+    </motion.div>
   );
 };

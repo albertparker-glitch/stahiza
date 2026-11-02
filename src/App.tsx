@@ -15,8 +15,7 @@ import {
   Building2,
   ArrowRight,
   ChevronUp,
-  Camera,
-  Sparkles
+  Camera
 } from 'lucide-react';
 import { SchoolBadgeImg } from './components/SchoolBadgeImg';
 import { Navbar } from './components/Navbar';
@@ -162,11 +161,21 @@ export default function App() {
             {/* HERO SECTION */}
             <section className="relative text-white py-12 sm:py-16 overflow-hidden bg-gradient-to-br from-[#0A192F] via-[#0F2A4A] to-[#173860]">
               <div className="max-w-7xl mx-auto px-4 sm:px-8 relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
-                <div className="lg:col-span-7 space-y-6">
-                  <div className="inline-flex items-center gap-3 bg-[#8A1C24]/30 border border-[#8A1C24]/50 px-4 py-2 rounded-full text-rose-200 text-xs sm:text-sm font-semibold tracking-wide">
+                <motion.div 
+                  initial={{ opacity: 0, y: 25 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5, ease: "easeOut" }}
+                  className="lg:col-span-7 space-y-6"
+                >
+                  <motion.div 
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ duration: 0.4, delay: 0.1 }}
+                    className="inline-flex items-center gap-3 bg-[#8A1C24]/30 border border-[#8A1C24]/50 px-4 py-2 rounded-full text-rose-200 text-xs sm:text-sm font-semibold tracking-wide"
+                  >
                     <SchoolBadgeImg size={22} className="w-5 h-5" />
                     <span>Official STAHIZA Administrative Portal</span>
-                  </div>
+                  </motion.div>
                   <h1 className="text-4xl sm:text-6xl font-black font-['Montserrat'] tracking-tight leading-none">
                     Standard High School <span className="text-transparent bg-clip-text bg-gradient-to-r from-rose-400 to-amber-300">Zzana</span>
                   </h1>
@@ -174,31 +183,44 @@ export default function App() {
                     "Education Is The Way"
                   </p>
                   <p className="text-slate-300 text-base sm:text-lg leading-relaxed max-w-2xl">
-                    When the horizon seems uncertain, remember that education is the ultimate guide. It equips you with the strength to rise, the wisdom to choose, and the power to succeed. Walk boldly—because education is the way.
+                    Fostering academic excellence, moral discipline, and championship talent along Entebbe Road.
                   </p>
                   <div className="flex flex-wrap gap-4 pt-4">
-                    <button
+                    <motion.button
+                      whileHover={{ scale: 1.03, y: -2 }}
+                      whileTap={{ scale: 0.97 }}
                       onClick={() => setApplyModalOpen(true)}
-                      className="bg-[#800020] hover:bg-[#600018] text-white font-bold px-8 py-4 rounded-xl shadow-xl hover:shadow-2xl transition transform hover:-translate-y-1 flex items-center gap-3 text-base"
+                      className="bg-[#800020] hover:bg-[#600018] text-white font-bold px-8 py-4 rounded-xl shadow-xl hover:shadow-2xl transition flex items-center gap-3 text-base"
                     >
                       <SchoolBadgeImg size={22} className="w-5 h-5" />
                       <span>Apply For Admissions</span>
                       <ArrowRight className="w-5 h-5" />
-                    </button>
-                    <button
+                    </motion.button>
+                    <motion.button
+                      whileHover={{ scale: 1.03, y: -2 }}
+                      whileTap={{ scale: 0.97 }}
                       onClick={() => setActiveTab('academics')}
                       className="bg-white/10 hover:bg-white/20 border border-white/20 text-white font-semibold px-7 py-4 rounded-xl backdrop-blur-md transition flex items-center gap-2 text-base"
                     >
                       <span>Explore Academics</span>
-                    </button>
+                    </motion.button>
                   </div>
-                </div>
+                </motion.div>
 
                 {/* HERO STATS / CREST EMBLEM CARD */}
-                <div className="lg:col-span-5 flex flex-col items-center justify-center bg-white/10 backdrop-blur-xl border border-white/15 p-8 rounded-3xl shadow-2xl space-y-6">
-                  <div className="p-4 bg-white rounded-2xl shadow-lg border border-slate-200">
+                <motion.div 
+                  initial={{ opacity: 0, scale: 0.95, y: 20 }}
+                  animate={{ opacity: 1, scale: 1, y: 0 }}
+                  transition={{ duration: 0.5, delay: 0.2, ease: "easeOut" }}
+                  className="lg:col-span-5 flex flex-col items-center justify-center bg-white/10 backdrop-blur-xl border border-white/15 p-8 rounded-3xl shadow-2xl space-y-6"
+                >
+                  <motion.div 
+                    whileHover={{ scale: 1.05 }}
+                    transition={{ type: "spring", stiffness: 300 }}
+                    className="p-4 bg-white rounded-2xl shadow-lg border border-slate-200"
+                  >
                     <SchoolBadgeImg size={100} className="w-28 h-28" />
-                  </div>
+                  </motion.div>
                   <div className="text-center space-y-2">
                     <h3 className="text-xl font-extrabold font-['Montserrat'] text-white">Standard High School Zzana</h3>
                     <p className="text-xs text-amber-300 font-semibold">{SCHOOL_CONTACTS.box}</p>
@@ -214,7 +236,7 @@ export default function App() {
                       <div className="text-xs text-slate-300 mt-0.5">UNEB Pass Rate</div>
                     </div>
                   </div>
-                </div>
+                </motion.div>
               </div>
             </section>
 
@@ -223,7 +245,7 @@ export default function App() {
               <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2 text-sm font-medium">
                 <div className="flex items-center gap-2">
                   <span className="bg-amber-400 text-[#800020] font-bold px-2.5 py-0.5 rounded text-xs uppercase">Official Notice</span>
-                  <span>Term I Admissions & Reporting for 2027 Academic Year are currently ongoing. Visit the admissions office along Entebbe Road or apply online.</span>
+                  <span>2027 Admissions now open. Apply online or visit our Entebbe Road campus.</span>
                 </div>
                 <button 
                   onClick={() => setApplyModalOpen(true)}
@@ -236,7 +258,13 @@ export default function App() {
 
             {/* CORE PILLARS */}
             <section className="py-20 px-4 sm:px-8 max-w-7xl mx-auto">
-              <div className="text-center max-w-3xl mx-auto mb-16 space-y-4">
+              <motion.div 
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5 }}
+                className="text-center max-w-3xl mx-auto mb-16 space-y-4"
+              >
                 <div className="inline-flex items-center justify-center p-2 bg-slate-100 rounded-full mb-2">
                   <SchoolBadgeImg size={36} className="w-9 h-9" />
                 </div>
@@ -245,31 +273,36 @@ export default function App() {
                   Pillars of Excellence
                 </h2>
                 <p className="text-slate-600 text-base sm:text-lg">
-                  Standard High School Zzana is built upon three foundational pillars ensuring comprehensive student development.
+                  Three core pillars guiding student development and future success.
                 </p>
-              </div>
+              </motion.div>
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                 {[
                   {
                     icon: BookOpen,
                     title: "Academics",
-                    desc: "Comprehensive UNEB O & A Level drilling in Arts and Sciences. Our dedicated faculty ensures exceptional grades and university admissions.",
+                    desc: "Rigorous UNEB drilling in Sciences and Arts for top grades and university placement.",
                   },
                   {
                     icon: Trophy,
                     title: "Sports",
-                    desc: "Undisputed champions in USSSA football, basketball, athletics, and netball. We launch professional athletic careers while instilling teamwork.",
+                    desc: "Reigning USSSA champions in football, basketball, and athletics with professional training.",
                   },
                   {
                     icon: ShieldCheck,
                     title: "Discipline",
-                    desc: "Instilling moral uprightness, leadership, scouting, and spiritual nourishment to mold well-rounded, responsible citizens.",
+                    desc: "Instilling integrity, leadership, and moral discipline in every learner.",
                   },
                 ].map((pillar, idx) => (
-                  <div 
+                  <motion.div 
                     key={idx}
-                    className="bg-gradient-to-br from-[#0A192F] via-[#0F2A4A] to-[#173860] text-white rounded-2xl p-8 shadow-xl hover:shadow-2xl transition-all duration-300 border border-slate-700 group hover:-translate-y-2 flex flex-col justify-between"
+                    initial={{ opacity: 0, y: 30 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true, margin: "-30px" }}
+                    transition={{ duration: 0.45, delay: idx * 0.12, ease: "easeOut" }}
+                    whileHover={{ y: -6 }}
+                    className="bg-gradient-to-br from-[#0A192F] via-[#0F2A4A] to-[#173860] text-white rounded-2xl p-8 shadow-xl hover:shadow-2xl transition-all duration-300 border border-slate-700 group flex flex-col justify-between"
                   >
                     <div className="space-y-6">
                       <div className="w-16 h-16 rounded-2xl flex items-center justify-center border bg-white/10 text-amber-300 border-white/20 group-hover:scale-110 transition duration-300">
@@ -286,7 +319,7 @@ export default function App() {
                       <span>Learn more</span>
                       <ChevronRight className="w-4 h-4 transform group-hover:translate-x-1 transition" />
                     </div>
-                  </div>
+                  </motion.div>
                 ))}
               </div>
             </section>
@@ -357,7 +390,13 @@ export default function App() {
             {/* HEADTEACHER WELCOME BANNER */}
             <section className="bg-slate-100 py-20 px-4 sm:px-8 border-y border-slate-200">
               <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
-                <div className="lg:col-span-5 relative">
+                <motion.div 
+                  initial={{ opacity: 0, x: -25 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.5 }}
+                  className="lg:col-span-5 relative"
+                >
                   <div className="absolute -inset-4 bg-gradient-to-tr from-[#800020] to-[#0A192F] rounded-3xl opacity-25 blur-lg"></div>
                   <div className="relative bg-[#0A192F] text-white p-8 sm:p-10 rounded-3xl shadow-xl space-y-6">
                     <div className="flex items-center gap-4">
@@ -370,71 +409,93 @@ export default function App() {
                       </div>
                     </div>
                     <blockquote className="italic font-serif text-lg leading-relaxed text-slate-200">
-                      "At STAHIZA, we believe every student possesses unique potential. Through disciplined academics, rigorous coaching, and moral guidance, we shape champions for life."
+                      "At STAHIZA, every learner has unique potential. Through disciplined academics and mentorship, we mold champions for life."
                     </blockquote>
                   </div>
-                </div>
+                </motion.div>
 
-                <div className="lg:col-span-7 space-y-6">
+                <motion.div 
+                  initial={{ opacity: 0, x: 25 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.5 }}
+                  className="lg:col-span-7 space-y-6"
+                >
                   <span className="text-[#800020] font-bold uppercase tracking-wider text-sm">Headteacher's Welcome</span>
                   <h2 className="text-3xl sm:text-4xl font-extrabold font-['Montserrat'] text-[#0A192F]">
                     Welcome to Standard High School Zzana
                   </h2>
                   <p className="text-slate-700 leading-relaxed text-base">
-                    Situated conveniently along Entebbe Road in Zzana/Nyanama, STAHIZA is more than just a school—it is a community of achievers. Our comprehensive curriculum covers both Science and Arts combinations for A-Level, and full UNEB syllabus mastery for O-Level.
-                  </p>
-                  <p className="text-slate-700 leading-relaxed text-base">
-                    Whether your child aspires to excel in national science examinations, represent Uganda in USSSA sports tournaments, or become a stellar orator and leader, STAHIZA provides the ideal fertile ground.
+                    Located along Entebbe Road, STAHIZA pairs comprehensive UNEB curriculum mastery in Sciences and Arts with national sports dominance. We provide a disciplined, secure environment where young minds flourish.
                   </p>
                   <div className="grid grid-cols-2 sm:grid-cols-3 gap-6 pt-4">
-                    <div className="bg-white p-4 rounded-xl shadow-sm border border-slate-200 text-center">
+                    <motion.div 
+                      whileHover={{ scale: 1.03 }}
+                      className="bg-white p-4 rounded-xl shadow-sm border border-slate-200 text-center"
+                    >
                       <div className="text-2xl sm:text-3xl font-black text-[#800020] font-['Montserrat']">100%</div>
                       <div className="text-xs text-slate-600 font-medium mt-1">Boarding Security</div>
-                    </div>
-                    <div className="bg-white p-4 rounded-xl shadow-sm border border-slate-200 text-center">
+                    </motion.div>
+                    <motion.div 
+                      whileHover={{ scale: 1.03 }}
+                      className="bg-white p-4 rounded-xl shadow-sm border border-slate-200 text-center"
+                    >
                       <div className="text-2xl sm:text-3xl font-black text-[#0A192F] font-['Montserrat']">50+</div>
                       <div className="text-xs text-slate-600 font-medium mt-1">Trophies & Awards</div>
-                    </div>
-                    <div className="bg-white p-4 rounded-xl shadow-sm border border-slate-200 text-center col-span-2 sm:col-span-1">
+                    </motion.div>
+                    <motion.div 
+                      whileHover={{ scale: 1.03 }}
+                      className="bg-white p-4 rounded-xl shadow-sm border border-slate-200 text-center col-span-2 sm:col-span-1"
+                    >
                       <div className="text-2xl sm:text-3xl font-black text-[#800020] font-['Montserrat']">Top 10</div>
                       <div className="text-xs text-slate-600 font-medium mt-1">National Ranking</div>
-                    </div>
+                    </motion.div>
                   </div>
-                </div>
+                </motion.div>
               </div>
             </section>
 
             {/* OFFICIAL ADMISSIONS DESK INQUIRY SECTION */}
             <section className="py-16 px-4 sm:px-8 max-w-7xl mx-auto">
-              <div className="bg-gradient-to-r from-[#0A192F] to-[#163c6c] text-white rounded-3xl p-8 sm:p-12 shadow-2xl flex flex-col md:flex-row items-center justify-between gap-8">
+              <motion.div 
+                initial={{ opacity: 0, y: 25 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5 }}
+                className="bg-gradient-to-r from-[#0A192F] to-[#163c6c] text-white rounded-3xl p-8 sm:p-12 shadow-2xl flex flex-col md:flex-row items-center justify-between gap-8"
+              >
                 <div className="space-y-4 max-w-2xl">
                   <div className="inline-flex items-center gap-3 bg-white/10 border border-white/20 px-4 py-1.5 rounded-full text-amber-300 text-xs font-semibold">
-                    <SchoolBadgeImg size={20} className="w-5 h-5" /> Official Admissions Desk & Office Hours
+                    <SchoolBadgeImg size={20} className="w-5 h-5" /> Official Admissions Desk
                   </div>
                   <h3 className="text-2xl sm:text-4xl font-extrabold font-['Montserrat']">
-                    Need assistance with school fees or subject combinations?
+                    Admissions, fees & subject combination guidance
                   </h3>
                   <p className="text-slate-300 text-sm sm:text-base leading-relaxed">
-                    Our administrative staff is available Monday to Friday (7:30 AM – 5:00 PM) and Saturday (9:00 AM – 1:00 PM) at our Entebbe Road campus. Call us directly at {SCHOOL_CONTACTS.phone1} or submit an online application form.
+                    Our team is available Monday to Saturday at our Entebbe Road campus or via phone to guide your admissions.
                   </p>
                 </div>
                 <div className="flex flex-col sm:flex-row gap-4">
-                  <button
+                  <motion.button
+                    whileHover={{ scale: 1.03 }}
+                    whileTap={{ scale: 0.97 }}
                     onClick={() => setApplyModalOpen(true)}
                     className="bg-[#800020] hover:bg-[#600018] text-white font-bold px-8 py-4 rounded-xl shadow-lg hover:shadow-xl transition flex items-center justify-center gap-3 whitespace-nowrap"
                   >
                     <SchoolBadgeImg size={22} className="w-5 h-5" />
                     <span>Apply Online Now</span>
-                  </button>
-                  <a
+                  </motion.button>
+                  <motion.a
+                    whileHover={{ scale: 1.03 }}
+                    whileTap={{ scale: 0.97 }}
                     href="tel:+256772831704"
                     className="bg-white/10 hover:bg-white/20 border border-white/20 text-white font-semibold px-8 py-4 rounded-xl backdrop-blur-md transition flex items-center justify-center gap-2 whitespace-nowrap"
                   >
                     <Phone className="w-5 h-5 text-amber-300" />
                     <span>{SCHOOL_CONTACTS.phone1}</span>
-                  </a>
+                  </motion.a>
                 </div>
-              </div>
+              </motion.div>
             </section>
             
             {/* VIDEO GALLERY ON HOME PAGE */}
@@ -444,25 +505,38 @@ export default function App() {
 
         {activeTab === 'leadership' && (
           <div className="py-16 px-4 sm:px-8 max-w-7xl mx-auto space-y-12">
-            <div className="text-center max-w-3xl mx-auto space-y-4">
+            <motion.div 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5 }}
+              className="text-center max-w-3xl mx-auto space-y-4"
+            >
               <SchoolBadgeImg size={56} className="mx-auto" />
               <span className="text-[#800020] font-bold uppercase tracking-wider text-sm block">Administration & Faculty</span>
               <h2 className="text-3xl sm:text-5xl font-extrabold font-['Montserrat'] text-[#0A192F]">
                 School Leadership
               </h2>
               <p className="text-slate-600 text-base">
-                Dedicated professionals steering Standard High School Zzana towards unprecedented academic and moral excellence.
+                Experienced educators and administrators steering STAHIZA toward academic and moral excellence.
               </p>
-            </div>
+            </motion.div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
               {leaders.map((leader, idx) => (
-                <div key={idx} className="bg-white rounded-3xl overflow-hidden shadow-md border border-slate-200 hover:shadow-xl transition flex flex-col">
+                <motion.div 
+                  key={idx} 
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, margin: "-30px" }}
+                  transition={{ duration: 0.45, delay: (idx % 3) * 0.1, ease: "easeOut" }}
+                  whileHover={{ y: -6 }}
+                  className="bg-white rounded-3xl overflow-hidden shadow-md border border-slate-200 hover:shadow-xl transition flex flex-col"
+                >
                   <div className="relative w-full h-80 bg-slate-100 overflow-hidden">
                     <img 
                       src={leader.img} 
                       alt={leader.name} 
-                      className="w-full h-full object-cover object-top shadow-xl transition-transform duration-500 hover:scale-110 active:scale-110 cursor-pointer"
+                      className="w-full h-full object-cover object-top shadow-xl transition-transform duration-500 hover:scale-105 active:scale-105 cursor-pointer"
                       onError={(e) => {
                         const target = e.currentTarget;
                         target.style.display = 'none';
@@ -486,7 +560,7 @@ export default function App() {
                   <div className="p-6 bg-white">
                     <h3 className="text-xl font-extrabold font-['Montserrat'] text-[#0A192F]">{leader.name}</h3>
                   </div>
-                </div>
+                </motion.div>
               ))}
             </div>
           </div>
@@ -494,19 +568,31 @@ export default function App() {
 
         {activeTab === 'academics' && (
           <div className="py-16 px-4 sm:px-8 max-w-7xl mx-auto space-y-16">
-            <div className="text-center max-w-3xl mx-auto space-y-4">
+            <motion.div 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5 }}
+              className="text-center max-w-3xl mx-auto space-y-4"
+            >
               <SchoolBadgeImg size={56} className="mx-auto" />
               <span className="text-[#800020] font-bold uppercase tracking-wider text-sm block">UNEB Curriculum</span>
               <h2 className="text-3xl sm:text-5xl font-extrabold font-['Montserrat'] text-[#0A192F]">
                 Academic Programs & Top Achievers
               </h2>
               <p className="text-slate-600 text-base">
-                Comprehensive lower and upper secondary education designed to unlock your child's highest potential, celebrating our top 10 academic champions.
+                Lower and upper secondary education designed for national exam distinctions and top university entry.
               </p>
-            </div>
+            </motion.div>
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-              <div className="bg-white rounded-3xl p-8 sm:p-10 shadow-sm border border-slate-200 space-y-6">
+              <motion.div 
+                initial={{ opacity: 0, y: 25 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.45 }}
+                whileHover={{ y: -4 }}
+                className="bg-white rounded-3xl p-8 sm:p-10 shadow-sm border border-slate-200 space-y-6"
+              >
                 <div className="flex items-center justify-between">
                   <div className="w-14 h-14 rounded-2xl bg-rose-50 text-[#800020] flex items-center justify-center">
                     <BookOpen className="w-7 h-7" />
@@ -515,16 +601,23 @@ export default function App() {
                 </div>
                 <h3 className="text-2xl font-bold font-['Montserrat'] text-[#0A192F]">O-Level (Lower Secondary)</h3>
                 <p className="text-slate-600 leading-relaxed text-sm">
-                  Full implementation of the Uganda National Examinations Board (UNEB) curriculum with emphasis on sciences (Physics, Chemistry, Biology, Mathematics) and humanities.
+                  Complete UNEB curriculum emphasizing sciences, mathematics, digital literacy, and continuous assessment.
                 </p>
                 <ul className="space-y-3 text-sm font-medium text-slate-700">
-                  <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-emerald-600" /> Practical laboratory sessions in Physics, Chemistry & Biology</li>
-                  <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-emerald-600" /> Computer literacy & ICT training for all students</li>
-                  <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-emerald-600" /> Remedial evening coaching and continuous assessment</li>
+                  <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-emerald-600" /> Practical labs in Physics, Chemistry & Biology</li>
+                  <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-emerald-600" /> ICT training and digital research</li>
+                  <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-emerald-600" /> Targeted revision and distinction drilling</li>
                 </ul>
-              </div>
+              </motion.div>
 
-              <div className="bg-white rounded-3xl p-8 sm:p-10 shadow-sm border border-slate-200 space-y-6">
+              <motion.div 
+                initial={{ opacity: 0, y: 25 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.45, delay: 0.1 }}
+                whileHover={{ y: -4 }}
+                className="bg-white rounded-3xl p-8 sm:p-10 shadow-sm border border-slate-200 space-y-6"
+              >
                 <div className="flex items-center justify-between">
                   <div className="w-14 h-14 rounded-2xl bg-blue-50 text-[#0A192F] flex items-center justify-center">
                     <GraduationCap className="w-7 h-7" />
@@ -533,27 +626,41 @@ export default function App() {
                 </div>
                 <h3 className="text-2xl font-bold font-['Montserrat'] text-[#0A192F]">A-Level (Upper Secondary)</h3>
                 <p className="text-slate-600 leading-relaxed text-sm">
-                  Prestigious subject combinations for both Sciences (PCM, BCM, PCB) and Arts (HEG, MEG, B.A.T) ensuring direct government and private university admissions.
+                  Sciences and Arts combinations engineered for direct public and private university admissions.
                 </p>
                 <ul className="space-y-3 text-sm font-medium text-slate-700">
-                  <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-emerald-600" /> Science Combinations: PCM/M, BCM, PCB, PEM</li>
-                  <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-emerald-600" /> Arts Combinations: HEG/ICT, MEG/ICT, HED/French</li>
-                  <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-emerald-600" /> General Paper & Sub-Math mandatory distinction drilling</li>
+                  <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-emerald-600" /> Sciences: PCM, BCM, PCB, PEM</li>
+                  <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-emerald-600" /> Arts: HEG, MEG, HED combinations</li>
+                  <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-emerald-600" /> Sub-Math & General Paper coaching</li>
                 </ul>
-              </div>
+              </motion.div>
             </div>
 
             {/* A-LEVEL TOP 10 HIGH ACHIEVERS (MAROON BACKGROUND THEME) */}
-            <div className="bg-[#800020] text-white rounded-3xl p-8 sm:p-12 shadow-2xl space-y-8">
+            <motion.div 
+              initial={{ opacity: 0, y: 25 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5 }}
+              className="bg-[#800020] text-white rounded-3xl p-8 sm:p-12 shadow-2xl space-y-8"
+            >
               <div className="text-center space-y-2">
                 <span className="bg-amber-300 text-[#800020] font-bold px-4 py-1 rounded-full text-xs uppercase tracking-wider inline-block">Upper Secondary Excellence</span>
                 <h3 className="text-3xl sm:text-4xl font-black font-['Montserrat']">A-Level Top 10 High Achievers</h3>
-                <p className="text-rose-100 text-sm max-w-xl mx-auto">Celebrating our brilliant scholars who scored top points in their UNEB A-Level combinations.</p>
+                <p className="text-rose-100 text-sm max-w-xl mx-auto">Celebrating students with top points in their UNEB combinations.</p>
               </div>
 
               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
                 {topStudents.filter(s => s.level === 'A-Level').map((student, idx) => (
-                  <div key={idx} className="bg-white text-slate-900 rounded-2xl overflow-hidden shadow-lg border-2 border-rose-300/30 flex flex-col justify-between group hover:scale-105 transition duration-300">
+                  <motion.div 
+                    key={idx} 
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    whileInView={{ opacity: 1, scale: 1 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.35, delay: (idx % 5) * 0.08 }}
+                    whileHover={{ y: -5, scale: 1.04 }}
+                    className="bg-white text-slate-900 rounded-2xl overflow-hidden shadow-lg border-2 border-rose-300/30 flex flex-col justify-between group transition duration-300"
+                  >
                     <div className="relative w-full h-44 bg-slate-100 overflow-hidden">
                       <img 
                         src={student.img} 
@@ -580,22 +687,36 @@ export default function App() {
                         {student.pointsOrAs}
                       </div>
                     </div>
-                  </div>
+                  </motion.div>
                 ))}
               </div>
-            </div>
+            </motion.div>
 
             {/* O-LEVEL TOP 10 HIGH ACHIEVERS (NAVY BLUE BACKGROUND THEME) */}
-            <div className="bg-[#0A192F] text-white rounded-3xl p-8 sm:p-12 shadow-2xl space-y-8">
+            <motion.div 
+              initial={{ opacity: 0, y: 25 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5 }}
+              className="bg-[#0A192F] text-white rounded-3xl p-8 sm:p-12 shadow-2xl space-y-8"
+            >
               <div className="text-center space-y-2">
                 <span className="bg-amber-300 text-[#0A192F] font-bold px-4 py-1 rounded-full text-xs uppercase tracking-wider inline-block">Lower Secondary Excellence</span>
                 <h3 className="text-3xl sm:text-4xl font-black font-['Montserrat']">O-Level Top 10 High Achievers</h3>
-                <p className="text-slate-300 text-sm max-w-xl mx-auto">Honoring our outstanding UNEB O-Level candidates with exceptional distinctions.</p>
+                <p className="text-slate-300 text-sm max-w-xl mx-auto">Honoring outstanding candidates with exceptional distinctions.</p>
               </div>
 
               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
                 {topStudents.filter(s => s.level === 'O-Level').map((student, idx) => (
-                  <div key={idx} className="bg-white text-slate-900 rounded-2xl overflow-hidden shadow-lg border-2 border-blue-300/30 flex flex-col justify-between group hover:scale-105 transition duration-300">
+                  <motion.div 
+                    key={idx} 
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    whileInView={{ opacity: 1, scale: 1 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.35, delay: (idx % 5) * 0.08 }}
+                    whileHover={{ y: -5, scale: 1.04 }}
+                    className="bg-white text-slate-900 rounded-2xl overflow-hidden shadow-lg border-2 border-blue-300/30 flex flex-col justify-between group transition duration-300"
+                  >
                     <div className="relative w-full h-44 bg-slate-100 overflow-hidden">
                       <img 
                         src={student.img} 
@@ -622,10 +743,10 @@ export default function App() {
                         {student.pointsOrAs}
                       </div>
                     </div>
-                  </div>
+                  </motion.div>
                 ))}
               </div>
-            </div>
+            </motion.div>
 
             {/* ACADEMICS YOUTUBE VIDEOS HIGHLIGHTS */}
             <AcademicsVideos />
@@ -635,46 +756,61 @@ export default function App() {
 
         {activeTab === 'sports' && (
           <div className="py-16 px-4 sm:px-8 max-w-7xl mx-auto space-y-12">
-            <div className="text-center max-w-3xl mx-auto space-y-4">
+            <motion.div 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5 }}
+              className="text-center max-w-3xl mx-auto space-y-4"
+            >
               <SchoolBadgeImg size={56} className="mx-auto" />
               <span className="text-[#800020] font-bold uppercase tracking-wider text-sm block">Champions of Uganda</span>
               <h2 className="text-3xl sm:text-5xl font-extrabold font-['Montserrat'] text-[#0A192F]">
                 Sports & Talent Powerhouse
               </h2>
               <p className="text-slate-600 text-base">
-                At STAHIZA, talent is nurtured alongside academics. We are reigning USSSA football and ball games champions.
+                Nurturing sporting excellence and creative talent alongside academic rigour.
               </p>
-            </div>
+            </motion.div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
               {[
                 {
                   title: "USSSA Football Champions",
-                  desc: "Legendary victories in national football competitions, producing Uganda Cranes and premier league stars.",
+                  desc: "Historic victories in national football competitions, producing national team talent.",
                   stat: "National Champions"
                 },
                 {
                   title: "Basketball & Netball",
-                  desc: "Top-tier indoor and outdoor court dominance across Kampala district and national championship levels.",
+                  desc: "Championship dominance across Kampala district and national tournaments.",
                   stat: "District & National Winners"
                 },
                 {
                   title: "Music, Dance & Drama (MDD)",
-                  desc: "Showcasing Ugandan cultural heritage, original plays, traditional dances, and choral excellence.",
+                  desc: "Celebrating cultural heritage through traditional folklore, choir, and stage drama.",
                   stat: "Gold Medalists 2025"
                 },
               ].map((item, idx) => (
-                <div key={idx} className="bg-white rounded-2xl p-8 shadow-sm border border-slate-200 space-y-4 hover:shadow-lg transition">
-                  <div className="flex items-center justify-between">
-                    <div className="w-12 h-12 rounded-xl bg-amber-500/10 text-amber-600 flex items-center justify-center">
-                      <Trophy className="w-6 h-6" />
+                <motion.div 
+                  key={idx} 
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, margin: "-30px" }}
+                  transition={{ duration: 0.45, delay: idx * 0.12, ease: "easeOut" }}
+                  whileHover={{ y: -6 }}
+                  className="bg-white rounded-2xl p-8 shadow-sm border border-slate-200 space-y-4 hover:shadow-lg transition flex flex-col justify-between"
+                >
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between">
+                      <div className="w-12 h-12 rounded-xl bg-amber-500/10 text-amber-600 flex items-center justify-center">
+                        <Trophy className="w-6 h-6" />
+                      </div>
+                      <SchoolBadgeImg size={34} />
                     </div>
-                    <SchoolBadgeImg size={34} />
+                    <span className="text-xs font-bold text-[#800020] bg-rose-50 px-3 py-1 rounded-full">{item.stat}</span>
+                    <h3 className="text-xl font-bold font-['Montserrat'] text-[#0A192F]">{item.title}</h3>
+                    <p className="text-slate-600 text-sm leading-relaxed">{item.desc}</p>
                   </div>
-                  <span className="text-xs font-bold text-[#800020] bg-rose-50 px-3 py-1 rounded-full">{item.stat}</span>
-                  <h3 className="text-xl font-bold font-['Montserrat'] text-[#0A192F]">{item.title}</h3>
-                  <p className="text-slate-600 text-sm leading-relaxed">{item.desc}</p>
-                </div>
+                </motion.div>
               ))}
             </div>
 
@@ -699,7 +835,7 @@ export default function App() {
             {/* CAMPUS SECTION DROPDOWN / FILTER SELECTOR */}
             <div id="campus-section-filter" className="flex flex-col sm:flex-row items-center justify-between gap-3 bg-white p-4 sm:p-5 rounded-2xl shadow-md border border-slate-200 max-w-2xl mx-auto">
               <div className="flex items-center gap-2">
-                <Sparkles className="w-4 h-4 text-[#800020]" />
+                <Building2 className="w-4 h-4 text-[#800020]" />
                 <label className="text-xs font-bold uppercase tracking-wider text-slate-500 whitespace-nowrap">Filter Directory:</label>
               </div>
               <select
@@ -750,42 +886,42 @@ export default function App() {
                   {[
                     { 
                       title: "Modern Science Labs", 
-                      desc: "Fully equipped Physics, Chemistry and Biology laboratories with specialized apparatus for practical mastery and UNEB national exams.",
+                      desc: "Equipped Physics, Chemistry, and Biology laboratories for hands-on experiments and UNEB practical exams.",
                       tag: "Physics, Chem & Biology",
                       img: "https://images.unsplash.com/photo-1532094349884-543bc11b234d?auto=format&fit=crop&w=800&q=80",
                       fallbackImg: "/pages/images/odeke.jpeg"
                     },
                     { 
                       title: "Computer Laboratory", 
-                      desc: "High-speed internet and modern desktop terminals for ICT lessons, coding, research, and national UNEB ICT examinations.",
+                      desc: "High-speed internet workstations for ICT practicals, coding, and national examinations.",
                       tag: "ICT & Digital Research",
                       img: getSupabaseOthersUrl("complab.jpeg"),
                       fallbackImg: "https://images.unsplash.com/photo-1581092921461-eab62e97a780?auto=format&fit=crop&w=800&q=80"
                     },
                     { 
                       title: "Comfortable Dormitories", 
-                      desc: "Secure, spacious boarding facilities for boys and girls with 24/7 warden supervision, running water, and study spaces.",
+                      desc: "Secure, warden-supervised boarding residences with running water and quiet study areas.",
                       tag: "Boarding & Resident Life",
                       img: "https://images.unsplash.com/photo-1555854877-bab0e564b8d5?auto=format&fit=crop&w=800&q=80",
                       fallbackImg: "/pages/images/bena.jpeg"
                     },
                     { 
                       title: "Spacious Dining Hall", 
-                      desc: "Nutritious, well-balanced meals prepared under high culinary hygiene standards to fuel active learning and athletics.",
+                      desc: "Nutritious, balanced meals prepared under strict culinary hygiene standards.",
                       tag: "Food & Nutrition Center",
                       img: getSupabaseOthersUrl("fnst.jpeg"),
                       fallbackImg: "https://images.unsplash.com/photo-1577495508048-b635879837f1?auto=format&fit=crop&w=800&q=80"
                     },
                     { 
                       title: "Sports Grounds & Courts", 
-                      desc: "Full-size football pitch, championship basketball & netball courts where national championship talents are groomed.",
+                      desc: "Full-size football pitch, basketball, and netball courts home to national champions.",
                       tag: "Football, Netball & Courts",
                       img: getSupabaseOthersUrl("hand.jpeg"),
                       fallbackImg: "https://images.unsplash.com/photo-1574629810360-7efbbe195018?auto=format&fit=crop&w=800&q=80"
                     },
                     { 
                       title: "School Library & Resource Center", 
-                      desc: "Extensive archive of syllabi textbooks, encyclopedias, past UNEB examination papers, and quiet revision zones.",
+                      desc: "Curriculum textbooks, encyclopedias, past UNEB papers, and dedicated silent study zones.",
                       tag: "Quiet Study & Archives",
                       img: getSupabaseOthersUrl("dedication 2026 s4.jpeg"),
                       fallbackImg: "https://images.unsplash.com/photo-1521587760476-6c12a4b040da?auto=format&fit=crop&w=800&q=80"
@@ -827,7 +963,7 @@ export default function App() {
                         </div>
                         <div className="pt-3 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500 font-medium">
                           <span className="flex items-center gap-1.5 text-[#800020] font-semibold">
-                            <Sparkles className="w-3.5 h-3.5" /> STAHIZA Standard
+                            <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" /> STAHIZA Standard
                           </span>
                           <span className="bg-slate-100 px-2.5 py-0.5 rounded-md font-mono text-[11px] text-slate-600">Facility</span>
                         </div>
@@ -871,42 +1007,42 @@ export default function App() {
                   {[
                     { 
                       title: "Scrabble & Board Games Club", 
-                      desc: "National champions in competitive Ugandan scrabble, developing advanced vocabulary, strategic calculation, and tournament grit.",
+                      desc: "National champions developing vocabulary, rapid calculation, and tournament strategy.",
                       tag: "National Champions",
                       img: getSupabaseOthersUrl("scrablle.jpeg"),
                       fallbackImg: "https://images.unsplash.com/photo-1610890716171-6b1bb98ffd09?auto=format&fit=crop&w=800&q=80"
                     },
                     { 
                       title: "Music, Dance & Drama (MDD)", 
-                      desc: "Cultural heritage preservation through traditional folklore dances, instrumental orchestra, choral singing, and stage theatre.",
+                      desc: "Preserving culture through traditional dances, choral vocals, and theatrical performance.",
                       tag: "Gold Medalists 2025",
                       img: getSupabaseOthersUrl("mdd.jpeg"),
                       fallbackImg: "https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?auto=format&fit=crop&w=800&q=80"
                     },
                     { 
                       title: "Science, Tech & Coding Club", 
-                      desc: "Hands-on software development, robotics, circuitry experiments, and science fair innovations led by passionate student innovators.",
+                      desc: "Software coding, robotics, circuit experiments, and science fair projects.",
                       tag: "Coding & Tech Champions",
                       img: getSupabaseOthersUrl("code.jpg"),
                       fallbackImg: "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?auto=format&fit=crop&w=800&q=80"
                     },
                     { 
                       title: "Debate & Writers Society", 
-                      desc: "Eloquent public speaking, argumentative discourse, essay writing, and analytical reasoning preparing future leaders for national circuits.",
+                      desc: "Public speaking, analytical reasoning, and competitive national debate.",
                       tag: "National Debate Circuit",
                       img: "https://images.unsplash.com/photo-1524178232363-1fb2b075b655?auto=format&fit=crop&w=800&q=80",
                       fallbackImg: "/pages/images/odeke.jpeg"
                     },
                     { 
-                      title: "Scouts, Guides & Religious Fellowships", 
-                      desc: "Character formation, outdoor campcraft, community volunteer service, moral integrity, and leadership discipline.",
+                      title: "Scouts, Guides & Fellowships", 
+                      desc: "Character development, campcraft, volunteer service, and leadership discipline.",
                       tag: "Leadership & Discipline",
                       img: getSupabaseOthersUrl("mus.jpeg"),
                       fallbackImg: "https://images.unsplash.com/photo-1529156069898-49953e39b3ac?auto=format&fit=crop&w=800&q=80"
                     },
                     { 
                       title: "Sports Academy & Girls FC", 
-                      desc: "Premier sports training in football, athletics, and basketball, creating avenues for international scout trials and national championships.",
+                      desc: "Elite training in football, athletics, and basketball with direct club pathways.",
                       tag: "USSSA Powerhouse",
                       img: getSupabaseOthersUrl("hand.jpeg"),
                       fallbackImg: "https://images.unsplash.com/photo-1508098682722-e99c43a406b2?auto=format&fit=crop&w=800&q=80"

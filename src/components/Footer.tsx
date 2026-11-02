@@ -9,6 +9,7 @@ interface FooterProps {
 }
 
 export const Footer: React.FC<FooterProps> = ({ setActiveTab, setApplyModalOpen }) => {
+  const [subscribed, setSubscribed] = React.useState(false);
   return (
     <footer className="bg-[#0A192F] text-slate-300 border-t border-slate-800">
       <div className="max-w-7xl mx-auto px-4 sm:px-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 pt-16 pb-12 border-b border-slate-800">
@@ -107,17 +108,21 @@ export const Footer: React.FC<FooterProps> = ({ setActiveTab, setApplyModalOpen 
             </a>
           </div>
           <div className="pt-2">
-            <form onSubmit={e => { e.preventDefault(); alert('Thank you for subscribing to STAHIZA newsletter!'); }} className="flex gap-2">
-              <input
-                type="email"
-                required
-                placeholder="Your email address"
-                className="bg-slate-800 text-white text-xs px-3 py-2 rounded-xl border border-slate-700 focus:outline-none flex-1"
-              />
-              <button type="submit" className="bg-[#800020] text-white text-xs font-bold px-4 py-2 rounded-xl">
-                Join
-              </button>
-            </form>
+            {subscribed ? (
+              <p className="text-emerald-400 text-xs font-semibold">Subscribed to STAHIZA updates!</p>
+            ) : (
+              <form onSubmit={e => { e.preventDefault(); setSubscribed(true); }} className="flex gap-2">
+                <input
+                  type="email"
+                  required
+                  placeholder="Your email address"
+                  className="bg-slate-800 text-white text-xs px-3 py-2 rounded-xl border border-slate-700 focus:outline-none flex-1"
+                />
+                <button type="submit" className="bg-[#800020] text-white text-xs font-bold px-4 py-2 rounded-xl hover:bg-[#600018] transition">
+                  Join
+                </button>
+              </form>
+            )}
           </div>
         </div>
 

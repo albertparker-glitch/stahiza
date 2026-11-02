@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { X, CheckCircle2 } from 'lucide-react';
 import { SchoolBadgeImg } from './SchoolBadgeImg';
 import { SCHOOL_CONTACTS } from '../data/schoolData';
+import { motion, AnimatePresence } from 'motion/react';
 
 interface ApplyModalProps {
   isOpen: boolean;
@@ -30,10 +31,16 @@ export const ApplyModal: React.FC<ApplyModalProps> = ({ isOpen, onClose }) => {
 
   return (
     <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
-      <div className="bg-white rounded-3xl max-w-2xl w-full p-6 sm:p-10 shadow-2xl relative my-8 animate-fadeIn">
+      <motion.div 
+        initial={{ opacity: 0, scale: 0.95, y: 15 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        exit={{ opacity: 0, scale: 0.95, y: 15 }}
+        transition={{ duration: 0.25, ease: "easeOut" }}
+        className="bg-white rounded-3xl max-w-2xl w-full p-6 sm:p-10 shadow-2xl relative my-8"
+      >
         <button
           onClick={() => { onClose(); setApplySubmitted(false); }}
-          className="absolute top-6 right-6 p-2 text-slate-400 hover:text-slate-700 bg-slate-100 rounded-full"
+          className="absolute top-6 right-6 p-2 text-slate-400 hover:text-slate-700 bg-slate-100 rounded-full transition"
         >
           <X className="w-5 h-5" />
         </button>
@@ -45,7 +52,7 @@ export const ApplyModal: React.FC<ApplyModalProps> = ({ isOpen, onClose }) => {
             </div>
             <h3 className="text-2xl sm:text-3xl font-extrabold text-[#0A192F] font-['Montserrat']">Application Received!</h3>
             <p className="text-slate-600 text-base max-w-md mx-auto">
-              Thank you, <span className="font-bold">{applyForm.parentName}</span>. Your application for <span className="font-bold">{applyForm.studentName}</span> has been securely submitted to STAHIZA Admissions Office. Our team will contact you via <span className="font-bold">{applyForm.phone}</span> or office desk ({SCHOOL_CONTACTS.phone1}) within 24 hours.
+              Thank you, <span className="font-bold">{applyForm.parentName}</span>. We have received the application for <span className="font-bold">{applyForm.studentName}</span>. Our admissions desk will call you at <span className="font-bold">{applyForm.phone}</span> shortly.
             </p>
             <button
               onClick={() => { onClose(); setApplySubmitted(false); }}
@@ -160,7 +167,7 @@ export const ApplyModal: React.FC<ApplyModalProps> = ({ isOpen, onClose }) => {
             </button>
           </form>
         )}
-      </div>
+      </motion.div>
     </div>
   );
 };

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { SchoolBadgeImg } from './SchoolBadgeImg';
-import { Play, ExternalLink, Sparkles, Youtube, GraduationCap } from 'lucide-react';
+import { Play, ExternalLink, Youtube, GraduationCap } from 'lucide-react';
 import { motion } from 'motion/react';
 
 interface AcademicVideo {
@@ -146,8 +146,8 @@ export const AcademicsVideos: React.FC = () => {
               <div className="p-5 sm:p-6 flex flex-col justify-between flex-grow space-y-4">
                 <div className="space-y-2">
                   <div className="flex items-center gap-2 text-xs font-bold text-[#800020]">
-                    <Sparkles className="w-3.5 h-3.5 text-amber-500" />
-                    <span>STAHIZA Video Spotlight</span>
+                    <GraduationCap className="w-3.5 h-3.5 text-amber-600" />
+                    <span>Academic Spotlight</span>
                   </div>
                   <h4 className="font-extrabold text-base sm:text-lg font-['Montserrat'] text-[#0A192F] line-clamp-2 leading-snug">
                     {video.title}
