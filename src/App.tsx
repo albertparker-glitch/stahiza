@@ -29,6 +29,55 @@ import { Leader, TopStudent, fetchLeaders, fetchMarqueeStaff, fetchTopStudents, 
 import { getSupabasePublicUrl, getSupabaseOthersUrl } from './lib/supabase';
 import { motion, AnimatePresence } from 'motion/react';
 
+const TYPEWRITER_PHRASES = [
+  '"Education Is The Way"',
+  '"Academic Excellence & Moral Discipline"',
+  '"Home of National Sports Champions"',
+  '"Nurturing Talents & Building Leaders"',
+];
+
+function TypewriterMotto() {
+  const [text, setText] = useState('');
+  const [phraseIdx, setPhraseIdx] = useState(0);
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  useEffect(() => {
+    const fullText = TYPEWRITER_PHRASES[phraseIdx % TYPEWRITER_PHRASES.length];
+    let timeout: NodeJS.Timeout;
+
+    if (!isDeleting) {
+      if (text.length < fullText.length) {
+        timeout = setTimeout(() => {
+          setText(fullText.slice(0, text.length + 1));
+        }, 65);
+      } else {
+        timeout = setTimeout(() => {
+          setIsDeleting(true);
+        }, 2200);
+      }
+    } else {
+      if (text.length > 0) {
+        timeout = setTimeout(() => {
+          setText(fullText.slice(0, text.length - 1));
+        }, 35);
+      } else {
+        setIsDeleting(false);
+        setPhraseIdx(prev => (prev + 1) % TYPEWRITER_PHRASES.length);
+        timeout = setTimeout(() => {}, 300);
+      }
+    }
+
+    return () => clearTimeout(timeout);
+  }, [text, isDeleting, phraseIdx]);
+
+  return (
+    <span className="inline-flex items-center min-h-[1.75em]">
+      <span>{text}</span>
+      <span className="inline-block w-[3px] h-6 sm:h-7 bg-[#800020] ml-1.5 animate-pulse rounded-full" />
+    </span>
+  );
+}
+
 export default function App() {
   const [activeTab, setActiveTab] = useState<'home' | 'leadership' | 'academics' | 'sports' | 'campus' | 'contact'>('home');
   const [applyModalOpen, setApplyModalOpen] = useState(false);
@@ -183,8 +232,8 @@ export default function App() {
                     <span className="text-[#0A192F]">-</span>{' '}
                     <span className="text-[#800020]">Z</span><span className="text-[#0A192F]">zana</span>
                   </h1>
-                  <p className="text-xl sm:text-2xl font-semibold text-[#800020] italic font-serif">
-                    "Education Is The Way"
+                  <p className="text-xl sm:text-2xl font-semibold text-[#800020] italic font-serif min-h-[2rem] sm:min-h-[2.5rem] flex items-center">
+                    <TypewriterMotto />
                   </p>
                   <p className="text-slate-700 text-base sm:text-lg leading-relaxed max-w-2xl font-medium">
                     Fostering academic excellence, moral discipline, and championship talent along Entebbe Road.
