@@ -32,6 +32,20 @@ const ACADEMIC_VIDEOS: AcademicVideo[] = [
     title: 'Excellence in UNEB Sciences & Arts',
     description: 'Hands-on practical sessions in science laboratories, interactive seminars, and candidate drilling.',
     tag: 'UNEB Preparation'
+  },
+  {
+    id: 'vid-4',
+    youtubeId: 'P6dxdxyeBko',
+    title: 'Academic Excellence, UNEB Results & Student Success',
+    description: 'A look into the disciplined study culture, motivated teaching staff, and exemplary academic performance at STAHIZA.',
+    tag: 'Academic Excellence'
+  },
+  {
+    id: 'vid-5',
+    youtubeId: '4ZXlyjdoJOg',
+    title: 'Holistic Education, Curriculum & Classroom Rigor',
+    description: 'Fostering intellectual growth, science and arts mastery, and comprehensive career preparation for every learner.',
+    tag: 'Curriculum & Rigor'
   }
 ];
 
@@ -61,7 +75,7 @@ export const AcademicsVideos: React.FC = () => {
       </motion.div>
 
       {/* Video Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
         {ACADEMIC_VIDEOS.map((video, idx) => {
           const isPlaying = activeVideoId === video.id;
           const embedUrl = `https://www.youtube-nocookie.com/embed/${video.youtubeId}?autoplay=1&rel=0`;

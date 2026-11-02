@@ -25,6 +25,7 @@ import { ApplyModal } from './components/ApplyModal';
 import { ContactSection } from './components/ContactSection';
 import { VideoGallery } from './components/VideoGallery';
 import { AcademicsVideos } from './components/AcademicsVideos';
+import { SportsVideos } from './components/SportsVideos';
 import { Leader, TopStudent, fetchLeaders, fetchMarqueeStaff, fetchTopStudents, SCHOOL_CONTACTS } from './data/schoolData';
 import { getSupabasePublicUrl, getSupabaseOthersUrl } from './lib/supabase';
 import { motion, AnimatePresence } from 'motion/react';
@@ -676,6 +677,9 @@ export default function App() {
                 </div>
               ))}
             </div>
+
+            {/* SPORTS & TALENT YOUTUBE VIDEOS */}
+            <SportsVideos />
           </div>
         )}
 
