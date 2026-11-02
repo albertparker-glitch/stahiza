@@ -33,12 +33,12 @@ export const FALLBACK_LEADERS: Leader[] = [
   {
     role: "Dean Arts",
     name: "Mr. Kyeyune Andrew",
-    img: getSupabasePublicUrl("odeke.jpeg")
+    img: getSupabasePublicUrl("kyeyune.jpeg")
   },
   {
     role: "Dean Sciences",
     name: "Mr. Waiswa Adi",
-    img: getSupabasePublicUrl("odeke.jpeg")
+    img: getSupabasePublicUrl("adi.jpeg")
   },
   {
     role: "DOS",
