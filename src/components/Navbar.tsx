@@ -89,7 +89,7 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, setAppl
             <SchoolBadgeImg size={46} className="transition group-hover:scale-105" />
             <div>
               <h1 className="font-extrabold text-lg sm:text-xl tracking-tight text-[#0A192F] font-['Montserrat'] leading-tight">
-                STAHIZA <span className="text-[#800020]">ZZANA</span>
+                STAHIZA
               </h1>
               <p className="text-[10px] sm:text-xs font-medium tracking-wider text-slate-500 uppercase">
                 Education Is The Way

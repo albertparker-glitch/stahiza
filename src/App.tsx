@@ -159,7 +159,7 @@ export default function App() {
             </div>
 
             {/* HERO SECTION */}
-            <section className="relative text-white py-12 sm:py-16 overflow-hidden bg-gradient-to-br from-[#0A192F] via-[#0F2A4A] to-[#173860]">
+            <section className="relative py-12 sm:py-16 overflow-hidden bg-[#F5F2EB] border-b border-stone-200">
               <div className="max-w-7xl mx-auto px-4 sm:px-8 relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
                 <motion.div 
                   initial={{ opacity: 0, y: 25 }}
@@ -171,18 +171,22 @@ export default function App() {
                     initial={{ opacity: 0, scale: 0.9 }}
                     animate={{ opacity: 1, scale: 1 }}
                     transition={{ duration: 0.4, delay: 0.1 }}
-                    className="inline-flex items-center gap-3 bg-[#8A1C24]/30 border border-[#8A1C24]/50 px-4 py-2 rounded-full text-rose-200 text-xs sm:text-sm font-semibold tracking-wide"
+                    className="inline-flex items-center gap-3 bg-[#800020]/10 border border-[#800020]/20 px-4 py-2 rounded-full text-[#800020] text-xs sm:text-sm font-semibold tracking-wide"
                   >
                     <SchoolBadgeImg size={22} className="w-5 h-5" />
                     <span>Official STAHIZA Administrative Portal</span>
                   </motion.div>
-                  <h1 className="text-4xl sm:text-6xl font-black font-['Montserrat'] tracking-tight leading-none">
-                    Standard High School <span className="text-transparent bg-clip-text bg-gradient-to-r from-rose-400 to-amber-300">Zzana</span>
+                  <h1 className="text-4xl sm:text-6xl font-black font-['Montserrat'] tracking-tight leading-tight">
+                    <span className="text-[#800020]">S</span><span className="text-[#0A192F]">tandard</span>{' '}
+                    <span className="text-[#800020]">H</span><span className="text-[#0A192F]">igh</span>{' '}
+                    <span className="text-[#800020]">S</span><span className="text-[#0A192F]">chool</span>{' '}
+                    <span className="text-[#0A192F]">-</span>{' '}
+                    <span className="text-[#800020]">Z</span><span className="text-[#0A192F]">zana</span>
                   </h1>
-                  <p className="text-xl sm:text-2xl font-medium text-amber-200 italic font-serif">
+                  <p className="text-xl sm:text-2xl font-semibold text-[#800020] italic font-serif">
                     "Education Is The Way"
                   </p>
-                  <p className="text-slate-300 text-base sm:text-lg leading-relaxed max-w-2xl">
+                  <p className="text-slate-700 text-base sm:text-lg leading-relaxed max-w-2xl font-medium">
                     Fostering academic excellence, moral discipline, and championship talent along Entebbe Road.
                   </p>
                   <div className="flex flex-wrap gap-4 pt-4">
@@ -200,7 +204,7 @@ export default function App() {
                       whileHover={{ scale: 1.03, y: -2 }}
                       whileTap={{ scale: 0.97 }}
                       onClick={() => setActiveTab('academics')}
-                      className="bg-white/10 hover:bg-white/20 border border-white/20 text-white font-semibold px-7 py-4 rounded-xl backdrop-blur-md transition flex items-center gap-2 text-base"
+                      className="bg-white hover:bg-stone-100 border border-stone-300 text-[#0A192F] font-semibold px-7 py-4 rounded-xl shadow-sm transition flex items-center gap-2 text-base"
                     >
                       <span>Explore Academics</span>
                     </motion.button>
@@ -212,28 +216,36 @@ export default function App() {
                   initial={{ opacity: 0, scale: 0.95, y: 20 }}
                   animate={{ opacity: 1, scale: 1, y: 0 }}
                   transition={{ duration: 0.5, delay: 0.2, ease: "easeOut" }}
-                  className="lg:col-span-5 flex flex-col items-center justify-center bg-white/10 backdrop-blur-xl border border-white/15 p-8 rounded-3xl shadow-2xl space-y-6"
+                  className="lg:col-span-5 flex flex-col items-center justify-center bg-white/95 backdrop-blur-xl border border-stone-200 p-8 rounded-3xl shadow-xl space-y-6"
                 >
                   <motion.div 
                     whileHover={{ scale: 1.05 }}
                     transition={{ type: "spring", stiffness: 300 }}
-                    className="p-4 bg-white rounded-2xl shadow-lg border border-slate-200"
+                    className="p-4 bg-white rounded-2xl shadow-md border border-slate-200"
                   >
                     <SchoolBadgeImg size={100} className="w-28 h-28" />
                   </motion.div>
                   <div className="text-center space-y-2">
-                    <h3 className="text-xl font-extrabold font-['Montserrat'] text-white">Standard High School Zzana</h3>
-                    <p className="text-xs text-amber-300 font-semibold">{SCHOOL_CONTACTS.box}</p>
-                    <p className="text-xs text-slate-300">Office Desk: {SCHOOL_CONTACTS.phone1}</p>
+                    <div className="inline-block">
+                      <h3 className="text-lg sm:text-xl font-extrabold font-['Montserrat'] px-4 py-2 rounded-xl bg-[#0A192F]/10 border border-[#0A192F]/15">
+                        <span className="text-[#800020]">S</span><span className="text-[#0A192F]">tandard</span>{' '}
+                        <span className="text-[#800020]">H</span><span className="text-[#0A192F]">igh</span>{' '}
+                        <span className="text-[#800020]">S</span><span className="text-[#0A192F]">chool</span>{' '}
+                        <span className="text-[#0A192F]">-</span>{' '}
+                        <span className="text-[#800020]">Z</span><span className="text-[#0A192F]">zana</span>
+                      </h3>
+                    </div>
+                    <p className="text-xs text-[#800020] font-bold">{SCHOOL_CONTACTS.box}</p>
+                    <p className="text-xs text-slate-600 font-medium">Office Desk: {SCHOOL_CONTACTS.phone1}</p>
                   </div>
                   <div className="grid grid-cols-2 gap-4 w-full pt-2">
-                    <div className="bg-black/20 p-4 rounded-xl text-center border border-white/10">
-                      <div className="text-2xl font-black text-amber-300 font-['Montserrat']">USSSA</div>
-                      <div className="text-xs text-slate-300 mt-0.5">National Champions</div>
+                    <div className="bg-[#F5F2EB] p-4 rounded-xl text-center border border-stone-200">
+                      <div className="text-2xl font-black text-[#800020] font-['Montserrat']">USSSA</div>
+                      <div className="text-xs text-slate-700 font-medium mt-0.5">National Champions</div>
                     </div>
-                    <div className="bg-black/20 p-4 rounded-xl text-center border border-white/10">
-                      <div className="text-2xl font-black text-rose-300 font-['Montserrat']">100%</div>
-                      <div className="text-xs text-slate-300 mt-0.5">UNEB Pass Rate</div>
+                    <div className="bg-[#F5F2EB] p-4 rounded-xl text-center border border-stone-200">
+                      <div className="text-2xl font-black text-[#0A192F] font-['Montserrat']">100%</div>
+                      <div className="text-xs text-slate-700 font-medium mt-0.5">UNEB Pass Rate</div>
                     </div>
                   </div>
                 </motion.div>
