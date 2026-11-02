@@ -12,6 +12,31 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Montserrat:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <script>
+      // Gracefully handle Vite HMR WebSocket connection events in sandboxed preview iframe
+      (function() {
+        var isViteWs = function(err) {
+          if (!err) return false;
+          var str = '';
+          try {
+            str = (typeof err === 'string' ? err : (err.message || err.reason || err.toString() || '')) + (err.stack || '');
+          } catch(e) {}
+          return str.includes('WebSocket') || str.includes('createWebSocketModuleRunnerTransport') || str.includes('@vite/client');
+        };
+        window.addEventListener('unhandledrejection', function (event) {
+          if (isViteWs(event.reason)) {
+            event.preventDefault();
+            event.stopImmediatePropagation();
+          }
+        }, true);
+        window.addEventListener('error', function (event) {
+          if (isViteWs(event.error) || isViteWs(event.message) || (event.filename && event.filename.includes('@vite/client'))) {
+            event.preventDefault();
+            event.stopImmediatePropagation();
+          }
+        }, true);
+      })();
+    </script>
   </head>
   <body>
     <div id="root"></div>
