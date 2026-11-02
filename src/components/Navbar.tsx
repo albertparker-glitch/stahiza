@@ -97,8 +97,8 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, setAppl
             </div>
           </div>
 
-          {/* DESKTOP NAV LINKS (SINGLE LINE, PREVENTS WRAPPING) */}
-          <nav className="hidden lg:flex items-center gap-0.5 xl:gap-1 font-medium text-xs xl:text-sm text-slate-700 whitespace-nowrap flex-nowrap shrink-0">
+          {/* DESKTOP NAV LINKS (SINGLE LINE, PREVENTS WRAPPING, SLIDING ACTIVE PILL) */}
+          <nav className="hidden lg:flex items-center gap-1 font-medium text-xs xl:text-sm text-slate-700 whitespace-nowrap flex-nowrap shrink-0">
             {[
               { id: 'home', label: 'Home' },
               { id: 'leadership', label: 'Leadership' },
@@ -106,19 +106,27 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, setAppl
               { id: 'sports', label: 'Sports & Talent' },
               { id: 'campus', label: 'Campus Life' },
               { id: 'contact', label: 'Contact Us' },
-            ].map(item => (
-              <button
-                key={item.id}
-                onClick={() => setActiveTab(item.id)}
-                className={`px-3 xl:px-4 py-2 rounded-lg transition whitespace-nowrap ${
-                  activeTab === item.id 
-                    ? 'bg-[#0A192F] text-white font-semibold shadow-sm' 
-                    : 'hover:bg-slate-100 hover:text-[#0A192F]'
-                }`}
-              >
-                {item.label}
-              </button>
-            ))}
+            ].map(item => {
+              const isActive = activeTab === item.id;
+              return (
+                <button
+                  key={item.id}
+                  onClick={() => setActiveTab(item.id)}
+                  className={`relative px-3.5 xl:px-4 py-2 rounded-xl transition-colors duration-200 whitespace-nowrap text-xs xl:text-sm font-semibold cursor-pointer ${
+                    isActive ? 'text-white' : 'text-slate-600 hover:text-[#0A192F] hover:bg-slate-50'
+                  }`}
+                >
+                  {isActive && (
+                    <motion.div
+                      layoutId="activeNavIndicator"
+                      className="absolute inset-0 bg-[#0A192F] rounded-xl -z-10 shadow-sm"
+                      transition={{ type: "spring", stiffness: 400, damping: 30 }}
+                    />
+                  )}
+                  {item.label}
+                </button>
+              );
+            })}
           </nav>
 
           {/* GLOBAL SEARCH & CTA APPLY */}
@@ -253,11 +261,11 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, setAppl
         <AnimatePresence>
           {mobileMenuOpen && (
             <motion.div 
-              initial={{ opacity: 0, y: -10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              transition={{ duration: 0.2 }}
-              className="lg:hidden absolute top-full left-0 right-0 bg-white border-b border-slate-200 px-6 py-6 space-y-3 shadow-2xl z-50"
+              initial={{ opacity: 0, y: -16, scale: 0.98 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: -16, scale: 0.98 }}
+              transition={{ duration: 0.28, ease: [0.16, 1, 0.3, 1] }}
+              className="lg:hidden absolute top-full left-0 right-0 bg-white/98 backdrop-blur-xl border-b border-slate-200 px-6 py-6 space-y-2 shadow-2xl z-50"
             >
               {[
                 { id: 'home', label: 'Home' },
@@ -266,25 +274,33 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, setAppl
                 { id: 'sports', label: 'Sports & Talent' },
                 { id: 'campus', label: 'Campus Life' },
                 { id: 'contact', label: 'Contact Us' },
-              ].map(item => (
-                <button
+              ].map((item, idx) => (
+                <motion.button
                   key={item.id}
+                  initial={{ opacity: 0, x: -12 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: idx * 0.04, duration: 0.25 }}
                   onClick={() => { setActiveTab(item.id); setMobileMenuOpen(false); }}
-                  className={`w-full text-left px-4 py-3 rounded-xl font-bold transition text-sm sm:text-base ${
+                  className={`w-full text-left px-4 py-3 rounded-xl font-bold transition text-sm sm:text-base cursor-pointer ${
                     activeTab === item.id ? 'bg-[#0A192F] text-white shadow' : 'text-slate-700 hover:bg-slate-100'
                   }`}
                 >
                   {item.label}
-                </button>
+                </motion.button>
               ))}
-              <div className="pt-2 flex flex-col gap-2">
+              <motion.div 
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.25 }}
+                className="pt-2 flex flex-col gap-2"
+              >
                 <button
                   onClick={() => { setApplyModalOpen(true); setMobileMenuOpen(false); }}
-                  className="w-full text-center py-3 rounded-xl bg-[#800020] text-white font-bold shadow-md text-sm sm:text-base"
+                  className="w-full text-center py-3 rounded-xl bg-[#800020] text-white font-bold shadow-md hover:shadow-lg transition active:scale-98 text-sm sm:text-base cursor-pointer"
                 >
                   Apply Now 2027
                 </button>
-              </div>
+              </motion.div>
             </motion.div>
           )}
         </AnimatePresence>

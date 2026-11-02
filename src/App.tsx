@@ -25,6 +25,8 @@ import { ContactSection } from './components/ContactSection';
 import { VideoGallery } from './components/VideoGallery';
 import { AcademicsVideos } from './components/AcademicsVideos';
 import { SportsVideos } from './components/SportsVideos';
+import { AnimatedCounter } from './components/AnimatedCounter';
+import { FloatingAdmissionsWidget } from './components/FloatingAdmissionsWidget';
 import { Leader, TopStudent, fetchLeaders, fetchMarqueeStaff, fetchTopStudents, SCHOOL_CONTACTS } from './data/schoolData';
 import { getSupabasePublicUrl, getSupabaseOthersUrl } from './lib/supabase';
 import { motion, AnimatePresence } from 'motion/react';
@@ -185,31 +187,36 @@ export default function App() {
 
       {/* MAIN CONTENT AREA */}
       <main>
-        <motion.div 
-          key={activeTab}
-          initial={{ opacity: 0, y: 15 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4, ease: "easeInOut" }}
-        >
+        <AnimatePresence mode="wait">
+          <motion.div 
+            key={activeTab}
+            initial={{ opacity: 0, y: 18 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -14 }}
+            transition={{ duration: 0.38, ease: [0.16, 1, 0.3, 1] }}
+          >
           {activeTab === 'home' && (
           <div>
-            {/* FULL BLEED 100% WIDTH VIDEO BANNER (Home page only) */}
-            <div className="w-full m-0 p-0 bg-black overflow-hidden leading-none block">
-              <video 
-                autoPlay 
-                loop 
-                muted 
-                playsInline 
-                className="w-full h-auto max-h-[600px] object-contain m-0 p-0 block pointer-events-none"
-              >
-                <source src={getSupabasePublicUrl('back.mp4')} type="video/mp4" />
-                Your browser does not support the video tag.
-              </video>
-            </div>
+            {/* HERO SECTION WITH BRENTWOOD ACADEMY BACKGROUND VIDEO POSITIONING */}
+            <section className="relative py-16 sm:py-24 overflow-hidden bg-[#F5F2EB] border-b border-stone-200 min-h-[580px] sm:min-h-[640px] flex items-center">
+              {/* ABSOLUTE BACKGROUND VIDEO LAYER */}
+              <div className="absolute inset-0 w-full h-full overflow-hidden pointer-events-none z-0">
+                <video 
+                  autoPlay 
+                  loop 
+                  muted 
+                  playsInline 
+                  className="w-full h-full object-cover object-center scale-105 pointer-events-none"
+                >
+                  <source src={getSupabasePublicUrl('back.mp4')} type="video/mp4" />
+                  Your browser does not support the video tag.
+                </video>
+                {/* SEMI-TRANSPARENT BEIGE TINT OVERLAY FOR CONTRAST & LEGIBILITY */}
+                <div className="absolute inset-0 bg-[#F5F2EB]/85 backdrop-blur-[1.5px]" />
+              </div>
 
-            {/* HERO SECTION */}
-            <section className="relative py-12 sm:py-16 overflow-hidden bg-[#F5F2EB] border-b border-stone-200">
-              <div className="max-w-7xl mx-auto px-4 sm:px-8 relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+              {/* FOREGROUND HERO CONTENT */}
+              <div className="max-w-7xl mx-auto px-4 sm:px-8 relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-12 items-center w-full">
                 <motion.div 
                   initial={{ opacity: 0, y: 25 }}
                   animate={{ opacity: 1, y: 0 }}
@@ -293,7 +300,9 @@ export default function App() {
                       <div className="text-xs text-slate-700 font-medium mt-0.5">National Champions</div>
                     </div>
                     <div className="bg-[#F5F2EB] p-4 rounded-xl text-center border border-stone-200">
-                      <div className="text-2xl font-black text-[#0A192F] font-['Montserrat']">100%</div>
+                      <div className="text-2xl font-black text-[#0A192F] font-['Montserrat']">
+                        <AnimatedCounter target={100} suffix="%" />
+                      </div>
                       <div className="text-xs text-slate-700 font-medium mt-0.5">UNEB Pass Rate</div>
                     </div>
                   </div>
@@ -358,18 +367,23 @@ export default function App() {
                 ].map((pillar, idx) => (
                   <motion.div 
                     key={idx}
-                    initial={{ opacity: 0, y: 30 }}
+                    initial={{ opacity: 0, y: 32 }}
                     whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true, margin: "-30px" }}
-                    transition={{ duration: 0.45, delay: idx * 0.12, ease: "easeOut" }}
-                    whileHover={{ y: -6 }}
-                    className="bg-gradient-to-br from-[#0A192F] via-[#0F2A4A] to-[#173860] text-white rounded-2xl p-8 shadow-xl hover:shadow-2xl transition-all duration-300 border border-slate-700 group flex flex-col justify-between"
+                    viewport={{ once: true, margin: "-40px" }}
+                    transition={{ duration: 0.6, delay: idx * 0.12, ease: [0.16, 1, 0.3, 1] }}
+                    whileHover={{ y: -8, scale: 1.015 }}
+                    onClick={() => {
+                      if (pillar.title === 'Academics') setActiveTab('academics');
+                      else if (pillar.title === 'Sports') setActiveTab('sports');
+                      else setActiveTab('campus');
+                    }}
+                    className="bg-gradient-to-br from-[#0A192F] via-[#0F2A4A] to-[#173860] text-white rounded-2xl p-8 shadow-xl hover:shadow-2xl transition-all duration-300 border border-slate-700/80 group flex flex-col justify-between cursor-pointer"
                   >
                     <div className="space-y-6">
-                      <div className="w-16 h-16 rounded-2xl flex items-center justify-center border bg-white/10 text-amber-300 border-white/20 group-hover:scale-110 transition duration-300">
+                      <div className="w-16 h-16 rounded-2xl flex items-center justify-center border bg-white/10 text-amber-300 border-white/20 group-hover:scale-110 group-hover:bg-white/15 transition-transform duration-300 ease-out">
                         <pillar.icon className="w-8 h-8" />
                       </div>
-                      <h3 className="text-2xl font-bold font-['Montserrat'] text-white">
+                      <h3 className="text-2xl font-bold font-['Montserrat'] text-white group-hover:text-amber-200 transition-colors">
                         {pillar.title}
                       </h3>
                       <p className="text-slate-300 leading-relaxed text-sm sm:text-base">
@@ -377,8 +391,8 @@ export default function App() {
                       </p>
                     </div>
                     <div className="pt-6 mt-6 border-t border-slate-800 flex items-center justify-between text-sm font-semibold text-amber-300 group-hover:text-amber-200">
-                      <span>Learn more</span>
-                      <ChevronRight className="w-4 h-4 transform group-hover:translate-x-1 transition" />
+                      <span>Explore {pillar.title}</span>
+                      <ChevronRight className="w-4 h-4 transform group-hover:translate-x-1.5 transition-transform duration-200" />
                     </div>
                   </motion.div>
                 ))}
@@ -491,24 +505,33 @@ export default function App() {
                   </p>
                   <div className="grid grid-cols-2 sm:grid-cols-3 gap-6 pt-4">
                     <motion.div 
-                      whileHover={{ scale: 1.03 }}
-                      className="bg-white p-4 rounded-xl shadow-sm border border-slate-200 text-center"
+                      whileHover={{ scale: 1.04, y: -4 }}
+                      transition={{ type: "spring", stiffness: 350, damping: 20 }}
+                      className="bg-white p-4 rounded-xl shadow-sm hover:shadow-md border border-slate-200 text-center transition-shadow"
                     >
-                      <div className="text-2xl sm:text-3xl font-black text-[#800020] font-['Montserrat']">100%</div>
+                      <div className="text-2xl sm:text-3xl font-black text-[#800020] font-['Montserrat']">
+                        <AnimatedCounter target={100} suffix="%" />
+                      </div>
                       <div className="text-xs text-slate-600 font-medium mt-1">Boarding Security</div>
                     </motion.div>
                     <motion.div 
-                      whileHover={{ scale: 1.03 }}
-                      className="bg-white p-4 rounded-xl shadow-sm border border-slate-200 text-center"
+                      whileHover={{ scale: 1.04, y: -4 }}
+                      transition={{ type: "spring", stiffness: 350, damping: 20 }}
+                      className="bg-white p-4 rounded-xl shadow-sm hover:shadow-md border border-slate-200 text-center transition-shadow"
                     >
-                      <div className="text-2xl sm:text-3xl font-black text-[#0A192F] font-['Montserrat']">50+</div>
+                      <div className="text-2xl sm:text-3xl font-black text-[#0A192F] font-['Montserrat']">
+                        <AnimatedCounter target={50} suffix="+" />
+                      </div>
                       <div className="text-xs text-slate-600 font-medium mt-1">Trophies & Awards</div>
                     </motion.div>
                     <motion.div 
-                      whileHover={{ scale: 1.03 }}
-                      className="bg-white p-4 rounded-xl shadow-sm border border-slate-200 text-center col-span-2 sm:col-span-1"
+                      whileHover={{ scale: 1.04, y: -4 }}
+                      transition={{ type: "spring", stiffness: 350, damping: 20 }}
+                      className="bg-white p-4 rounded-xl shadow-sm hover:shadow-md border border-slate-200 text-center col-span-2 sm:col-span-1 transition-shadow"
                     >
-                      <div className="text-2xl sm:text-3xl font-black text-[#800020] font-['Montserrat']">Top 10</div>
+                      <div className="text-2xl sm:text-3xl font-black text-[#800020] font-['Montserrat']">
+                        Top <AnimatedCounter target={10} />
+                      </div>
                       <div className="text-xs text-slate-600 font-medium mt-1">National Ranking</div>
                     </motion.div>
                   </div>
@@ -893,25 +916,39 @@ export default function App() {
               </p>
             </div>
 
-            {/* CAMPUS SECTION DROPDOWN / FILTER SELECTOR */}
-            <div id="campus-section-filter" className="flex flex-col sm:flex-row items-center justify-between gap-3 bg-white p-4 sm:p-5 rounded-2xl shadow-md border border-slate-200 max-w-2xl mx-auto">
-              <div className="flex items-center gap-2">
-                <Building2 className="w-4 h-4 text-[#800020]" />
-                <label className="text-xs font-bold uppercase tracking-wider text-slate-500 whitespace-nowrap">Filter Directory:</label>
+            {/* CAMPUS SECTION FILTER SELECTOR (WALKER SCHOOL STYLE SLIDING PILLS) */}
+            <div id="campus-section-filter" className="max-w-4xl mx-auto space-y-3">
+              <div className="bg-white p-2 rounded-2xl shadow-sm border border-slate-200 overflow-x-auto scrollbar-none flex items-center justify-start sm:justify-center gap-1.5">
+                {[
+                  { id: 'all', label: 'All Overview' },
+                  { id: 'facilities', label: 'Facilities' },
+                  { id: 'clubs', label: 'Clubs' },
+                  { id: 'prefects', label: 'Prefects' },
+                  { id: 'teachers', label: 'Teachers' },
+                  { id: 'staff', label: 'Staff' },
+                  { id: 'gallery', label: 'Photo Gallery' },
+                ].map((item) => {
+                  const isSelected = campusSection === item.id;
+                  return (
+                    <button
+                      key={item.id}
+                      onClick={() => setCampusSection(item.id as any)}
+                      className={`relative px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold whitespace-nowrap transition-colors duration-200 cursor-pointer ${
+                        isSelected ? 'text-white' : 'text-slate-600 hover:text-[#0A192F] hover:bg-slate-50'
+                      }`}
+                    >
+                      {isSelected && (
+                        <motion.div
+                          layoutId="campusActivePill"
+                          className="absolute inset-0 bg-[#0A192F] rounded-xl -z-10 shadow-sm"
+                          transition={{ type: "spring", stiffness: 380, damping: 28 }}
+                        />
+                      )}
+                      {item.label}
+                    </button>
+                  );
+                })}
               </div>
-              <select
-                value={campusSection}
-                onChange={(e) => setCampusSection(e.target.value as any)}
-                className="bg-slate-50 border border-slate-300 rounded-xl px-4 py-2.5 text-sm font-bold text-[#0A192F] focus:outline-none focus:ring-2 focus:ring-[#0A192F] w-full sm:w-auto shadow-sm cursor-pointer"
-              >
-                <option value="all">All Sections (Full Overview)</option>
-                <option value="facilities">Campus Facilities (Labs, Dorms, Library)</option>
-                <option value="clubs">Clubs & Societies (Scrabble, MDD, Debate)</option>
-                <option value="prefects">Prefects Cabinet & Student Leaders</option>
-                <option value="teachers">Teachers & Administration</option>
-                <option value="staff">Staff Members</option>
-                <option value="gallery">Campus Photo Gallery</option>
-              </select>
             </div>
 
             {/* FACILITIES SECTION */}
@@ -1370,7 +1407,8 @@ export default function App() {
         {activeTab === 'contact' && (
           <ContactSection />
         )}
-        </motion.div>
+          </motion.div>
+        </AnimatePresence>
       </main>
 
       {/* FOOTER */}
@@ -1383,6 +1421,12 @@ export default function App() {
       <ApplyModal 
         isOpen={applyModalOpen} 
         onClose={() => setApplyModalOpen(false)} 
+      />
+
+      {/* FLOATING ADMISSIONS WIDGET (WALKER SCHOOL STYLE QUICK DOCK) */}
+      <FloatingAdmissionsWidget 
+        onApplyClick={() => setApplyModalOpen(true)}
+        onContactClick={() => setActiveTab('contact')}
       />
 
       {/* FLOATING BACK TO TOP BUTTON (ALL PAGES) */}

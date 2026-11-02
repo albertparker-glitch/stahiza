@@ -22,28 +22,39 @@ export const ApplyModal: React.FC<ApplyModalProps> = ({ isOpen, onClose }) => {
   });
   const [applySubmitted, setApplySubmitted] = useState(false);
 
-  if (!isOpen) return null;
-
   const handleApplySubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setApplySubmitted(true);
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
-      <motion.div 
-        initial={{ opacity: 0, scale: 0.95, y: 15 }}
-        animate={{ opacity: 1, scale: 1, y: 0 }}
-        exit={{ opacity: 0, scale: 0.95, y: 15 }}
-        transition={{ duration: 0.25, ease: "easeOut" }}
-        className="bg-white rounded-3xl max-w-2xl w-full p-6 sm:p-10 shadow-2xl relative my-8"
-      >
-        <button
-          onClick={() => { onClose(); setApplySubmitted(false); }}
-          className="absolute top-6 right-6 p-2 text-slate-400 hover:text-slate-700 bg-slate-100 rounded-full transition"
-        >
-          <X className="w-5 h-5" />
-        </button>
+    <AnimatePresence>
+      {isOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 overflow-y-auto">
+          {/* Backdrop */}
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.25 }}
+            onClick={() => { onClose(); setApplySubmitted(false); }}
+            className="fixed inset-0 bg-black/75 backdrop-blur-sm"
+          />
+
+          {/* Modal Card */}
+          <motion.div 
+            initial={{ opacity: 0, scale: 0.92, y: 24 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.92, y: 24 }}
+            transition={{ type: "spring", stiffness: 360, damping: 28 }}
+            className="bg-white rounded-3xl max-w-2xl w-full p-6 sm:p-10 shadow-2xl relative my-8 z-10"
+          >
+            <button
+              onClick={() => { onClose(); setApplySubmitted(false); }}
+              className="absolute top-6 right-6 p-2 text-slate-400 hover:text-slate-700 bg-slate-100 rounded-full transition cursor-pointer"
+            >
+              <X className="w-5 h-5" />
+            </button>
 
         {applySubmitted ? (
           <div className="text-center py-12 space-y-6">
@@ -167,7 +178,9 @@ export const ApplyModal: React.FC<ApplyModalProps> = ({ isOpen, onClose }) => {
             </button>
           </form>
         )}
-      </motion.div>
-    </div>
+          </motion.div>
+        </div>
+      )}
+    </AnimatePresence>
   );
 };

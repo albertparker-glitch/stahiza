@@ -91,11 +91,12 @@ export const SportsVideos: React.FC = () => {
           return (
             <motion.div
               key={video.id}
-              initial={{ opacity: 0, y: 25 }}
+              initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "-40px" }}
-              transition={{ duration: 0.45, delay: (idx % 3) * 0.1, ease: "easeOut" }}
-              className={`bg-white rounded-3xl overflow-hidden shadow-md border border-slate-200 hover:shadow-xl hover:border-amber-400/60 transition-all duration-300 flex flex-col justify-between group ${
+              transition={{ duration: 0.55, delay: (idx % 3) * 0.1, ease: [0.16, 1, 0.3, 1] }}
+              whileHover={{ y: -8, scale: 1.01 }}
+              className={`bg-white rounded-3xl overflow-hidden shadow-md border border-slate-200 hover:shadow-2xl hover:border-amber-400/60 transition-all duration-300 flex flex-col justify-between group ${
                 idx === 3 ? 'md:col-span-1 lg:col-span-1' : ''
               }`}
             >
@@ -117,15 +118,18 @@ export const SportsVideos: React.FC = () => {
                     <img
                       src={thumbnailUrl}
                       alt={video.title}
-                      className="w-full h-full object-cover group-hover/thumb:scale-105 transition-transform duration-500"
+                      className="w-full h-full object-cover group-hover/thumb:scale-108 transition-transform duration-700 ease-out"
                       loading="lazy"
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent group-hover/thumb:opacity-90 transition-opacity" />
                     
-                    {/* Play Button Overlay */}
+                    {/* Play Button Overlay with Pulse Ring */}
                     <div className="absolute inset-0 flex items-center justify-center">
-                      <div className="w-14 h-14 rounded-full bg-amber-500 hover:bg-amber-600 text-white flex items-center justify-center shadow-2xl transform group-hover/thumb:scale-115 active:scale-95 transition duration-300 border-2 border-white/40">
-                        <Play className="w-6 h-6 fill-current ml-0.5 text-[#0A192F]" />
+                      <div className="relative flex items-center justify-center">
+                        <div className="absolute -inset-2 rounded-full bg-amber-400/35 animate-ping opacity-75 group-hover/thumb:opacity-100" />
+                        <div className="relative w-14 h-14 rounded-full bg-amber-500 hover:bg-amber-600 text-white flex items-center justify-center shadow-2xl transform group-hover/thumb:scale-115 active:scale-95 transition-transform duration-300 border-2 border-white/40">
+                          <Play className="w-6 h-6 fill-current ml-0.5 text-[#0A192F]" />
+                        </div>
                       </div>
                     </div>
 

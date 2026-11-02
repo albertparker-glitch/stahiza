@@ -151,11 +151,12 @@ export const VideoGallery: React.FC = () => {
             {videos.map((vid, idx) => (
               <motion.div 
                 key={idx}
-                initial={{ opacity: 0, scale: 0.95, y: 20 }}
+                initial={{ opacity: 0, scale: 0.96, y: 24 }}
                 whileInView={{ opacity: 1, scale: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: idx * 0.1 }}
-                className="rounded-2xl overflow-hidden bg-slate-900 shadow-xl border border-slate-800/80 group hover:border-amber-300/40 transition duration-300 flex flex-col justify-between"
+                viewport={{ once: true, margin: "-40px" }}
+                transition={{ duration: 0.55, delay: idx * 0.1, ease: [0.16, 1, 0.3, 1] }}
+                whileHover={{ y: -6, scale: 1.015 }}
+                className="rounded-2xl overflow-hidden bg-slate-900 shadow-xl border border-slate-800/80 group hover:border-amber-300/40 hover:shadow-2xl transition duration-300 flex flex-col justify-between"
               >
                 <div className="relative aspect-video w-full bg-black overflow-hidden">
                   <video 
