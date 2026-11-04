@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { supabase, getSupabasePublicUrl } from '../lib/supabase';
+import { supabase, getSupabaseVideosUrl } from '../lib/supabase';
 import { SchoolBadgeImg } from './SchoolBadgeImg';
 import { Film, Play } from 'lucide-react';
 import { motion } from 'motion/react';
@@ -10,95 +10,58 @@ interface VideoItem {
   title: string;
 }
 
+const DEFAULT_VIDEOS: VideoItem[] = [
+  {
+    name: 'life1.mp4',
+    url: getSupabaseVideosUrl('life1.mp4'),
+    title: 'STAHIZA Campus Life Highlight 1'
+  },
+  {
+    name: 'life2.mp4',
+    url: getSupabaseVideosUrl('life2.mp4'),
+    title: 'STAHIZA Campus Life Highlight 2'
+  },
+  {
+    name: 'life3.mp4',
+    url: getSupabaseVideosUrl('life3.mp4'),
+    title: 'STAHIZA Campus Life Highlight 3'
+  },
+  {
+    name: 'life4.mp4',
+    url: getSupabaseVideosUrl('life4.mp4'),
+    title: 'STAHIZA Campus Life Highlight 4'
+  }
+];
+
 export const VideoGallery: React.FC = () => {
-  const [videos, setVideos] = useState<VideoItem[]>([]);
+  const [videos, setVideos] = useState<VideoItem[]>(DEFAULT_VIDEOS);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function fetchVideos() {
       try {
-        const cleaningVideoUrl = getSupabasePublicUrl('videos/cleaning.mp4');
-        const back4VideoUrl = getSupabasePublicUrl('videos/back4.mp4');
+        const lifeFiles = ['life1.mp4', 'life2.mp4', 'life3.mp4', 'life4.mp4'];
 
-        if (!supabase) {
-          setVideos([
-            {
-              name: 'back4.mp4',
-              url: back4VideoUrl,
-              title: 'STAHIZA Campus Highlight'
-            },
-            {
-              name: 'cleaning.mp4',
-              url: cleaningVideoUrl,
-              title: 'Campus Cleaning & Environment'
-            }
-          ]);
+        const client = supabase;
+        if (!client) {
+          setVideos(DEFAULT_VIDEOS);
           setLoading(false);
           return;
         }
 
-        const { data: files, error } = await supabase.storage
-          .from('IMAGES')
-          .list('videos/', {
-            limit: 20,
-            offset: 0,
-            sortBy: { column: 'name', order: 'asc' }
-          });
-
-        let videoItems: VideoItem[] = [];
-
-        videoItems.push({
-          name: 'back4.mp4',
-          url: back4VideoUrl,
-          title: 'STAHIZA Campus Highlight'
+        const items: VideoItem[] = lifeFiles.map((filename, index) => {
+          const { data } = client.storage.from('IMAGES').getPublicUrl(`videos/${filename}`);
+          return {
+            name: filename,
+            url: data?.publicUrl || getSupabaseVideosUrl(filename),
+            title: `STAHIZA Campus Life Highlight ${index + 1}`
+          };
         });
 
-        videoItems.push({
-          name: 'cleaning.mp4',
-          url: cleaningVideoUrl,
-          title: 'Campus Cleaning & Environment'
-        });
-
-        if (!error && files && files.length > 0) {
-          const mp4Files = files.filter(f => 
-            f.name && 
-            f.name.toLowerCase().endsWith('.mp4') && 
-            f.name.toLowerCase() !== 'cleaning.mp4' &&
-            f.name.toLowerCase() !== 'back4.mp4'
-          );
-          
-          if (supabase) {
-            const client = supabase;
-            mp4Files.forEach(file => {
-              const { data } = client.storage.from('IMAGES').getPublicUrl(`videos/${file.name}`);
-              const cleanTitle = file.name
-                .replace(/\.[^/.]+$/, '')
-                .replace(/[-_]/g, ' ')
-                .replace(/\b\w/g, c => c.toUpperCase());
-              videoItems.push({
-                name: file.name,
-                url: data.publicUrl,
-                title: cleanTitle
-              });
-            });
-          }
-        }
-
-        setVideos(videoItems);
+        setVideos(items);
       } catch (err) {
         console.error('Error fetching videos from Supabase:', err);
-        setVideos([
-          {
-            name: 'back4.mp4',
-            url: getSupabasePublicUrl('videos/back4.mp4'),
-            title: 'STAHIZA Campus Highlight'
-          },
-          {
-            name: 'cleaning.mp4',
-            url: getSupabasePublicUrl('videos/cleaning.mp4'),
-            title: 'Campus Cleaning & Environment'
-          }
-        ]);
+        setVideos(DEFAULT_VIDEOS);
       } finally {
         setLoading(false);
       }
@@ -127,14 +90,14 @@ export const VideoGallery: React.FC = () => {
             Campus Moments & Activities
           </h2>
           <p className="text-slate-300 text-sm">
-            Explore recent highlights from academics, sports championships, and campus life at Standard High School Zzana.
+            Watch official highlights from student life, campus assemblies, and activities at Standard High School Zzana.
           </p>
         </motion.div>
 
         {/* Loading State / Skeletons */}
         {loading ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {[1, 2, 3].map(n => (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {[1, 2, 3, 4].map(n => (
               <div key={n} className="rounded-2xl overflow-hidden bg-slate-900 border border-slate-800 p-4 space-y-4 animate-pulse">
                 <div className="aspect-video w-full bg-slate-800 rounded-xl"></div>
                 <div className="h-4 bg-slate-800 rounded w-3/4"></div>
@@ -146,8 +109,8 @@ export const VideoGallery: React.FC = () => {
             No video files found in the Supabase videos/ directory.
           </div>
         ) : (
-          /* Responsive Grid */
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          /* Responsive 4-Column Grid for life1 to life4 */
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {videos.map((vid, idx) => (
               <motion.div 
                 key={idx}
@@ -155,7 +118,7 @@ export const VideoGallery: React.FC = () => {
                 whileInView={{ opacity: 1, scale: 1, y: 0 }}
                 viewport={{ once: true, margin: "-40px" }}
                 transition={{ duration: 0.55, delay: idx * 0.1, ease: [0.16, 1, 0.3, 1] }}
-                whileHover={{ y: -6, scale: 1.015 }}
+                whileHover={{ y: -6, scale: 1.025 }}
                 className="rounded-2xl overflow-hidden bg-slate-900 shadow-xl border border-slate-800/80 group hover:border-amber-300/40 hover:shadow-2xl transition duration-300 flex flex-col justify-between"
               >
                 <div className="relative aspect-video w-full bg-black overflow-hidden">
@@ -164,12 +127,14 @@ export const VideoGallery: React.FC = () => {
                     loop 
                     muted 
                     playsInline 
+                    controls
                     className="w-full h-full object-cover group-hover:scale-105 transition duration-500"
                   >
                     <source src={vid.url} type="video/mp4" />
+                    <source src={vid.url.replace('.mp4', '.webm')} type="video/webm" />
                     Your browser does not support the video tag.
                   </video>
-                  <div className="absolute top-3 right-3 bg-black/60 backdrop-blur-md p-1.5 rounded-lg border border-white/10 text-amber-300">
+                  <div className="absolute top-3 right-3 bg-black/60 backdrop-blur-md p-1.5 rounded-lg border border-white/10 text-amber-300 pointer-events-none">
                     <Play className="w-3.5 h-3.5 fill-current" />
                   </div>
                 </div>
