@@ -913,6 +913,57 @@ export default function App() {
               </p>
             </div>
 
+            {/* HORIZONTAL STATS ROW (CAMPUS LIFE) */}
+            <motion.div 
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5 }}
+              className="grid grid-cols-1 sm:grid-cols-3 gap-6 my-6 max-w-5xl mx-auto"
+            >
+              <div className="bg-gradient-to-br from-[#0A192F] to-[#173860] text-white p-6 rounded-2xl border border-slate-700/80 shadow-lg flex items-center justify-between hover:shadow-xl transition-all duration-300 hover:-translate-y-0.5">
+                <div className="space-y-1">
+                  <div className="text-3xl sm:text-4xl font-extrabold font-['Montserrat'] text-amber-300">
+                    <AnimatedCounter target={1500} suffix="+" />
+                  </div>
+                  <div className="text-xs font-bold text-slate-300 uppercase tracking-wider">
+                    Total Students
+                  </div>
+                </div>
+                <div className="w-12 h-12 rounded-xl bg-amber-400/15 text-amber-300 flex items-center justify-center border border-amber-400/20 shrink-0">
+                  <Users className="w-6 h-6" />
+                </div>
+              </div>
+
+              <div className="bg-gradient-to-br from-[#800020] to-[#500014] text-white p-6 rounded-2xl border border-rose-900/60 shadow-lg flex items-center justify-between hover:shadow-xl transition-all duration-300 hover:-translate-y-0.5">
+                <div className="space-y-1">
+                  <div className="text-3xl sm:text-4xl font-extrabold font-['Montserrat'] text-amber-200">
+                    <AnimatedCounter target={18} suffix="+" />
+                  </div>
+                  <div className="text-xs font-bold text-rose-200 uppercase tracking-wider">
+                    Active Clubs
+                  </div>
+                </div>
+                <div className="w-12 h-12 rounded-xl bg-white/10 text-rose-200 flex items-center justify-center border border-white/20 shrink-0">
+                  <Trophy className="w-6 h-6" />
+                </div>
+              </div>
+
+              <div className="bg-gradient-to-br from-[#0A192F] to-[#173860] text-white p-6 rounded-2xl border border-slate-700/80 shadow-lg flex items-center justify-between hover:shadow-xl transition-all duration-300 hover:-translate-y-0.5">
+                <div className="space-y-1">
+                  <div className="text-3xl sm:text-4xl font-extrabold font-['Montserrat'] text-amber-300">
+                    <AnimatedCounter target={25} suffix="+" />
+                  </div>
+                  <div className="text-xs font-bold text-slate-300 uppercase tracking-wider">
+                    Years of Excellence
+                  </div>
+                </div>
+                <div className="w-12 h-12 rounded-xl bg-amber-400/15 text-amber-300 flex items-center justify-center border border-amber-400/20 shrink-0">
+                  <Award className="w-6 h-6" />
+                </div>
+              </div>
+            </motion.div>
+
             {/* CAMPUS SECTION FILTER SELECTOR (WALKER SCHOOL STYLE SLIDING PILLS) */}
             <div id="campus-section-filter" className="max-w-4xl mx-auto space-y-3">
               <div className="bg-white p-2 rounded-2xl shadow-sm border border-slate-200 overflow-x-auto scrollbar-none flex items-center justify-start sm:justify-center gap-1.5">
