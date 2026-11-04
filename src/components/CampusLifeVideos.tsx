@@ -1,5 +1,6 @@
 import React from 'react';
 import { getSupabaseVideosUrl } from '../lib/supabase';
+import { Video } from 'lucide-react';
 import { motion } from 'motion/react';
 
 export interface CampusVideoItem {
@@ -21,7 +22,34 @@ const CAMPUS_VIDEOS_LIST: CampusVideoItem[] = [
 export const CampusLifeVideos: React.FC = () => {
   return (
     <div className="space-y-6 pt-2">
-      {/* VIDEO GRID - ONLY VIDEOS WITH BOX SHADOW, NO CAPTIONS OR WORDS */}
+      {/* STICKY CATEGORY HEADER WITH TITLE "Stahiza in a brief" */}
+      <div className="sticky top-20 z-20 -mx-4 sm:-mx-8 px-4 sm:px-8 py-3.5 bg-[#F8FAFC]/95 backdrop-blur-md border-y border-slate-200/90 shadow-sm flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <div className="w-8 h-8 rounded-xl bg-[#0A192F] text-amber-300 flex items-center justify-center font-bold shadow-sm shrink-0">
+            <Video className="w-4 h-4" />
+          </div>
+          <div>
+            <h3 className="text-xl sm:text-2xl font-extrabold font-['Montserrat'] text-[#0A192F]">
+              Stahiza in a brief
+            </h3>
+            <span className="text-[10px] sm:text-xs text-[#800020] font-bold uppercase tracking-wider block">
+              Campus Life Video Highlights
+            </span>
+          </div>
+        </div>
+
+        <button 
+          onClick={() => {
+            const el = document.getElementById('campus-section-filter');
+            if (el) el.scrollIntoView({ behavior: 'smooth' });
+          }}
+          className="text-xs font-bold text-[#800020] hover:text-[#600018] bg-rose-50 border border-rose-200 px-3.5 py-1.5 rounded-full transition flex items-center gap-1 shadow-sm shrink-0"
+        >
+          <span>Change Section</span>
+        </button>
+      </div>
+
+      {/* VIDEO GRID - ONLY VIDEOS WITH BOX SHADOW */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8">
         {CAMPUS_VIDEOS_LIST.map((vid, idx) => {
           const videoUrl = getSupabaseVideosUrl(vid.fileKey);

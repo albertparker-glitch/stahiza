@@ -30,6 +30,7 @@ import { AnimatedCounter } from './components/AnimatedCounter';
 import { FloatingAdmissionsWidget } from './components/FloatingAdmissionsWidget';
 import { AdmissionsFaq } from './components/AdmissionsFaq';
 import { SectionDivider } from './components/SectionDivider';
+import { AdmissionFormSection } from './components/AdmissionFormSection';
 import { Leader, TopStudent, fetchLeaders, fetchMarqueeStaff, fetchTopStudents, SCHOOL_CONTACTS } from './data/schoolData';
 import { getSupabasePublicUrl, getSupabaseOthersUrl } from './lib/supabase';
 import { motion, AnimatePresence } from 'motion/react';
@@ -84,7 +85,7 @@ function TypewriterMotto() {
 }
 
 export default function App() {
-  const [activeTab, setActiveTab] = useState<'home' | 'leadership' | 'academics' | 'sports' | 'campus' | 'contact'>('home');
+  const [activeTab, setActiveTab] = useState<'home' | 'leadership' | 'academics' | 'sports' | 'campus' | 'admissions' | 'contact'>('home');
   const [applyModalOpen, setApplyModalOpen] = useState(false);
   const [leaders, setLeaders] = useState<Leader[]>([]);
   const [marqueeStaff, setMarqueeStaff] = useState<Leader[]>([]);
@@ -1428,6 +1429,10 @@ export default function App() {
           </div>
         )}
 
+        {activeTab === 'admissions' && (
+          <AdmissionFormSection />
+        )}
+
         {activeTab === 'contact' && (
           <ContactSection />
         )}
@@ -1445,6 +1450,7 @@ export default function App() {
       <ApplyModal 
         isOpen={applyModalOpen} 
         onClose={() => setApplyModalOpen(false)} 
+        onNavigateToAdmissions={() => setActiveTab('admissions')}
       />
 
       {/* FLOATING ADMISSIONS WIDGET (WALKER SCHOOL STYLE QUICK DOCK) */}

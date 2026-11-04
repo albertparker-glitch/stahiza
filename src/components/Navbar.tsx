@@ -105,6 +105,7 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, setAppl
               { id: 'academics', label: 'Academics' },
               { id: 'sports', label: 'Sports & Talent' },
               { id: 'campus', label: 'Campus Life' },
+              { id: 'admissions', label: 'Fees & Admission' },
               { id: 'contact', label: 'Contact Us' },
             ].map(item => {
               const isActive = activeTab === item.id;
@@ -273,6 +274,7 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, setAppl
                 { id: 'academics', label: 'Academics' },
                 { id: 'sports', label: 'Sports & Talent' },
                 { id: 'campus', label: 'Campus Life' },
+                { id: 'admissions', label: 'Fees & Admission Form' },
                 { id: 'contact', label: 'Contact Us' },
               ].map((item, idx) => (
                 <motion.button
