@@ -31,6 +31,7 @@ import { FloatingAdmissionsWidget } from './components/FloatingAdmissionsWidget'
 import { AdmissionsFaq } from './components/AdmissionsFaq';
 import { SectionDivider } from './components/SectionDivider';
 import { AdmissionFormSection } from './components/AdmissionFormSection';
+import { Preloader } from './components/Preloader';
 import { Leader, TopStudent, fetchLeaders, fetchMarqueeStaff, fetchTopStudents, SCHOOL_CONTACTS } from './data/schoolData';
 import { getSupabasePublicUrl, getSupabaseOthersUrl } from './lib/supabase';
 import { motion, AnimatePresence } from 'motion/react';
@@ -182,6 +183,9 @@ export default function App() {
   return (
     <div className="min-h-screen bg-[#F8FAFC] text-slate-800 font-['Inter',sans-serif] selection:bg-[#800020] selection:text-white">
       
+      {/* 3-SECOND ROTATING DOTTED SPHERE PRELOADER WITH SITE THEME */}
+      <Preloader duration={3000} />
+
       {/* NAVBAR */}
       <Navbar 
         activeTab={activeTab} 
