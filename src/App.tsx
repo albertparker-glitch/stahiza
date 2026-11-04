@@ -1100,7 +1100,9 @@ export default function App() {
                       whileInView={{ opacity: 1, y: 0 }}
                       viewport={{ once: true, margin: "-40px" }}
                       transition={{ duration: 0.45, delay: (idx % 3) * 0.1, ease: "easeOut" }}
-                      className="bg-white rounded-2xl overflow-hidden shadow-sm border border-slate-200 flex flex-col hover:shadow-xl transition-all duration-300 hover:-translate-y-1 group"
+                      whileHover={{ scale: 1.025, y: -6, transition: { duration: 0.25, ease: "easeOut" } }}
+                      whileTap={{ scale: 0.98 }}
+                      className="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-2xl border border-slate-200 flex flex-col transition-shadow duration-300 group cursor-pointer"
                     >
                       <div className="relative w-full h-48 sm:h-52 bg-slate-100 overflow-hidden">
                         <img 
