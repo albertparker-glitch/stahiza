@@ -28,6 +28,9 @@ export function getSupabaseAcademicsUrl(fileName: string): string {
 
 export function getSupabaseVideosUrl(fileName: string): string {
   if (!supabaseUrl) return `/pages/images/${fileName}`;
-  const cleanName = fileName.startsWith('/') ? fileName.slice(1) : fileName;
+  let cleanName = fileName.startsWith('/') ? fileName.slice(1) : fileName;
+  if (!cleanName.includes('.')) {
+    cleanName = `${cleanName}.mp4`;
+  }
   return `${supabaseUrl}/storage/v1/object/public/IMAGES/videos/${cleanName}`;
 }

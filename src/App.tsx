@@ -25,6 +25,7 @@ import { ContactSection } from './components/ContactSection';
 import { VideoGallery } from './components/VideoGallery';
 import { AcademicsVideos } from './components/AcademicsVideos';
 import { SportsVideos } from './components/SportsVideos';
+import { CampusLifeVideos } from './components/CampusLifeVideos';
 import { AnimatedCounter } from './components/AnimatedCounter';
 import { FloatingAdmissionsWidget } from './components/FloatingAdmissionsWidget';
 import { AdmissionsFaq } from './components/AdmissionsFaq';
@@ -87,7 +88,7 @@ export default function App() {
   const [leaders, setLeaders] = useState<Leader[]>([]);
   const [marqueeStaff, setMarqueeStaff] = useState<Leader[]>([]);
   const [topStudents, setTopStudents] = useState<TopStudent[]>([]);
-  const [campusSection, setCampusSection] = useState<'all' | 'facilities' | 'clubs' | 'prefects' | 'teachers' | 'staff' | 'gallery'>('all');
+  const [campusSection, setCampusSection] = useState<'all' | 'facilities' | 'clubs' | 'prefects' | 'teachers' | 'videos' | 'gallery'>('all');
   const [showBackToTop, setShowBackToTop] = useState(false);
 
   useEffect(() => {
@@ -916,7 +917,7 @@ export default function App() {
                 Campus Life & Directory
               </h2>
               <p className="text-slate-600 text-base">
-                Explore campus facilities, student clubs, prefects cabinet, teachers, staff, and photo gallery.
+                Explore campus facilities, student clubs, prefects cabinet, teachers, and photo gallery.
               </p>
             </div>
 
@@ -980,7 +981,7 @@ export default function App() {
                   { id: 'clubs', label: 'Clubs' },
                   { id: 'prefects', label: 'Prefects' },
                   { id: 'teachers', label: 'Teachers' },
-                  { id: 'staff', label: 'Staff' },
+                  { id: 'videos', label: 'Campus Videos' },
                   { id: 'gallery', label: 'Photo Gallery' },
                 ].map((item) => {
                   const isSelected = campusSection === item.id;
@@ -1360,56 +1361,9 @@ export default function App() {
               </div>
             )}
 
-            {/* STAFF SECTION */}
-            {(campusSection === 'all' || campusSection === 'staff') && (
-              <div className="space-y-6 pt-2">
-                {/* STICKY CATEGORY HEADER */}
-                <div className="sticky top-20 z-20 -mx-4 sm:-mx-8 px-4 sm:px-8 py-3 bg-[#F8FAFC]/95 backdrop-blur-md border-y border-slate-200/90 shadow-sm flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-xl bg-[#800020] text-white flex items-center justify-center font-bold shadow-sm">
-                      <Users className="w-4 h-4" />
-                    </div>
-                    <div>
-                      <h3 className="text-lg sm:text-xl font-extrabold font-['Montserrat'] text-[#0A192F]">
-                        Staff Members & Department Heads
-                      </h3>
-                      <span className="text-[10px] sm:text-xs text-slate-500 font-semibold uppercase tracking-wider">
-                        Dedicated Academic & Co-Curricular Team
-                      </span>
-                    </div>
-                  </div>
-                  <button 
-                    onClick={() => {
-                      const el = document.getElementById('campus-section-filter');
-                      if (el) el.scrollIntoView({ behavior: 'smooth' });
-                    }}
-                    className="text-xs font-bold text-[#800020] hover:text-[#600018] bg-rose-50 border border-rose-200 px-3 py-1.5 rounded-full transition flex items-center gap-1 shadow-sm shrink-0"
-                  >
-                    <span>Change Section</span>
-                  </button>
-                </div>
-
-                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-6">
-                  {marqueeStaff.map((st, idx) => (
-                    <motion.div 
-                      key={idx} 
-                      initial={{ opacity: 0, y: 25 }}
-                      whileInView={{ opacity: 1, y: 0 }}
-                      viewport={{ once: true, margin: "-40px" }}
-                      transition={{ duration: 0.4, delay: (idx % 4) * 0.08, ease: "easeOut" }}
-                      className="bg-white rounded-2xl overflow-hidden shadow-sm border border-slate-200 flex flex-col hover:shadow-md transition hover:-translate-y-1"
-                    >
-                      <div className="relative w-full h-44 bg-slate-100 overflow-hidden">
-                        <img src={st.img} alt={st.name} className="w-full h-full object-cover object-top" />
-                      </div>
-                      <div className="p-3 bg-white text-center">
-                        <h4 className="font-bold text-xs sm:text-sm text-[#0A192F] truncate">{st.name}</h4>
-                        <span className="text-[10px] text-slate-500">{st.role}</span>
-                      </div>
-                    </motion.div>
-                  ))}
-                </div>
-              </div>
+            {/* CAMPUS VIDEOS SECTION (SUPABASE IMAGES/VIDEOS/LIFE1 TO LIFE8) */}
+            {(campusSection === 'all' || campusSection === 'videos') && (
+              <CampusLifeVideos />
             )}
 
             {/* GALLERY SECTION */}
