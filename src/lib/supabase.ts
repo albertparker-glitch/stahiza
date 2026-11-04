@@ -1,7 +1,7 @@
 import { createClient } from '@supabase/supabase-js';
 
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || '';
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || '';
+const supabaseUrl = (typeof import.meta !== 'undefined' && import.meta.env ? import.meta.env.VITE_SUPABASE_URL : '') || (typeof process !== 'undefined' && process.env ? process.env.VITE_SUPABASE_URL : '') || '';
+const supabaseAnonKey = (typeof import.meta !== 'undefined' && import.meta.env ? import.meta.env.VITE_SUPABASE_ANON_KEY : '') || (typeof process !== 'undefined' && process.env ? process.env.VITE_SUPABASE_ANON_KEY : '') || '';
 
 export const supabase = (supabaseUrl && supabaseAnonKey) 
   ? createClient(supabaseUrl, supabaseAnonKey) 
@@ -34,3 +34,11 @@ export function getSupabaseVideosUrl(fileName: string): string {
   }
   return `${supabaseUrl}/storage/v1/object/public/IMAGES/videos/${cleanName}`;
 }
+
+export function getSupabaseVideoUrl(path: string = 'video/back4.mp4'): string {
+  if (!supabaseUrl) return `/pages/images/${path.replace(/^.*\//, '')}`;
+  let cleanPath = path.startsWith('/') ? path.slice(1) : path;
+  cleanPath = cleanPath.replace(/^images\//i, '');
+  return `${supabaseUrl}/storage/v1/object/public/IMAGES/${cleanPath}`;
+}
+

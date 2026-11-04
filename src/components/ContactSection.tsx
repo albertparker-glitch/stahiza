@@ -16,6 +16,7 @@ import {
 } from 'lucide-react';
 import { SchoolBadgeImg } from './SchoolBadgeImg';
 import { SCHOOL_CONTACTS } from '../data/schoolData';
+import { getSupabaseVideoUrl, getSupabaseVideosUrl, getSupabasePublicUrl } from '../lib/supabase';
 import { motion } from 'motion/react';
 
 export const ContactSection: React.FC = () => {
@@ -376,12 +377,20 @@ export const ContactSection: React.FC = () => {
               <div className="md:col-span-5 flex justify-center md:justify-end">
                 <div className="relative w-full max-w-[210px] h-[330px] rounded-t-full rounded-b-[24px] overflow-hidden shadow-2xl border-2 border-white group">
                   
-                  {/* ARCH IMAGE (CAMPUS TOWER / ACADEMIC ENVIRONMENT) */}
-                  <img
-                    src="https://images.unsplash.com/photo-1541829070764-84a7d30dd3f3?q=80&w=1200&auto=format&fit=crop"
-                    alt="STAHIZA Campus & Academic Halls"
-                    className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-700 filter brightness-95 contrast-105"
-                  />
+                  {/* ARCH VIDEO (REPLACED WITH images/video/back4.mp4 FROM SUPABASE) */}
+                  <video
+                    autoPlay
+                    loop
+                    muted
+                    playsInline
+                    className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-700 bg-slate-900"
+                  >
+                    <source src={getSupabaseVideoUrl("video/back4.mp4")} type="video/mp4" />
+                    <source src={getSupabaseVideosUrl("back4.mp4")} type="video/mp4" />
+                    <source src={getSupabasePublicUrl("back4.mp4")} type="video/mp4" />
+                    <source src="/pages/images/back.mp4" type="video/mp4" />
+                    Your browser does not support the video tag.
+                  </video>
 
                   {/* AMBIENT GRADIENT OVERLAY */}
                   <div className="absolute inset-0 bg-gradient-to-t from-[#0A192F]/85 via-transparent to-transparent pointer-events-none" />

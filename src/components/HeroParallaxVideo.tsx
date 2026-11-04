@@ -1,6 +1,6 @@
 import React, { useRef } from 'react';
 import { motion, useScroll, useTransform, useReducedMotion } from 'motion/react';
-import { getSupabasePublicUrl } from '../lib/supabase';
+import { getSupabasePublicUrl, getSupabaseVideoUrl, getSupabaseVideosUrl } from '../lib/supabase';
 
 export const HeroParallaxVideo: React.FC = () => {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -37,6 +37,9 @@ export const HeroParallaxVideo: React.FC = () => {
           playsInline
           className="w-full h-auto max-h-[600px] object-cover sm:object-contain m-0 p-0 block pointer-events-none"
         >
+          <source src={getSupabaseVideoUrl('video/back4.mp4')} type="video/mp4" />
+          <source src={getSupabaseVideosUrl('back4.mp4')} type="video/mp4" />
+          <source src={getSupabasePublicUrl('back4.mp4')} type="video/mp4" />
           <source src={getSupabasePublicUrl('back.mp4')} type="video/mp4" />
           Your browser does not support the video tag.
         </video>
