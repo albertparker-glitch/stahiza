@@ -97,6 +97,17 @@ export default function App() {
   const [topStudents, setTopStudents] = useState<TopStudent[]>([]);
   const [campusSection, setCampusSection] = useState<'all' | 'facilities' | 'clubs' | 'prefects' | 'teachers' | 'videos' | 'gallery'>('all');
   const [showBackToTop, setShowBackToTop] = useState(false);
+  const [applySuccessAnimation, setApplySuccessAnimation] = useState(false);
+
+  const handleHeroApplyClick = () => {
+    setApplySuccessAnimation(true);
+    setTimeout(() => {
+      setApplyModalOpen(true);
+    }, 450);
+    setTimeout(() => {
+      setApplySuccessAnimation(false);
+    }, 1800);
+  };
 
   useEffect(() => {
     // Disable automatic browser scroll restoration to prevent landing at the bottom
@@ -247,14 +258,50 @@ export default function App() {
                   </p>
                   <div className="flex flex-wrap gap-4 pt-4">
                     <motion.button
+                      layout
                       whileHover={{ scale: 1.03, y: -2 }}
-                      whileTap={{ scale: 0.97 }}
-                      onClick={() => setApplyModalOpen(true)}
-                      className="bg-[#800020] hover:bg-[#600018] text-white font-bold px-8 py-4 rounded-xl shadow-xl hover:shadow-2xl transition flex items-center gap-3 text-base"
+                      whileTap={{ scale: 0.96 }}
+                      onClick={handleHeroApplyClick}
+                      transition={{ layout: { duration: 0.35, type: "spring", stiffness: 400, damping: 28 } }}
+                      className={`font-bold px-8 py-4 rounded-xl shadow-xl hover:shadow-2xl transition-colors duration-300 flex items-center gap-3 text-base cursor-pointer overflow-hidden ${
+                        applySuccessAnimation 
+                          ? 'bg-emerald-700 text-white shadow-emerald-900/30' 
+                          : 'bg-[#800020] hover:bg-[#600018] text-white'
+                      }`}
                     >
-                      <SchoolBadgeImg size={22} className="w-5 h-5" />
-                      <span>Apply For Admissions</span>
-                      <ArrowRight className="w-5 h-5" />
+                      <motion.div layout className="shrink-0">
+                        <SchoolBadgeImg size={22} className="w-5 h-5" />
+                      </motion.div>
+                      
+                      <motion.span layout="position" className="whitespace-nowrap">
+                        {applySuccessAnimation ? 'Opening Admissions...' : 'Apply For Admissions'}
+                      </motion.span>
+
+                      <AnimatePresence mode="wait">
+                        {applySuccessAnimation ? (
+                          <motion.span
+                            key="checkmark-icon"
+                            initial={{ scale: 0, opacity: 0, rotate: -45 }}
+                            animate={{ scale: 1.15, opacity: 1, rotate: 0 }}
+                            exit={{ scale: 0, opacity: 0 }}
+                            transition={{ type: "spring", stiffness: 500, damping: 22 }}
+                            className="text-amber-300 shrink-0"
+                          >
+                            <CheckCircle2 className="w-5 h-5 stroke-[2.5]" />
+                          </motion.span>
+                        ) : (
+                          <motion.span
+                            key="arrow-icon"
+                            initial={{ opacity: 0, x: -6 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            exit={{ opacity: 0, x: 6 }}
+                            transition={{ duration: 0.2 }}
+                            className="shrink-0"
+                          >
+                            <ArrowRight className="w-5 h-5" />
+                          </motion.span>
+                        )}
+                      </AnimatePresence>
                     </motion.button>
                     <motion.button
                       whileHover={{ scale: 1.03, y: -2 }}
