@@ -32,6 +32,7 @@ import { AdmissionsFaq } from './components/AdmissionsFaq';
 import { SectionDivider } from './components/SectionDivider';
 import { AdmissionFormSection } from './components/AdmissionFormSection';
 import { Preloader } from './components/Preloader';
+import { HeroParallaxVideo } from './components/HeroParallaxVideo';
 import { Leader, TopStudent, fetchLeaders, fetchMarqueeStaff, fetchTopStudents, SCHOOL_CONTACTS } from './data/schoolData';
 import { useTheme } from './context/ThemeContext';
 import { getSupabasePublicUrl, getSupabaseOthersUrl } from './lib/supabase';
@@ -210,19 +211,8 @@ export default function App() {
           >
           {activeTab === 'home' && (
           <div>
-            {/* FULL BLEED 100% WIDTH VIDEO BANNER (Home page only) */}
-            <div className="w-full m-0 p-0 bg-black overflow-hidden leading-none block">
-              <video 
-                autoPlay 
-                loop 
-                muted 
-                playsInline 
-                className="w-full h-auto max-h-[600px] object-contain m-0 p-0 block pointer-events-none"
-              >
-                <source src={getSupabasePublicUrl('back.mp4')} type="video/mp4" />
-                Your browser does not support the video tag.
-              </video>
-            </div>
+            {/* FULL BLEED 100% WIDTH VIDEO BANNER WITH PARALLAX (Home page only) */}
+            <HeroParallaxVideo />
 
             {/* HERO SECTION */}
             <section className="relative py-12 sm:py-16 overflow-hidden bg-[#F5F2EB] border-b border-stone-200">
@@ -282,7 +272,7 @@ export default function App() {
                   initial={{ opacity: 0, scale: 0.95, y: 20 }}
                   animate={{ opacity: 1, scale: 1, y: 0 }}
                   transition={{ duration: 0.5, delay: 0.2, ease: "easeOut" }}
-                  className="lg:col-span-5 flex flex-col items-center justify-center bg-white/95 backdrop-blur-xl border border-stone-200 p-8 rounded-3xl shadow-xl space-y-6"
+                  className="lg:col-span-5 flex flex-col items-center justify-center bg-[#0A192F] text-white border border-slate-700/80 p-8 rounded-3xl shadow-2xl space-y-6"
                 >
                   <motion.div 
                     whileHover={{ scale: 1.05 }}
@@ -293,7 +283,7 @@ export default function App() {
                   </motion.div>
                   <div className="text-center space-y-2">
                     <div className="inline-block">
-                      <h3 className="text-lg sm:text-xl font-extrabold font-['Montserrat'] px-4 py-2 rounded-xl bg-[#0A192F]/10 border border-[#0A192F]/15">
+                      <h3 className="text-lg sm:text-xl font-extrabold font-['Montserrat'] px-4 py-2 rounded-xl bg-white/95 border border-white/30 shadow-sm">
                         <span className="text-[#800020]">S</span><span className="text-[#0A192F]">tandard</span>{' '}
                         <span className="text-[#800020]">H</span><span className="text-[#0A192F]">igh</span>{' '}
                         <span className="text-[#800020]">S</span><span className="text-[#0A192F]">chool</span>{' '}
@@ -301,19 +291,19 @@ export default function App() {
                         <span className="text-[#800020]">Z</span><span className="text-[#0A192F]">zana</span>
                       </h3>
                     </div>
-                    <p className="text-xs text-[#800020] font-bold">{SCHOOL_CONTACTS.box}</p>
-                    <p className="text-xs text-slate-600 font-medium">Office Desk: {SCHOOL_CONTACTS.phone1}</p>
+                    <p className="text-xs text-amber-300 font-bold">{SCHOOL_CONTACTS.box}</p>
+                    <p className="text-xs text-slate-300 font-medium">Office Desk: {SCHOOL_CONTACTS.phone1}</p>
                   </div>
                   <div className="grid grid-cols-2 gap-4 w-full pt-2">
-                    <div className="bg-[#F5F2EB] p-4 rounded-xl text-center border border-stone-200">
-                      <div className="text-2xl font-black text-[#800020] font-['Montserrat']">USSSA</div>
-                      <div className="text-xs text-slate-700 font-medium mt-0.5">National Champions</div>
+                    <div className="bg-white/10 backdrop-blur-md p-4 rounded-xl text-center border border-white/15">
+                      <div className="text-2xl font-black text-amber-300 font-['Montserrat']">USSSA</div>
+                      <div className="text-xs text-slate-300 font-medium mt-0.5">National Champions</div>
                     </div>
-                    <div className="bg-[#F5F2EB] p-4 rounded-xl text-center border border-stone-200">
-                      <div className="text-2xl font-black text-[#0A192F] font-['Montserrat']">
+                    <div className="bg-white/10 backdrop-blur-md p-4 rounded-xl text-center border border-white/15">
+                      <div className="text-2xl font-black text-rose-300 font-['Montserrat']">
                         <AnimatedCounter target={100} suffix="%" />
                       </div>
-                      <div className="text-xs text-slate-700 font-medium mt-0.5">UNEB Pass Rate</div>
+                      <div className="text-xs text-slate-300 font-medium mt-0.5">UNEB Pass Rate</div>
                     </div>
                   </div>
                 </motion.div>

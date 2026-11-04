@@ -1,5 +1,5 @@
 import React from 'react';
-import { Phone, Mail, MapPin, ChevronRight, Facebook, Instagram, Youtube, ExternalLink } from 'lucide-react';
+import { Phone, Mail, MapPin, ChevronRight, Facebook, Instagram, Youtube, ExternalLink, Check } from 'lucide-react';
 import { SchoolBadgeImg } from './SchoolBadgeImg';
 import { SCHOOL_CONTACTS } from '../data/schoolData';
 
@@ -133,36 +133,18 @@ export const Footer: React.FC<FooterProps> = ({ setActiveTab, setApplyModalOpen 
           </div>
         </div>
 
-        {/* COLUMN 4: CONNECT & NEWSLETTER */}
+        {/* COLUMN 4: OFFICIAL CIRCULARS & NEWSLETTER */}
         <div className="space-y-4">
-          <h4 className="font-bold text-white text-base font-['Montserrat']">Stay Connected</h4>
+          <h4 className="font-bold text-white text-base font-['Montserrat']">Stay Informed</h4>
           <p className="text-slate-400 text-sm leading-relaxed">
-            Follow our official social pages for match results, UNEB updates, and campus events.
+            Subscribe for official termly circulars, UNEB candidate updates, and match schedules sent directly to parents.
           </p>
-          
-          {/* Quick Social Buttons */}
-          <div className="flex items-center gap-2.5 pt-1">
-            {socialLinks.map((item, idx) => {
-              const Icon = item.icon;
-              return (
-                <a
-                  key={idx}
-                  href={item.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  title={`${item.name} (${item.handle})`}
-                  className={`w-10 h-10 rounded-xl bg-slate-800/90 text-slate-300 hover:text-white border border-slate-700/80 flex items-center justify-center transition-all duration-300 transform hover:-translate-y-1 ${item.color}`}
-                >
-                  <Icon className="w-4 h-4" />
-                </a>
-              );
-            })}
-          </div>
 
-          <div className="pt-2">
+          <div className="pt-1">
             {subscribed ? (
-              <div className="bg-emerald-950/60 border border-emerald-500/40 text-emerald-300 text-xs font-semibold p-3 rounded-xl">
-                Subscribed to STAHIZA updates!
+              <div className="bg-emerald-950/60 border border-emerald-500/40 text-emerald-300 text-xs font-semibold p-3.5 rounded-xl flex items-center gap-2">
+                <Check className="w-4 h-4 text-emerald-400 shrink-0" />
+                <span>Subscribed to STAHIZA termly circulars!</span>
               </div>
             ) : (
               <form onSubmit={e => { e.preventDefault(); setSubscribed(true); }} className="space-y-2">
@@ -171,13 +153,14 @@ export const Footer: React.FC<FooterProps> = ({ setActiveTab, setApplyModalOpen 
                   <input
                     type="email"
                     required
-                    placeholder="Your email address"
-                    className="bg-slate-800 text-white text-xs px-3 py-2.5 rounded-xl border border-slate-700 focus:outline-none focus:border-amber-400 flex-1"
+                    placeholder="Enter parent email address"
+                    className="bg-slate-800 text-white text-xs px-3.5 py-2.5 rounded-xl border border-slate-700 focus:outline-none focus:border-amber-400 flex-1"
                   />
-                  <button type="submit" className="bg-[#800020] text-white text-xs font-bold px-4 py-2.5 rounded-xl hover:bg-[#600018] transition shrink-0 cursor-pointer">
+                  <button type="submit" className="bg-[#800020] text-white text-xs font-bold px-4 py-2.5 rounded-xl hover:bg-[#600018] transition shrink-0 cursor-pointer shadow-sm">
                     Join
                   </button>
                 </div>
+                <p className="text-[10px] text-slate-500">Official circulars only. No spam.</p>
               </form>
             )}
           </div>
