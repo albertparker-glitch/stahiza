@@ -121,7 +121,7 @@ export const Footer: React.FC<FooterProps> = ({ setActiveTab, setApplyModalOpen 
           </div>
           <div className="pt-2">
             <a
-              href="https://maps.google.com/?q=Zzana+Entebbe+Road+Kampala"
+              href={SCHOOL_CONTACTS.mapsSearchUrl}
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-2 bg-[#800020] hover:bg-[#600018] text-white text-xs font-semibold px-4 py-2.5 rounded-xl shadow transition"

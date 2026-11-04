@@ -27,7 +27,7 @@ export const ContactSection: React.FC = () => {
     message: ''
   });
   const [submitted, setSubmitted] = useState(false);
-  const [showMap, setShowMap] = useState(false);
+  const [showMap, setShowMap] = useState(true);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -290,14 +290,28 @@ export const ContactSection: React.FC = () => {
                   
                   {/* ADDRESS */}
                   <div className="flex items-start gap-3.5">
-                    <div className="w-9 h-9 rounded-full bg-white shadow-sm border border-slate-200 text-[#800020] flex items-center justify-center shrink-0">
-                      <MapPin className="w-4 h-4 text-[#800020]" />
-                    </div>
+                    <a 
+                      href={SCHOOL_CONTACTS.mapsSearchUrl} 
+                      target="_blank" 
+                      rel="noopener noreferrer" 
+                      className="w-9 h-9 rounded-full bg-white shadow-sm border border-slate-200 text-[#800020] hover:bg-[#800020] hover:text-white flex items-center justify-center shrink-0 transition"
+                      title="Pinpoint Standard High School Zzana on Google Maps"
+                    >
+                      <MapPin className="w-4 h-4" />
+                    </a>
                     <div>
-                      <h5 className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Campus Address</h5>
-                      <p className="text-xs font-bold text-[#0A192F] mt-0.5 leading-snug">
+                      <h5 className="text-[10px] font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1">
+                        <span>Campus Address</span>
+                        <ExternalLink className="w-2.5 h-2.5 text-[#800020]" />
+                      </h5>
+                      <a 
+                        href={SCHOOL_CONTACTS.mapsSearchUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-xs font-bold text-[#0A192F] hover:text-[#800020] mt-0.5 leading-snug block transition"
+                      >
                         {SCHOOL_CONTACTS.location}
-                      </p>
+                      </a>
                       <span className="text-[10px] text-slate-500 font-medium block mt-0.5">
                         {SCHOOL_CONTACTS.box}
                       </span>
@@ -473,33 +487,49 @@ export const ContactSection: React.FC = () => {
 
         </motion.div>
 
-        {/* EXPANDABLE GOOGLE MAP SECTION */}
+        {/* ALWAYS VISIBLE GOOGLE MAP SECTION */}
         {showMap && (
-          <div className="mt-4 pt-4 border-t border-slate-100 rounded-2xl overflow-hidden p-2 space-y-3 animate-fadeIn">
-            <div className="flex items-center justify-between">
-              <h4 className="text-xs font-bold uppercase tracking-wider text-slate-500 font-['Montserrat']">
-                STAHIZA Campus Location (Zzana, Entebbe Road, Kampala)
-              </h4>
+          <div className="mt-4 pt-4 border-t border-slate-200/90 rounded-2xl overflow-hidden p-2 space-y-3 bg-slate-50/80">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
+              <div className="flex items-center gap-2">
+                <div className="w-7 h-7 rounded-lg bg-[#800020] text-amber-300 flex items-center justify-center font-bold shadow-xs">
+                  <MapPin className="w-4 h-4" />
+                </div>
+                <div>
+                  <h4 className="text-xs font-extrabold uppercase tracking-wider text-[#0A192F] font-['Montserrat']">
+                    Exact Campus Location: Standard High School Zzana
+                  </h4>
+                  <span className="text-[10px] text-slate-500 font-medium block">
+                    Along Entebbe Road, Zzana (1 km off Zzana Roundabout), Wakiso District
+                  </span>
+                </div>
+              </div>
+
               <a
-                href="https://maps.google.com/?q=Standard+High+School+Zzana+Entebbe+Road+Kampala"
+                href={SCHOOL_CONTACTS.mapsSearchUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-xs font-bold text-[#800020] hover:text-[#600018] flex items-center gap-1 transition"
+                className="text-xs font-bold text-white bg-[#800020] hover:bg-[#600018] px-4 py-2 rounded-full flex items-center gap-1.5 transition shadow-sm shrink-0"
               >
-                <span>Open in Google Maps</span>
-                <ArrowRight className="w-3.5 h-3.5" />
+                <span>Pinpoint on Google Maps</span>
+                <ExternalLink className="w-3.5 h-3.5 text-amber-300" />
               </a>
             </div>
-            <div className="w-full h-80 rounded-xl overflow-hidden border border-slate-200 shadow-inner">
+
+            <div className="w-full h-80 sm:h-96 rounded-2xl overflow-hidden border border-slate-300/80 shadow-md relative group">
               <iframe
-                title="STAHIZA Map"
-                src="https://maps.google.com/maps?q=Standard+High+School+Zzana+Entebbe+Road+Kampala&t=&z=15&ie=UTF8&iwloc=&output=embed"
+                title="Standard High School Zzana Location Map"
+                src={SCHOOL_CONTACTS.embedMapUrl}
                 width="100%"
                 height="100%"
                 style={{ border: 0 }}
-                allowFullScreen={false}
+                allowFullScreen={true}
                 loading="lazy"
+                className="w-full h-full"
               />
+              <div className="absolute top-3 right-3 bg-[#0A192F]/90 backdrop-blur-md text-amber-300 text-[10px] font-extrabold px-3 py-1.5 rounded-xl border border-white/20 shadow pointer-events-none">
+                STAHIZA Campus Pin (Entebbe Road)
+              </div>
             </div>
           </div>
         )}
