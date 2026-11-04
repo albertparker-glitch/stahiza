@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Phone, Mail, MapPin, Menu, X, ArrowRight, Search } from 'lucide-react';
 import { SchoolBadgeImg } from './SchoolBadgeImg';
+import { ThemeToggle } from './ThemeToggle';
 import { SCHOOL_CONTACTS } from '../data/schoolData';
 import { motion, AnimatePresence } from 'motion/react';
 
@@ -69,8 +70,9 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, setAppl
               <span>Entebbe Road, Zzana/Nyanama, Kampala</span>
             </div>
           </div>
-          <div className="flex items-center gap-4">
-            <span className="text-emerald-300 font-semibold flex items-center gap-1.5 border-2 border-emerald-500 shadow-lg px-3.5 py-1 rounded-full bg-emerald-950/60">
+          <div className="flex items-center gap-3">
+            <ThemeToggle />
+            <span className="hidden xs:flex text-emerald-300 font-semibold items-center gap-1.5 border-2 border-emerald-500 shadow-lg px-3.5 py-1 rounded-full bg-emerald-950/60">
               <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span> Admissions 2027 Open
             </span>
           </div>
@@ -296,6 +298,10 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, setAppl
                 transition={{ delay: 0.25 }}
                 className="pt-2 flex flex-col gap-2"
               >
+                <div className="flex items-center justify-between p-3 rounded-xl bg-slate-100 border border-slate-200">
+                  <span className="text-xs font-bold text-[#0A192F]">App Theme Mode</span>
+                  <ThemeToggle />
+                </div>
                 <button
                   onClick={() => { setApplyModalOpen(true); setMobileMenuOpen(false); }}
                   className="w-full text-center py-3 rounded-xl bg-[#800020] text-white font-bold shadow-md hover:shadow-lg transition active:scale-98 text-sm sm:text-base cursor-pointer"

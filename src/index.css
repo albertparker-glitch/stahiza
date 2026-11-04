@@ -1,1 +1,65 @@
 @import "tailwindcss";
+
+/* MIDNIGHT NAVY DARK MODE DYNAMIC OVERRIDES */
+html.dark {
+  background-color: #060e1a;
+  color: #f8fafc;
+}
+
+html.dark body {
+  background-color: #060e1a;
+  color: #f8fafc;
+}
+
+/* Smooth transition for theme switching */
+*, *::before, *::after {
+  transition-property: background-color, border-color, color, fill, stroke;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 200ms;
+}
+
+/* Card and surface dark mode adaptations */
+html.dark .bg-white {
+  background-color: #0a192f !important;
+  color: #f8fafc !important;
+  border-color: rgba(51, 65, 85, 0.6) !important;
+}
+
+html.dark .bg-slate-50,
+html.dark .bg-stone-100,
+html.dark .bg-[#F8FAFC],
+html.dark .bg-[#F5F2EB] {
+  background-color: #0d203d !important;
+  color: #f8fafc !important;
+  border-color: rgba(51, 65, 85, 0.8) !important;
+}
+
+html.dark .text-slate-800,
+html.dark .text-slate-700,
+html.dark .text-[#0A192F] {
+  color: #f1f5f9 !important;
+}
+
+html.dark .text-slate-600,
+html.dark .text-slate-500 {
+  color: #94a3b8 !important;
+}
+
+html.dark .border-slate-200,
+html.dark .border-slate-100,
+html.dark .border-stone-200 {
+  border-color: rgba(51, 65, 85, 0.8) !important;
+}
+
+html.dark header.bg-white\/95 {
+  background-color: rgba(10, 25, 47, 0.95) !important;
+  border-color: rgba(30, 41, 59, 0.8) !important;
+}
+
+html.dark input,
+html.dark select,
+html.dark textarea {
+  background-color: #0a192f !important;
+  color: #f8fafc !important;
+  border-color: #334155 !important;
+}

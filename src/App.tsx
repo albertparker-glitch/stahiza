@@ -33,6 +33,7 @@ import { SectionDivider } from './components/SectionDivider';
 import { AdmissionFormSection } from './components/AdmissionFormSection';
 import { Preloader } from './components/Preloader';
 import { Leader, TopStudent, fetchLeaders, fetchMarqueeStaff, fetchTopStudents, SCHOOL_CONTACTS } from './data/schoolData';
+import { useTheme } from './context/ThemeContext';
 import { getSupabasePublicUrl, getSupabaseOthersUrl } from './lib/supabase';
 import { motion, AnimatePresence } from 'motion/react';
 
@@ -86,6 +87,8 @@ function TypewriterMotto() {
 }
 
 export default function App() {
+  const { theme } = useTheme();
+  const isDark = theme === 'dark';
   const [activeTab, setActiveTab] = useState<'home' | 'leadership' | 'academics' | 'sports' | 'campus' | 'admissions' | 'contact'>('home');
   const [applyModalOpen, setApplyModalOpen] = useState(false);
   const [leaders, setLeaders] = useState<Leader[]>([]);
@@ -181,7 +184,9 @@ export default function App() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC] text-slate-800 font-['Inter',sans-serif] selection:bg-[#800020] selection:text-white">
+    <div className={`min-h-screen transition-colors duration-300 font-['Inter',sans-serif] selection:bg-[#800020] selection:text-white ${
+      isDark ? 'bg-[#060E1A] text-slate-100 dark' : 'bg-[#F8FAFC] text-slate-800'
+    }`}>
       
       {/* 3-SECOND ROTATING DOTTED SPHERE PRELOADER WITH SITE THEME */}
       <Preloader duration={3000} />
