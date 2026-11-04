@@ -29,6 +29,7 @@ import { CampusLifeVideos } from './components/CampusLifeVideos';
 import { AnimatedCounter } from './components/AnimatedCounter';
 import { FloatingAdmissionsWidget } from './components/FloatingAdmissionsWidget';
 import { AdmissionsFaq } from './components/AdmissionsFaq';
+import { SectionDivider } from './components/SectionDivider';
 import { Leader, TopStudent, fetchLeaders, fetchMarqueeStaff, fetchTopStudents, SCHOOL_CONTACTS } from './data/schoolData';
 import { getSupabasePublicUrl, getSupabaseOthersUrl } from './lib/supabase';
 import { motion, AnimatePresence } from 'motion/react';
@@ -325,8 +326,10 @@ export default function App() {
               </div>
             </div>
 
+            <SectionDivider variant="crest" />
+
             {/* CORE PILLARS */}
-            <section className="py-20 px-4 sm:px-8 max-w-7xl mx-auto">
+            <section className="py-12 px-4 sm:px-8 max-w-7xl mx-auto">
               <motion.div 
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
@@ -398,6 +401,8 @@ export default function App() {
               </div>
             </section>
 
+            <SectionDivider variant="gold" />
+
             {/* STAFF MARQUEE SECTION UNDER PILLARS */}
             <section className="py-16 bg-white overflow-hidden border-b border-slate-200">
               <div className="max-w-7xl mx-auto px-4 sm:px-8 mb-8 text-center space-y-2">
@@ -460,6 +465,8 @@ export default function App() {
                 </div>
               </div>
             </section>
+
+            <SectionDivider variant="crest" />
 
             {/* HEADTEACHER WELCOME BANNER */}
             <section className="bg-slate-100 py-20 px-4 sm:px-8 border-y border-slate-200">
@@ -538,6 +545,8 @@ export default function App() {
               </div>
             </section>
 
+            <SectionDivider variant="gold" />
+
             {/* OFFICIAL ADMISSIONS DESK INQUIRY SECTION */}
             <section className="py-16 px-4 sm:px-8 max-w-7xl mx-auto">
               <motion.div 
@@ -581,11 +590,15 @@ export default function App() {
               </motion.div>
             </section>
 
+            <SectionDivider variant="crest" />
+
             {/* ADMISSIONS FAQ ACCORDION COMPONENT */}
             <AdmissionsFaq 
               onApplyClick={() => setApplyModalOpen(true)}
               onContactClick={() => setActiveTab('contact')}
             />
+
+            <SectionDivider variant="gold" />
             
             {/* VIDEO GALLERY ON HOME PAGE */}
             <VideoGallery />
