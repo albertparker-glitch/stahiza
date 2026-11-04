@@ -9,13 +9,16 @@ import {
   BookOpen,
   Users,
   ChevronRight,
+  ChevronLeft,
   ShieldCheck,
   Award,
   CheckCircle2,
   Building2,
   ArrowRight,
   ChevronUp,
-  Camera
+  Camera,
+  X,
+  Maximize2
 } from 'lucide-react';
 import { SchoolBadgeImg } from './components/SchoolBadgeImg';
 import { Navbar } from './components/Navbar';
@@ -87,6 +90,159 @@ function TypewriterMotto() {
   );
 }
 
+export interface FacilityPhoto {
+  url: string;
+  caption: string;
+  fallbackUrl?: string;
+}
+
+export interface CampusFacility {
+  id: string;
+  title: string;
+  desc: string;
+  tag: string;
+  img: string;
+  fallbackImg?: string;
+  gallery: FacilityPhoto[];
+}
+
+export const CAMPUS_FACILITIES: CampusFacility[] = [
+  { 
+    id: "science-labs",
+    title: "Modern Science Labs", 
+    desc: "Equipped Physics, Chemistry, and Biology laboratories for hands-on experiments and UNEB practical exams.",
+    tag: "Physics, Chem & Biology",
+    img: "https://images.unsplash.com/photo-1532094349884-543bc11b234d?auto=format&fit=crop&w=1200&q=80",
+    fallbackImg: "/pages/images/odeke.jpeg",
+    gallery: [
+      {
+        url: "https://images.unsplash.com/photo-1532094349884-543bc11b234d?auto=format&fit=crop&w=1200&q=80",
+        caption: "Equipped UNEB Physics & Chemistry Practical Stations",
+        fallbackUrl: "/pages/images/odeke.jpeg"
+      },
+      {
+        url: "https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&w=1200&q=80",
+        caption: "Hands-on Science Apparatus & Reagents Demonstration"
+      },
+      {
+        url: "https://images.unsplash.com/photo-1576086213369-97a306d36557?auto=format&fit=crop&w=1200&q=80",
+        caption: "Biology Specimen Analysis & Scientific Research"
+      }
+    ]
+  },
+  { 
+    id: "computer-lab",
+    title: "Computer Laboratory", 
+    desc: "High-speed internet workstations for ICT practicals, coding, and national examinations.",
+    tag: "ICT & Digital Research",
+    img: getSupabaseOthersUrl("complab.jpeg"),
+    fallbackImg: "https://images.unsplash.com/photo-1581092921461-eab62e97a780?auto=format&fit=crop&w=1200&q=80",
+    gallery: [
+      {
+        url: getSupabaseOthersUrl("complab.jpeg"),
+        caption: "STAHIZA Modern High-Speed Computer Laboratory",
+        fallbackUrl: "https://images.unsplash.com/photo-1581092921461-eab62e97a780?auto=format&fit=crop&w=1200&q=80"
+      },
+      {
+        url: "https://images.unsplash.com/photo-1581092921461-eab62e97a780?auto=format&fit=crop&w=1200&q=80",
+        caption: "Digital Workstations for UNEB ICT Practicals"
+      },
+      {
+        url: "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=1200&q=80",
+        caption: "Student Coding, Digital Research & E-Learning"
+      }
+    ]
+  },
+  { 
+    id: "dormitories",
+    title: "Comfortable Dormitories", 
+    desc: "Secure, warden-supervised boarding residences with running water and quiet study areas.",
+    tag: "Boarding & Resident Life",
+    img: "https://images.unsplash.com/photo-1555854877-bab0e564b8d5?auto=format&fit=crop&w=1200&q=80",
+    fallbackImg: "/pages/images/bena.jpeg",
+    gallery: [
+      {
+        url: "https://images.unsplash.com/photo-1555854877-bab0e564b8d5?auto=format&fit=crop&w=1200&q=80",
+        caption: "Secure & Spacious Student Boarding Quarters",
+        fallbackUrl: "/pages/images/bena.jpeg"
+      },
+      {
+        url: "https://images.unsplash.com/photo-1595526114035-0d45ed16cfbf?auto=format&fit=crop&w=1200&q=80",
+        caption: "Supervised Evening Study Desks & Restful Living"
+      }
+    ]
+  },
+  { 
+    id: "dining-hall",
+    title: "Spacious Dining Hall", 
+    desc: "Nutritious, balanced meals prepared under strict culinary hygiene standards.",
+    tag: "Food & Nutrition Center",
+    img: getSupabaseOthersUrl("fnst.jpeg"),
+    fallbackImg: "https://images.unsplash.com/photo-1577495508048-b635879837f1?auto=format&fit=crop&w=1200&q=80",
+    gallery: [
+      {
+        url: getSupabaseOthersUrl("fnst.jpeg"),
+        caption: "STAHIZA Main Student Dining & Nutrition Complex",
+        fallbackUrl: "https://images.unsplash.com/photo-1577495508048-b635879837f1?auto=format&fit=crop&w=1200&q=80"
+      },
+      {
+        url: "https://images.unsplash.com/photo-1577495508048-b635879837f1?auto=format&fit=crop&w=1200&q=80",
+        caption: "Spacious Seating & Orderly Meal Serving Hall"
+      },
+      {
+        url: "https://images.unsplash.com/photo-1567521464027-f127ff144326?auto=format&fit=crop&w=1200&q=80",
+        caption: "Clean Food Service & Quality Student Catering"
+      }
+    ]
+  },
+  { 
+    id: "sports-grounds",
+    title: "Sports Grounds & Courts", 
+    desc: "Full-size football pitch, basketball, and netball courts home to national champions.",
+    tag: "Football, Netball & Courts",
+    img: getSupabaseOthersUrl("hand.jpeg"),
+    fallbackImg: "https://images.unsplash.com/photo-1574629810360-7efbbe195018?auto=format&fit=crop&w=1200&q=80",
+    gallery: [
+      {
+        url: getSupabaseOthersUrl("hand.jpeg"),
+        caption: "STAHIZA National Championship Handball & Sports Arena",
+        fallbackUrl: "https://images.unsplash.com/photo-1574629810360-7efbbe195018?auto=format&fit=crop&w=1200&q=80"
+      },
+      {
+        url: "https://images.unsplash.com/photo-1574629810360-7efbbe195018?auto=format&fit=crop&w=1200&q=80",
+        caption: "Full-Size Football Pitch & Athletics Track"
+      },
+      {
+        url: "https://images.unsplash.com/photo-1546519638-68e109498ffc?auto=format&fit=crop&w=1200&q=80",
+        caption: "Tournament Basketball & Netball Courts"
+      }
+    ]
+  },
+  { 
+    id: "library",
+    title: "School Library & Resource Center", 
+    desc: "Curriculum textbooks, encyclopedias, past UNEB papers, and dedicated silent study zones.",
+    tag: "Quiet Study & Archives",
+    img: getSupabaseOthersUrl("dedication 2026 s4.jpeg"),
+    fallbackImg: "https://images.unsplash.com/photo-1521587760476-6c12a4b040da?auto=format&fit=crop&w=1200&q=80",
+    gallery: [
+      {
+        url: getSupabaseOthersUrl("dedication 2026 s4.jpeg"),
+        caption: "STAHIZA Candidate Dedication & Resource Center",
+        fallbackUrl: "https://images.unsplash.com/photo-1521587760476-6c12a4b040da?auto=format&fit=crop&w=1200&q=80"
+      },
+      {
+        url: "https://images.unsplash.com/photo-1521587760476-6c12a4b040da?auto=format&fit=crop&w=1200&q=80",
+        caption: "Quiet Individual Study Desks & Reference Sections"
+      },
+      {
+        url: "https://images.unsplash.com/photo-1497633762265-9d179a990aa6?auto=format&fit=crop&w=1200&q=80",
+        caption: "Comprehensive UNEB Archives & National Curriculum Texts"
+      }
+    ]
+  },
+];
+
 export default function App() {
   const { theme } = useTheme();
   const isDark = theme === 'dark';
@@ -98,6 +254,28 @@ export default function App() {
   const [campusSection, setCampusSection] = useState<'all' | 'facilities' | 'clubs' | 'prefects' | 'teachers' | 'videos' | 'gallery'>('all');
   const [showBackToTop, setShowBackToTop] = useState(false);
   const [applySuccessAnimation, setApplySuccessAnimation] = useState(false);
+  const [selectedFacility, setSelectedFacility] = useState<CampusFacility | null>(null);
+  const [activeFacilityPhotoIdx, setActiveFacilityPhotoIdx] = useState(0);
+
+  const openFacilityModal = (fac: CampusFacility) => {
+    setSelectedFacility(fac);
+    setActiveFacilityPhotoIdx(0);
+  };
+
+  useEffect(() => {
+    if (!selectedFacility) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setSelectedFacility(null);
+      } else if (e.key === 'ArrowRight') {
+        setActiveFacilityPhotoIdx((prev) => (prev + 1) % selectedFacility.gallery.length);
+      } else if (e.key === 'ArrowLeft') {
+        setActiveFacilityPhotoIdx((prev) => (prev - 1 + selectedFacility.gallery.length) % selectedFacility.gallery.length);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [selectedFacility]);
 
   const handleHeroApplyClick = () => {
     setApplySuccessAnimation(true);
@@ -1097,52 +1275,10 @@ export default function App() {
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {[
-                    { 
-                      title: "Modern Science Labs", 
-                      desc: "Equipped Physics, Chemistry, and Biology laboratories for hands-on experiments and UNEB practical exams.",
-                      tag: "Physics, Chem & Biology",
-                      img: "https://images.unsplash.com/photo-1532094349884-543bc11b234d?auto=format&fit=crop&w=800&q=80",
-                      fallbackImg: "/pages/images/odeke.jpeg"
-                    },
-                    { 
-                      title: "Computer Laboratory", 
-                      desc: "High-speed internet workstations for ICT practicals, coding, and national examinations.",
-                      tag: "ICT & Digital Research",
-                      img: getSupabaseOthersUrl("complab.jpeg"),
-                      fallbackImg: "https://images.unsplash.com/photo-1581092921461-eab62e97a780?auto=format&fit=crop&w=800&q=80"
-                    },
-                    { 
-                      title: "Comfortable Dormitories", 
-                      desc: "Secure, warden-supervised boarding residences with running water and quiet study areas.",
-                      tag: "Boarding & Resident Life",
-                      img: "https://images.unsplash.com/photo-1555854877-bab0e564b8d5?auto=format&fit=crop&w=800&q=80",
-                      fallbackImg: "/pages/images/bena.jpeg"
-                    },
-                    { 
-                      title: "Spacious Dining Hall", 
-                      desc: "Nutritious, balanced meals prepared under strict culinary hygiene standards.",
-                      tag: "Food & Nutrition Center",
-                      img: getSupabaseOthersUrl("fnst.jpeg"),
-                      fallbackImg: "https://images.unsplash.com/photo-1577495508048-b635879837f1?auto=format&fit=crop&w=800&q=80"
-                    },
-                    { 
-                      title: "Sports Grounds & Courts", 
-                      desc: "Full-size football pitch, basketball, and netball courts home to national champions.",
-                      tag: "Football, Netball & Courts",
-                      img: getSupabaseOthersUrl("hand.jpeg"),
-                      fallbackImg: "https://images.unsplash.com/photo-1574629810360-7efbbe195018?auto=format&fit=crop&w=800&q=80"
-                    },
-                    { 
-                      title: "School Library & Resource Center", 
-                      desc: "Curriculum textbooks, encyclopedias, past UNEB papers, and dedicated silent study zones.",
-                      tag: "Quiet Study & Archives",
-                      img: getSupabaseOthersUrl("dedication 2026 s4.jpeg"),
-                      fallbackImg: "https://images.unsplash.com/photo-1521587760476-6c12a4b040da?auto=format&fit=crop&w=800&q=80"
-                    },
-                  ].map((fac, idx) => (
+                  {CAMPUS_FACILITIES.map((fac, idx) => (
                     <motion.div 
-                      key={idx} 
+                      key={fac.id || idx} 
+                      onClick={() => openFacilityModal(fac)}
                       initial={{ opacity: 0, y: 30 }}
                       whileInView={{ opacity: 1, y: 0 }}
                       viewport={{ once: true, margin: "-40px" }}
@@ -1163,6 +1299,13 @@ export default function App() {
                           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" 
                         />
                         <div className="absolute inset-0 bg-gradient-to-t from-[#0A192F]/85 via-black/20 to-transparent" />
+                        
+                        {/* Hover expand badge indicator */}
+                        <div className="absolute top-3 left-3 bg-[#0A192F]/85 backdrop-blur-md text-white text-[11px] font-semibold px-2.5 py-1 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center gap-1.5 shadow-md border border-white/15">
+                          <Maximize2 className="w-3 h-3 text-amber-300" />
+                          <span>Click to expand</span>
+                        </div>
+
                         <div className="absolute top-3 right-3 bg-white/95 backdrop-blur-sm p-1.5 rounded-xl shadow-md">
                           <SchoolBadgeImg size={24} />
                         </div>
@@ -1172,16 +1315,23 @@ export default function App() {
                       </div>
                       <div className="p-5 sm:p-6 flex-1 flex flex-col justify-between space-y-3">
                         <div>
-                          <h4 className="font-bold text-lg font-['Montserrat'] text-[#0A192F] group-hover:text-[#800020] transition-colors">
-                            {fac.title}
-                          </h4>
+                          <div className="flex items-start justify-between gap-2">
+                            <h4 className="font-bold text-lg font-['Montserrat'] text-[#0A192F] group-hover:text-[#800020] transition-colors leading-snug">
+                              {fac.title}
+                            </h4>
+                            <span className="p-1 rounded-lg text-slate-400 group-hover:text-[#800020] group-hover:bg-rose-50 transition-colors shrink-0">
+                              <Maximize2 className="w-4 h-4" />
+                            </span>
+                          </div>
                           <p className="text-slate-600 text-sm leading-relaxed mt-2">{fac.desc}</p>
                         </div>
                         <div className="pt-3 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500 font-medium">
                           <span className="flex items-center gap-1.5 text-[#800020] font-semibold">
                             <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" /> STAHIZA Standard
                           </span>
-                          <span className="bg-slate-100 px-2.5 py-0.5 rounded-md font-mono text-[11px] text-slate-600">Facility</span>
+                          <span className="bg-slate-100 px-2.5 py-0.5 rounded-md font-mono text-[11px] text-slate-600 flex items-center gap-1">
+                            <Camera className="w-3 h-3 text-slate-500" /> {fac.gallery.length} Photos
+                          </span>
                         </div>
                       </div>
                     </motion.div>
@@ -1500,6 +1650,181 @@ export default function App() {
         onClose={() => setApplyModalOpen(false)} 
         onNavigateToAdmissions={() => setActiveTab('admissions')}
       />
+
+      {/* CAMPUS FACILITY EXPANDABLE IMAGE GALLERY MODAL */}
+      <AnimatePresence>
+        {selectedFacility && (
+          <div 
+            className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 overflow-y-auto"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="facility-modal-title"
+          >
+            {/* Backdrop */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.2 }}
+              onClick={() => setSelectedFacility(null)}
+              className="fixed inset-0 bg-[#0A192F]/85 backdrop-blur-md"
+            />
+
+            {/* Modal Dialog Card (Scaled to not be overly large, displaying the complete uncropped image) */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.94, y: 16 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.94, y: 16 }}
+              transition={{ duration: 0.25, ease: "easeOut" }}
+              onClick={(e) => e.stopPropagation()}
+              className="relative w-full max-w-2xl sm:max-w-3xl bg-white rounded-2xl sm:rounded-3xl shadow-2xl border border-slate-200/90 overflow-hidden z-10 my-auto flex flex-col"
+            >
+              {/* Header Bar */}
+              <div className="px-4 sm:px-6 py-3.5 bg-slate-50 border-b border-slate-200/80 flex items-center justify-between gap-3">
+                <div className="flex items-center gap-2.5 min-w-0">
+                  <div className="w-8 h-8 rounded-xl bg-[#0A192F] text-amber-300 flex items-center justify-center shrink-0 shadow-sm">
+                    <Building2 className="w-4 h-4" />
+                  </div>
+                  <div className="min-w-0">
+                    <div className="flex items-center gap-2">
+                      <span className="text-[10px] sm:text-xs font-bold uppercase tracking-wider text-[#800020] bg-rose-50 px-2 py-0.5 rounded-md border border-rose-100">
+                        {selectedFacility.tag}
+                      </span>
+                      <span className="text-xs text-slate-500 font-medium hidden sm:inline">
+                        • Photo {activeFacilityPhotoIdx + 1} of {selectedFacility.gallery.length}
+                      </span>
+                    </div>
+                    <h3 id="facility-modal-title" className="text-base sm:text-lg font-bold font-['Montserrat'] text-[#0A192F] truncate">
+                      {selectedFacility.title}
+                    </h3>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-2 shrink-0">
+                  <div className="hidden sm:block">
+                    <SchoolBadgeImg size={28} />
+                  </div>
+                  <button
+                    onClick={() => setSelectedFacility(null)}
+                    aria-label="Close modal"
+                    className="p-2 rounded-xl text-slate-500 hover:text-slate-800 hover:bg-slate-200/70 transition-colors focus:outline-none focus:ring-2 focus:ring-[#800020]"
+                  >
+                    <X className="w-5 h-5" />
+                  </button>
+                </div>
+              </div>
+
+              {/* Image Frame - Complete full image without cropping or excessive height */}
+              <div className="relative bg-slate-950 flex items-center justify-center overflow-hidden min-h-[220px] max-h-[50vh] sm:max-h-[55vh]">
+                <img
+                  src={selectedFacility.gallery[activeFacilityPhotoIdx]?.url || selectedFacility.img}
+                  alt={selectedFacility.gallery[activeFacilityPhotoIdx]?.caption || selectedFacility.title}
+                  onError={(e) => {
+                    const fallback = selectedFacility.gallery[activeFacilityPhotoIdx]?.fallbackUrl || selectedFacility.fallbackImg;
+                    if (fallback && e.currentTarget.src !== fallback) {
+                      e.currentTarget.src = fallback;
+                    }
+                  }}
+                  className="w-full h-auto max-h-[50vh] sm:max-h-[55vh] object-contain select-none transition-all duration-300"
+                />
+
+                {/* Left/Right Gallery Nav Arrows if multiple photos */}
+                {selectedFacility.gallery.length > 1 && (
+                  <>
+                    <button
+                      onClick={() => setActiveFacilityPhotoIdx((prev) => (prev - 1 + selectedFacility.gallery.length) % selectedFacility.gallery.length)}
+                      aria-label="Previous photo"
+                      className="absolute left-3 top-1/2 -translate-y-1/2 p-2 rounded-full bg-black/60 hover:bg-black/85 text-white backdrop-blur-sm transition border border-white/20 shadow-lg cursor-pointer"
+                    >
+                      <ChevronLeft className="w-5 h-5" />
+                    </button>
+                    <button
+                      onClick={() => setActiveFacilityPhotoIdx((prev) => (prev + 1) % selectedFacility.gallery.length)}
+                      aria-label="Next photo"
+                      className="absolute right-3 top-1/2 -translate-y-1/2 p-2 rounded-full bg-black/60 hover:bg-black/85 text-white backdrop-blur-sm transition border border-white/20 shadow-lg cursor-pointer"
+                    >
+                      <ChevronRight className="w-5 h-5" />
+                    </button>
+                  </>
+                )}
+
+                {/* Subtle caption overlay at bottom of image */}
+                <div className="absolute bottom-2 left-3 right-3 flex items-center justify-between text-xs text-white/95 bg-black/65 backdrop-blur-md px-3 py-1.5 rounded-lg border border-white/10">
+                  <span className="truncate pr-2 font-medium">
+                    {selectedFacility.gallery[activeFacilityPhotoIdx]?.caption || selectedFacility.title}
+                  </span>
+                  <span className="text-[11px] text-amber-300 font-mono shrink-0">
+                    Full Image ({activeFacilityPhotoIdx + 1}/{selectedFacility.gallery.length})
+                  </span>
+                </div>
+              </div>
+
+              {/* Gallery Thumbnails Strip (if multiple photos) */}
+              {selectedFacility.gallery.length > 1 && (
+                <div className="px-4 py-2 bg-slate-900 border-t border-slate-800 flex items-center gap-2 overflow-x-auto scrollbar-none">
+                  {selectedFacility.gallery.map((photo, pIdx) => {
+                    const isPhotoActive = pIdx === activeFacilityPhotoIdx;
+                    return (
+                      <button
+                        key={pIdx}
+                        onClick={() => setActiveFacilityPhotoIdx(pIdx)}
+                        className={`relative rounded-lg overflow-hidden border-2 transition-all duration-200 shrink-0 w-16 h-12 cursor-pointer ${
+                          isPhotoActive ? 'border-amber-400 scale-105 shadow-md' : 'border-transparent opacity-60 hover:opacity-100'
+                        }`}
+                      >
+                        <img
+                          src={photo.url}
+                          alt={photo.caption}
+                          className="w-full h-full object-cover"
+                          onError={(e) => {
+                            if (photo.fallbackUrl && e.currentTarget.src !== photo.fallbackUrl) {
+                              e.currentTarget.src = photo.fallbackUrl;
+                            }
+                          }}
+                        />
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
+
+              {/* Info & Footer Actions */}
+              <div className="p-4 sm:p-5 bg-white space-y-3">
+                <p className="text-slate-600 text-xs sm:text-sm leading-relaxed">
+                  {selectedFacility.desc}
+                </p>
+
+                <div className="flex flex-wrap items-center justify-between gap-3 pt-2 border-t border-slate-100">
+                  <div className="flex items-center gap-2 text-xs text-slate-500">
+                    <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                    <span className="font-semibold text-slate-700">Official STAHIZA Facility</span>
+                    <span className="hidden sm:inline">• Verified campus infrastructure</span>
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={() => {
+                        setSelectedFacility(null);
+                        setApplyModalOpen(true);
+                      }}
+                      className="px-4 py-2 rounded-xl bg-[#800020] hover:bg-[#600018] text-white text-xs font-bold transition shadow-sm flex items-center gap-1.5 cursor-pointer"
+                    >
+                      <span>Apply For Admission</span>
+                      <ArrowRight className="w-3.5 h-3.5" />
+                    </button>
+                    <button
+                      onClick={() => setSelectedFacility(null)}
+                      className="px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold transition cursor-pointer"
+                    >
+                      Close
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
 
       {/* FLOATING ADMISSIONS WIDGET (WALKER SCHOOL STYLE QUICK DOCK) */}
       <FloatingAdmissionsWidget 
