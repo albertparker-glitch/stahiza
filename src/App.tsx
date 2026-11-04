@@ -27,6 +27,7 @@ import { AcademicsVideos } from './components/AcademicsVideos';
 import { SportsVideos } from './components/SportsVideos';
 import { AnimatedCounter } from './components/AnimatedCounter';
 import { FloatingAdmissionsWidget } from './components/FloatingAdmissionsWidget';
+import { AdmissionsFaq } from './components/AdmissionsFaq';
 import { Leader, TopStudent, fetchLeaders, fetchMarqueeStaff, fetchTopStudents, SCHOOL_CONTACTS } from './data/schoolData';
 import { getSupabasePublicUrl, getSupabaseOthersUrl } from './lib/supabase';
 import { motion, AnimatePresence } from 'motion/react';
@@ -578,6 +579,12 @@ export default function App() {
                 </div>
               </motion.div>
             </section>
+
+            {/* ADMISSIONS FAQ ACCORDION COMPONENT */}
+            <AdmissionsFaq 
+              onApplyClick={() => setApplyModalOpen(true)}
+              onContactClick={() => setActiveTab('contact')}
+            />
             
             {/* VIDEO GALLERY ON HOME PAGE */}
             <VideoGallery />
@@ -1176,7 +1183,7 @@ export default function App() {
                       title: "Debate & Writers Society", 
                       desc: "Public speaking, analytical reasoning, and competitive national debate.",
                       tag: "National Debate Circuit",
-                      img: "https://images.unsplash.com/photo-1524178232363-1fb2b075b655?auto=format&fit=crop&w=800&q=80",
+                      img: getSupabaseOthersUrl("debate.jpeg"),
                       fallbackImg: "/pages/images/odeke.jpeg"
                     },
                     { 
@@ -1326,7 +1333,9 @@ export default function App() {
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                  {leaders.map((teacher, idx) => (
+                  {leaders
+                    .filter(l => !l.role.toLowerCase().includes('prefect') && !l.role.toLowerCase().includes('cabinet') && !l.role.toLowerCase().includes('unsa') && !l.role.toLowerCase().includes('top'))
+                    .map((teacher, idx) => (
                     <motion.div 
                       key={idx} 
                       initial={{ opacity: 0, y: 30 }}
