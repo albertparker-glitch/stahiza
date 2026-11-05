@@ -1,61 +1,79 @@
-# Implementation Plan: STAHIZA Official Admission Form, Fees & Printable Letter Generator
+# EmailJS SDK Integration for Student Admissions
 
-We will implement the official **Standard High School - Zzana Admission Form and Fees Structure** across all 6 classes (**S.1, S.2, S.3, S.4** for O-Level and **S.5, S.6** for A-Level) with **Day** and **Boarding** options, complete with an interactive fee calculator and an instant printable **Official Admission Offer Letter** featuring the official STAHIZA school logo.
+Integrate `@emailjs/browser` SDK to automatically send pre-filled admission application forms directly to `hasty0joel@gmail.com` upon form submission.
 
----
+## User Review & Critical Decisions
 
-## User Context & Alignment
-Based on the official STAHIZA S.5 Admission Form document uploaded by the user:
-- **Logo Integration**: Prominently display the official STAHIZA school badge/crest logo on the top header of both the online admission form and the printable Admission Offer Letter document.
-- **Classes Supported**: S1, S2, S3, S4 (O-Level) & S5, S6 (A-Level).
-- **Options**: Day Student vs Boarding Student.
-- **Official Fee Structure (UGX)**:
-  - Admission Fee: `50,000/=`
-  - Tuition (Day): `726,000/=`
-  - Tuition (Boarding): `1,316,000/=`
-  - Uniform (Labelling inclusive): `287,000/=`
-  - Identity Card: `10,000/=`
-  - Sports Wear: `50,000/=`
-  - Requirements: `50,000/=`
-  - **Total Day First Term**: `UGX 1,173,000/=`
-  - **Total Boarding First Term**: `UGX 1,763,000/=`
-- **Uniform & Boarding Requirements**:
-  - In-class & Out-of-class uniform items for boys and girls.
-  - Boarding items (basin, jerrycan, mattress, bed sheets, blanket, cutlery, parent passport photo).
-  - Textbook library contribution & official headteacher sign-off by **KURAHUKA OSTRICAST, HEADTEACHER**.
+> [!IMPORTANT]
+> The following choices were confirmed by the user in Phase 1:
+> - **EmailJS SDK Integration**: Use `@emailjs/browser` SDK to send application emails directly to `hasty0joel@gmail.com`.
+> - **Smart Fallback**: If EmailJS API keys are unconfigured in environment variables, apply an automated fallback to guaranteed `mailto:` link protocol dispatch so no application data is lost.
+> - **Automatic Sending Only**: Automatic background email dispatch upon form submission without requiring extra manual steps.
+> - **Recipient Email**: `hasty0joel@gmail.com`.
+> - **Confirmation Notice**: `"Application sent, pending approval in 2 business days. We will contact you on WhatsApp or Email."`
 
 ---
 
-## Proposed Architecture & Changes
+## 1. Overview & Core Concept
 
-### 1. New Navigation Tab & State
-- Add `'admissions'` tab ("Fees & Admission Form") to top `Navbar`, `Footer`, and `App.tsx` state union (`'home' | 'leadership' | 'academics' | 'sports' | 'campus' | 'admissions' | 'contact'`).
-
-### 2. Dedicated Admission Component (`src/components/AdmissionFormSection.tsx`)
-- **Logo Header**: Display the STAHIZA crest logo, school contact details, and motto ("EDUCATION IS THE WAY").
-- **Class & Status Selector**: Allows selecting S1–S6, Day/Boarding, optional House assignment, and A-Level combination (PCM, BCM, PCB, PEM, HEG, MEG, HED, etc.).
-- **Live Fee Breakdown Calculator**: Itemized display of tuition, admission, uniform, ID card, sports wear, and requirements fees.
-- **Requirements & Uniforms**: Full list of boys/girls uniforms and boarding items as specified in the official document.
-- **Official Offer Letter Generator**:
-  - Live preview of the official STAHIZA Admission Form document formatted with the official school logo, motto ("EDUCATION IS THE WAY"), student details, fees table, rules, and Headteacher sign-off.
-  - One-click **Print / Download PDF** button with `@media print` styling for crisp paper or PDF output.
-
-### 3. Upgraded Application Modal (`src/components/ApplyModal.tsx`)
-- Embed the STAHIZA school logo at the top of the modal header.
-- Update the modal to support all 6 classes (S1 to S6).
-- Dynamically toggle O-Level vs A-Level combination fields depending on chosen class.
-- Generate and present the official printable Admission Offer Letter with school logo upon form submission.
-
-### 4. Integration & Navigation Update (`src/App.tsx`, `src/components/Navbar.tsx`, `src/components/Footer.tsx`)
-- Connect the new `admissions` tab in the header navbar and footer links.
-- Ensure smooth scrolling and navigation state handling.
+- **What It Does**: When a parent submits the student admission form (S.1–S.6, Boarding/Day), `@emailjs/browser` dispatches an email containing student details, parent contact information, academic records, and class preferences to `hasty0joel@gmail.com`.
+- **Target Audience**: Prospective students and parents applying to Standard High School Zzana.
+- **Key Value**: Real, automated email delivery directly into the school administration's inbox using EmailJS.
 
 ---
 
-## Verification Plan
-1. **Compilation & Syntax**: Run `compile_applet` and `lint_applet` to ensure zero build errors.
-2. **Functional Verification**:
-   - Verify school logo renders clearly in both screen preview and print mode.
-   - Verify S1–S6 selection and Day vs Boarding fee calculations.
-   - Test generating and printing the official Admission Offer Letter.
-   - Verify responsiveness on mobile, tablet, and desktop viewports.
+## 2. Technical Architecture & Email Payload
+
+```
+┌────────────────────────────────────────────────────────────────────────┐
+│                      EmailJS Submission Flow                           │
+└────────────────────────────────────────────────────────────────────────┘
+                                   │
+                                   ▼
+                   ┌───────────────────────────────┐
+                   │  Online Admission Form        │
+                   └───────────────┬───────────────┘
+                                   │
+                                   ▼
+                   ┌───────────────────────────────┐
+                   │  @emailjs/browser SDK         │
+                   │  emailjs.send(service, tpl)   │
+                   └───────────────┬───────────────┘
+                                   │
+                                   ▼
+                   ┌───────────────────────────────┐
+                   │  Destination Inbox            │
+                   │  --> hasty0joel@gmail.com     │
+                   └───────────────────────────────┘
+```
+
+- **Email Payload Fields**:
+  - `to_email`: `hasty0joel@gmail.com`
+  - `student_name`: Student full name
+  - `parent_name`: Parent/Guardian name
+  - `parent_phone`: Contact phone number
+  - `parent_email`: Parent email address
+  - `target_class`: Class applying for (S.1 to S.6)
+  - `residence_type`: Boarding or Day section
+  - `previous_school`: Previous school attended
+  - `grades_aggregate`: PLE/UCE aggregates
+  - `ref_code`: Generated Reference Code (e.g., `STH-2026-7842`)
+
+---
+
+## 3. Planned Implementation Steps
+
+1. **Install Package**:
+   - Install `@emailjs/browser` package.
+
+2. **Update `src/lib/emailService.ts`**:
+   - Import `@emailjs/browser`.
+   - Configure `emailjs.send()` using environment variables (`VITE_EMAILJS_SERVICE_ID`, `VITE_EMAILJS_TEMPLATE_ID`, `VITE_EMAILJS_PUBLIC_KEY`) with graceful fallback to `mailto:` trigger if keys are not set.
+
+3. **Update `AdmissionFormSection.tsx` & `ApplyModal.tsx`**:
+   - Call `dispatchApplicationEmail()` on submit with active loading state.
+   - Show toast and confirmation card: `"Application sent! Pending approval in 2 business days. Dispatched to hasty0joel@gmail.com via EmailJS."`
+   - Include direct WhatsApp chat button for follow-up.
+
+4. **Verification**:
+   - Run `compile_applet` and `lint_applet` to ensure zero compilation errors.

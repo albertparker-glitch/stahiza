@@ -406,10 +406,12 @@ export async function fetchSchoolVideos(): Promise<SchoolVideoItem[]> {
 export const SCHOOL_CONTACTS = {
   phone1: "+256 772 831 704",
   phone2: "+256 782 316 838",
-  email: "stahiza2020@gmail.com",
+  email: "hasty0joel@gmail.com",
   location: "Along Entebbe Road, Zzana (1 km off Zzana Roundabout), Wakiso District, Uganda",
   box: "P.O. Box 22981 Kampala - Uganda",
   hours: "Mon – Fri: 7:30 AM – 5:00 PM, Sat: 9:00 AM – 1:00 PM",
+  selectionCode: "2624",
+  centerNo: "U1288",
   mapsSearchUrl: "https://www.google.com/maps/search/?api=1&query=Standard+High+School+Zzana+Entebbe+Road+Kampala+Uganda",
   embedMapUrl: "https://maps.google.com/maps?q=Standard+High+School+Zzana+Entebbe+Road+Kampala+Uganda&t=&z=15&ie=UTF8&iwloc=&output=embed"
 };
