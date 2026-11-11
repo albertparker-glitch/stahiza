@@ -36,7 +36,7 @@ import { SectionDivider } from './components/SectionDivider';
 import { AdmissionFormSection } from './components/AdmissionFormSection';
 import { Preloader } from './components/Preloader';
 import { HeroParallaxVideo } from './components/HeroParallaxVideo';
-import { Leader, TopStudent, fetchLeaders, fetchMarqueeStaff, fetchTopStudents, SCHOOL_CONTACTS } from './data/schoolData';
+import { Leader, fetchLeaders, fetchMarqueeStaff, SCHOOL_CONTACTS } from './data/schoolData';
 import { useTheme } from './context/ThemeContext';
 import { getSupabasePublicUrl, getSupabaseOthersUrl } from './lib/supabase';
 import { motion, AnimatePresence } from 'motion/react';
@@ -250,7 +250,6 @@ export default function App() {
   const [applyModalOpen, setApplyModalOpen] = useState(false);
   const [leaders, setLeaders] = useState<Leader[]>([]);
   const [marqueeStaff, setMarqueeStaff] = useState<Leader[]>([]);
-  const [topStudents, setTopStudents] = useState<TopStudent[]>([]);
   const [campusSection, setCampusSection] = useState<'all' | 'facilities' | 'clubs' | 'prefects' | 'teachers' | 'videos' | 'gallery'>('all');
   const [showBackToTop, setShowBackToTop] = useState(false);
   const [applySuccessAnimation, setApplySuccessAnimation] = useState(false);
@@ -321,7 +320,6 @@ export default function App() {
   useEffect(() => {
     fetchLeaders().then(data => setLeaders(data));
     fetchMarqueeStaff().then(data => setMarqueeStaff(data));
-    fetchTopStudents().then(data => setTopStudents(data));
   }, []);
 
   const marqueeRef = React.useRef<HTMLDivElement>(null);
@@ -904,7 +902,7 @@ export default function App() {
               <SchoolBadgeImg size={56} className="mx-auto" />
               <span className="text-[#800020] font-bold uppercase tracking-wider text-sm block">UNEB Curriculum</span>
               <h2 className="text-3xl sm:text-5xl font-extrabold font-['Montserrat'] text-[#0A192F]">
-                Academic Programs & Top Achievers
+                Academic Programs & Curriculum
               </h2>
               <p className="text-slate-600 text-base">
                 Lower and upper secondary education designed for national exam distinctions and top university entry.
@@ -962,118 +960,6 @@ export default function App() {
                 </ul>
               </motion.div>
             </div>
-
-            {/* A-LEVEL TOP 10 HIGH ACHIEVERS (MAROON BACKGROUND THEME) */}
-            <motion.div 
-              initial={{ opacity: 0, y: 25 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5 }}
-              className="bg-[#800020] text-white rounded-3xl p-8 sm:p-12 shadow-2xl space-y-8"
-            >
-              <div className="text-center space-y-2">
-                <span className="bg-amber-300 text-[#800020] font-bold px-4 py-1 rounded-full text-xs uppercase tracking-wider inline-block">Upper Secondary Excellence</span>
-                <h3 className="text-3xl sm:text-4xl font-black font-['Montserrat']">A-Level Top 10 High Achievers</h3>
-                <p className="text-rose-100 text-sm max-w-xl mx-auto">Celebrating students with top points in their UNEB combinations.</p>
-              </div>
-
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
-                {topStudents.filter(s => s.level === 'A-Level').map((student, idx) => (
-                  <motion.div 
-                    key={idx} 
-                    initial={{ opacity: 0, scale: 0.9 }}
-                    whileInView={{ opacity: 1, scale: 1 }}
-                    viewport={{ once: true }}
-                    transition={{ duration: 0.35, delay: (idx % 5) * 0.08 }}
-                    whileHover={{ y: -5, scale: 1.04 }}
-                    className="bg-white text-slate-900 rounded-2xl overflow-hidden shadow-lg border-2 border-rose-300/30 flex flex-col justify-between group transition duration-300"
-                  >
-                    <div className="relative w-full h-44 bg-slate-100 overflow-hidden">
-                      <img 
-                        src={student.img} 
-                        alt={student.name} 
-                        className="w-full h-full object-cover object-top group-hover:scale-110 transition duration-500"
-                        onError={(e) => {
-                          const target = e.currentTarget;
-                          target.style.display = 'none';
-                          const fallback = target.nextElementSibling as HTMLElement;
-                          if (fallback) fallback.style.display = 'flex';
-                        }}
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-br from-[#800020] to-[#0A192F] text-white flex-col items-center justify-center p-2 text-center" style={{ display: 'none' }}>
-                        <span className="text-2xl font-black font-['Montserrat']">{student.name.split(' ')[1]?.[0] || 'S'}</span>
-                      </div>
-                      <div className="absolute top-2 right-2 bg-amber-400 text-[#800020] font-black text-[10px] w-6 h-6 rounded-full flex items-center justify-center shadow">
-                        #{idx + 1}
-                      </div>
-                    </div>
-                    <div className="p-3 bg-white text-center space-y-1">
-                      <h4 className="font-extrabold text-xs sm:text-sm text-[#0A192F] font-['Montserrat'] truncate">{student.name}</h4>
-                      <div className="text-[10px] text-slate-500 font-semibold">{student.combinationOrStream}</div>
-                      <div className="mt-1 bg-[#800020] text-amber-200 py-1 px-2 rounded-lg text-[10px] font-bold shadow-sm">
-                        {student.pointsOrAs}
-                      </div>
-                    </div>
-                  </motion.div>
-                ))}
-              </div>
-            </motion.div>
-
-            {/* O-LEVEL TOP 10 HIGH ACHIEVERS (NAVY BLUE BACKGROUND THEME) */}
-            <motion.div 
-              initial={{ opacity: 0, y: 25 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5 }}
-              className="bg-[#0A192F] text-white rounded-3xl p-8 sm:p-12 shadow-2xl space-y-8"
-            >
-              <div className="text-center space-y-2">
-                <span className="bg-amber-300 text-[#0A192F] font-bold px-4 py-1 rounded-full text-xs uppercase tracking-wider inline-block">Lower Secondary Excellence</span>
-                <h3 className="text-3xl sm:text-4xl font-black font-['Montserrat']">O-Level Top 10 High Achievers</h3>
-                <p className="text-slate-300 text-sm max-w-xl mx-auto">Honoring outstanding candidates with exceptional distinctions.</p>
-              </div>
-
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
-                {topStudents.filter(s => s.level === 'O-Level').map((student, idx) => (
-                  <motion.div 
-                    key={idx} 
-                    initial={{ opacity: 0, scale: 0.9 }}
-                    whileInView={{ opacity: 1, scale: 1 }}
-                    viewport={{ once: true }}
-                    transition={{ duration: 0.35, delay: (idx % 5) * 0.08 }}
-                    whileHover={{ y: -5, scale: 1.04 }}
-                    className="bg-white text-slate-900 rounded-2xl overflow-hidden shadow-lg border-2 border-blue-300/30 flex flex-col justify-between group transition duration-300"
-                  >
-                    <div className="relative w-full h-44 bg-slate-100 overflow-hidden">
-                      <img 
-                        src={student.img} 
-                        alt={student.name} 
-                        className="w-full h-full object-cover object-top group-hover:scale-110 transition duration-500"
-                        onError={(e) => {
-                          const target = e.currentTarget;
-                          target.style.display = 'none';
-                          const fallback = target.nextElementSibling as HTMLElement;
-                          if (fallback) fallback.style.display = 'flex';
-                        }}
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-br from-[#0A192F] to-[#800020] text-white flex-col items-center justify-center p-2 text-center" style={{ display: 'none' }}>
-                        <span className="text-2xl font-black font-['Montserrat']">{student.name.split(' ')[1]?.[0] || 'S'}</span>
-                      </div>
-                      <div className="absolute top-2 right-2 bg-amber-400 text-[#0A192F] font-black text-[10px] w-6 h-6 rounded-full flex items-center justify-center shadow">
-                        #{idx + 1}
-                      </div>
-                    </div>
-                    <div className="p-3 bg-white text-center space-y-1">
-                      <h4 className="font-extrabold text-xs sm:text-sm text-[#0A192F] font-['Montserrat'] truncate">{student.name}</h4>
-                      <div className="text-[10px] text-slate-500 font-semibold">{student.combinationOrStream}</div>
-                      <div className="mt-1 bg-[#0A192F] text-amber-300 py-1 px-2 rounded-lg text-[10px] font-bold shadow-sm">
-                        {student.pointsOrAs}
-                      </div>
-                    </div>
-                  </motion.div>
-                ))}
-              </div>
-            </motion.div>
 
             {/* ACADEMICS YOUTUBE VIDEOS HIGHLIGHTS */}
             <AcademicsVideos />

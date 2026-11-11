@@ -54,8 +54,6 @@ export const A_LEVEL_COMBINATIONS = [
 
 export const HOUSES_LIST = [
   'Lumumba House',
-  'Kabalega House',
-  'Mutesa House',
   'Nyerere House',
   'Mandela House',
   'Nkurumah House'
