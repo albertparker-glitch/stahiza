@@ -18,7 +18,10 @@ import {
   ChevronUp,
   Camera,
   X,
-  Maximize2
+  Maximize2,
+  Target,
+  Eye,
+  Compass
 } from 'lucide-react';
 import { SchoolBadgeImg } from './components/SchoolBadgeImg';
 import { Navbar } from './components/Navbar';
@@ -246,7 +249,7 @@ export const CAMPUS_FACILITIES: CampusFacility[] = [
 export default function App() {
   const { theme } = useTheme();
   const isDark = theme === 'dark';
-  const [activeTab, setActiveTab] = useState<'home' | 'leadership' | 'academics' | 'sports' | 'campus' | 'admissions' | 'contact'>('home');
+  const [activeTab, setActiveTab] = useState<'home' | 'governance' | 'academics' | 'sports' | 'campus' | 'admissions' | 'contact'>('home');
   const [applyModalOpen, setApplyModalOpen] = useState(false);
   const [leaders, setLeaders] = useState<Leader[]>([]);
   const [marqueeStaff, setMarqueeStaff] = useState<Leader[]>([]);
@@ -587,7 +590,7 @@ export default function App() {
                   {
                     icon: ShieldCheck,
                     title: "Discipline",
-                    desc: "Instilling integrity, leadership, and moral discipline in every learner.",
+                    desc: "Instilling integrity, governance, and moral discipline in every learner.",
                   },
                 ].map((pillar, idx) => (
                   <motion.div 
@@ -828,7 +831,7 @@ export default function App() {
           </div>
         )}
 
-        {activeTab === 'leadership' && (
+        {activeTab === 'governance' && (
           <div className="py-16 px-4 sm:px-8 max-w-7xl mx-auto space-y-12">
             <motion.div 
               initial={{ opacity: 0, y: 20 }}
@@ -839,12 +842,201 @@ export default function App() {
               <SchoolBadgeImg size={56} className="mx-auto" />
               <span className="text-[#800020] font-bold uppercase tracking-wider text-sm block">Administration & Faculty</span>
               <h2 className="text-3xl sm:text-5xl font-extrabold font-['Montserrat'] text-[#0A192F]">
-                School Leadership
+                School Governance
               </h2>
               <p className="text-slate-600 text-base">
                 Experienced educators and administrators steering STAHIZA toward academic and moral excellence.
               </p>
             </motion.div>
+
+            {/* MISSION & VISION FLOATING NAVY BLUE CONTAINERS */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 pt-2">
+              <motion.div
+                initial={{ opacity: 0, y: 24 }}
+                animate={{
+                  opacity: 1,
+                  y: [0, -10, 0],
+                }}
+                transition={{
+                  opacity: { duration: 0.5 },
+                  y: { duration: 5.5, repeat: Infinity, ease: "easeInOut" },
+                }}
+                whileHover={{ y: -12, scale: 1.015 }}
+                className="relative overflow-hidden bg-gradient-to-br from-[#0A192F] via-[#0F2A4A] to-[#071426] text-white rounded-3xl p-8 sm:p-10 shadow-[0_22px_50px_rgba(10,25,47,0.38)] border border-amber-300/20 flex flex-col justify-between space-y-5"
+              >
+                {/* Smooth fluid ambient flow layer */}
+                <motion.div
+                  aria-hidden="true"
+                  animate={{
+                    x: ['-20%', '20%', '-20%'],
+                    y: ['-10%', '15%', '-10%'],
+                    scale: [1, 1.15, 1],
+                  }}
+                  transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
+                  className="pointer-events-none absolute -top-24 -right-24 w-72 h-72 rounded-full bg-gradient-to-tr from-[#800020]/30 via-amber-400/15 to-sky-400/20 blur-3xl"
+                />
+                <div className="relative z-10 space-y-4">
+                  <div className="flex items-center gap-3.5">
+                    <div className="w-12 h-12 rounded-2xl bg-white/10 border border-white/20 text-amber-300 flex items-center justify-center shadow-inner shrink-0">
+                      <Target className="w-6 h-6" />
+                    </div>
+                    <h3 className="text-2xl font-extrabold font-['Montserrat'] text-white tracking-tight">
+                      Mission
+                    </h3>
+                  </div>
+                  <p className="text-slate-100 text-base sm:text-lg leading-relaxed font-medium">
+                    To provide affordable and quality education that produce disciplined, academically sound and successful citizens.
+                  </p>
+                </div>
+              </motion.div>
+
+              <motion.div
+                initial={{ opacity: 0, y: 24 }}
+                animate={{
+                  opacity: 1,
+                  y: [0, -10, 0],
+                }}
+                transition={{
+                  opacity: { duration: 0.5, delay: 0.1 },
+                  y: { duration: 6.2, delay: 0.9, repeat: Infinity, ease: "easeInOut" },
+                }}
+                whileHover={{ y: -12, scale: 1.015 }}
+                className="relative overflow-hidden bg-gradient-to-br from-[#0A192F] via-[#102E52] to-[#071426] text-white rounded-3xl p-8 sm:p-10 shadow-[0_22px_50px_rgba(10,25,47,0.38)] border border-amber-300/20 flex flex-col justify-between space-y-5"
+              >
+                {/* Smooth fluid ambient flow layer */}
+                <motion.div
+                  aria-hidden="true"
+                  animate={{
+                    x: ['20%', '-20%', '20%'],
+                    y: ['15%', '-10%', '15%'],
+                    scale: [1.1, 1, 1.1],
+                  }}
+                  transition={{ duration: 11, repeat: Infinity, ease: "easeInOut" }}
+                  className="pointer-events-none absolute -bottom-24 -left-24 w-72 h-72 rounded-full bg-gradient-to-tr from-sky-400/20 via-amber-400/15 to-[#800020]/30 blur-3xl"
+                />
+                <div className="relative z-10 space-y-4">
+                  <div className="flex items-center gap-3.5">
+                    <div className="w-12 h-12 rounded-2xl bg-white/10 border border-white/20 text-amber-300 flex items-center justify-center shadow-inner shrink-0">
+                      <Eye className="w-6 h-6" />
+                    </div>
+                    <h3 className="text-2xl font-extrabold font-['Montserrat'] text-white tracking-tight">
+                      Vision
+                    </h3>
+                  </div>
+                  <p className="text-slate-100 text-base sm:text-lg leading-relaxed font-medium">
+                    To be the first choice for secondary education in the communities we serve and beyond.
+                  </p>
+                </div>
+              </motion.div>
+            </div>
+
+            {/* BIG CORE VALUES MARQUEE CONTAINER */}
+            <div className="relative overflow-hidden bg-gradient-to-br from-[#0A192F] via-[#0F2747] to-[#081529] text-white rounded-3xl p-6 sm:p-8 shadow-[0_22px_55px_rgba(10,25,47,0.35)] border border-slate-700/80 space-y-6">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 px-2">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-2xl bg-white/10 border border-white/20 text-amber-300 flex items-center justify-center shrink-0">
+                    <Compass className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <h3 className="text-xl sm:text-2xl font-extrabold font-['Montserrat'] text-white">
+                      Core Values
+                    </h3>
+                    <p className="text-xs text-amber-300/90 font-medium">
+                      Principles guiding every decision and action at STAHIZA
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="relative w-full overflow-hidden py-2">
+                <style>{`
+                  @keyframes coreValuesMarquee {
+                    0% { transform: translateX(0); }
+                    100% { transform: translateX(-50%); }
+                  }
+                  .animate-core-values-marquee {
+                    display: flex;
+                    width: max-content;
+                    animation: coreValuesMarquee 36s linear infinite;
+                  }
+                  .animate-core-values-marquee:hover {
+                    animation-play-state: paused;
+                  }
+                  @media (prefers-reduced-motion: reduce) {
+                    .animate-core-values-marquee {
+                      animation: none;
+                      flex-wrap: wrap;
+                      width: 100%;
+                    }
+                  }
+                `}</style>
+                <div className="animate-core-values-marquee gap-5 items-stretch">
+                  {[
+                    ...[
+                      {
+                        num: '1',
+                        title: 'Integrity',
+                        desc: 'Our decisions and actions reflect honesty, fairness, trust and respect for all.',
+                      },
+                      {
+                        num: '2',
+                        title: 'Excellence',
+                        desc: 'Our decisions and actions reflect our commitment to accountability, innovation and learning.',
+                      },
+                      {
+                        num: '3',
+                        title: 'Openness',
+                        desc: 'Our decisions and actions reflect open minded transparent dialogue.',
+                      },
+                      {
+                        num: '4',
+                        title: 'Services',
+                        desc: 'Our decisions and actions reflect our commitment to deliver curriculum support services and extra curricular activities in an appropriate timely manner.',
+                      },
+                    ],
+                    ...[
+                      {
+                        num: '1',
+                        title: 'Integrity',
+                        desc: 'Our decisions and actions reflect honesty, fairness, trust and respect for all.',
+                      },
+                      {
+                        num: '2',
+                        title: 'Excellence',
+                        desc: 'Our decisions and actions reflect our commitment to accountability, innovation and learning.',
+                      },
+                      {
+                        num: '3',
+                        title: 'Openness',
+                        desc: 'Our decisions and actions reflect open minded transparent dialogue.',
+                      },
+                      {
+                        num: '4',
+                        title: 'Services',
+                        desc: 'Our decisions and actions reflect our commitment to deliver curriculum support services and extra curricular activities in an appropriate timely manner.',
+                      },
+                    ],
+                  ].map((val, idx) => (
+                    <div
+                      key={idx}
+                      className="w-72 sm:w-80 shrink-0 bg-white/10 backdrop-blur-md border border-white/15 rounded-2xl p-6 shadow-lg flex flex-col justify-between space-y-3 hover:bg-white/15 transition-colors"
+                    >
+                      <div className="flex items-center gap-3">
+                        <span className="w-8 h-8 rounded-xl bg-amber-400 text-[#0A192F] font-black font-mono text-sm flex items-center justify-center shrink-0">
+                          {val.num}
+                        </span>
+                        <h4 className="text-lg font-extrabold font-['Montserrat'] text-amber-300">
+                          {val.num}. {val.title}
+                        </h4>
+                      </div>
+                      <p className="text-slate-200 text-sm leading-relaxed">
+                        {val.desc}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
               {leaders.map((leader, idx) => (
@@ -1287,8 +1479,8 @@ export default function App() {
                     },
                     { 
                       title: "Scouts, Guides & Fellowships", 
-                      desc: "Character development, campcraft, volunteer service, and leadership discipline.",
-                      tag: "Leadership & Discipline",
+                      desc: "Character development, campcraft, volunteer service, and governance discipline.",
+                      tag: "Governance & Discipline",
                       img: getSupabaseOthersUrl("mus.jpeg"),
                       fallbackImg: "https://images.unsplash.com/photo-1529156069898-49953e39b3ac?auto=format&fit=crop&w=800&q=80"
                     },
@@ -1358,7 +1550,7 @@ export default function App() {
                     </div>
                     <div>
                       <h3 className="text-lg sm:text-xl font-extrabold font-['Montserrat'] text-[#0A192F]">
-                        Prefects Cabinet & Student Leadership
+                        Prefects Cabinet & Student Governance
                       </h3>
                       <span className="text-[10px] sm:text-xs text-slate-500 font-semibold uppercase tracking-wider">
                         Cabinet Executives & UNSA Representatives

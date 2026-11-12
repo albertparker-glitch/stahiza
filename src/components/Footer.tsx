@@ -86,7 +86,7 @@ export const Footer: React.FC<FooterProps> = ({ setActiveTab, setApplyModalOpen 
           <ul className="space-y-2.5 text-sm">
             {[
               { label: 'Home', tab: 'home' },
-              { label: 'About Leadership', tab: 'leadership' },
+              { label: 'About Governance', tab: 'governance' },
               { label: 'Academics & Curriculum', tab: 'academics' },
               { label: 'Fees & Admission Form', tab: 'admissions' },
               { label: 'Online Application Modal', modal: 'apply' },

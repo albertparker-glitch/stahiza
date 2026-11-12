@@ -21,8 +21,8 @@ export const FALLBACK_LEADERS: Leader[] = [
     img: getSupabasePublicUrl("ostricast.jpeg")
   },
   {
-    role: "Deputy Headteacher",
-    name: "Mrs. Mbabazi Bena",
+    role: "Deputy Headteacher Finances",
+    name: "Mrs. Mbabazi Benna",
     img: getSupabasePublicUrl("bena.jpeg")
   },
   {
@@ -154,9 +154,16 @@ export async function fetchLeaders(): Promise<Leader[]> {
     return data.map((item: any) => {
       const rawImg = item.img_url || item.img || "odeke.jpeg";
       const imgUrl = rawImg.startsWith('http') ? rawImg : getSupabasePublicUrl(rawImg);
+      const rawRole = String(item.role || '');
+      const rawName = String(item.name || '');
+      const normalizedRole =
+        rawRole.trim().toLowerCase() === 'deputy headteacher' || rawRole.trim().toLowerCase() === 'deputy head teacher'
+          ? 'Deputy Headteacher Finances'
+          : rawRole;
+      const normalizedName = rawName.replace(/\bBena\b/g, 'Benna');
       return {
-        role: item.role,
-        name: item.name,
+        role: normalizedRole,
+        name: normalizedName,
         img: imgUrl
       };
     });

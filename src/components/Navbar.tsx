@@ -29,8 +29,8 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, setAppl
     { title: 'USSSA Football & Sports Champions', category: 'Sports', tab: 'sports' },
     { title: 'Basketball & Netball Teams', category: 'Sports', tab: 'sports' },
     { title: 'Music, Dance & Drama (MDD)', category: 'Sports', tab: 'sports' },
-    { title: 'School Leadership & Administration', category: 'Leadership', tab: 'leadership' },
-    { title: 'Headteacher Mr. Kurahuka Ostricast', category: 'Leadership', tab: 'leadership' },
+    { title: 'School Governance & Administration', category: 'Governance', tab: 'governance' },
+    { title: 'Headteacher Mr. Kurahuka Ostricast', category: 'Governance', tab: 'governance' },
     { title: 'Campus Facilities & Computer Lab', category: 'Campus', tab: 'campus' },
     { title: 'Contact Us & Office Desk', category: 'Contact', tab: 'contact' },
     { title: 'Location along Entebbe Road Zzana', category: 'Contact', tab: 'contact' },
@@ -103,7 +103,7 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, setAppl
           <nav className="hidden lg:flex items-center gap-1 font-medium text-xs xl:text-sm text-slate-700 whitespace-nowrap flex-nowrap shrink-0">
             {[
               { id: 'home', label: 'Home' },
-              { id: 'leadership', label: 'Leadership' },
+              { id: 'governance', label: 'Governance' },
               { id: 'academics', label: 'Academics' },
               { id: 'sports', label: 'Sports & Talent' },
               { id: 'campus', label: 'Campus Life' },
@@ -272,7 +272,7 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, setAppl
             >
               {[
                 { id: 'home', label: 'Home' },
-                { id: 'leadership', label: 'Leadership' },
+                { id: 'governance', label: 'Governance' },
                 { id: 'academics', label: 'Academics' },
                 { id: 'sports', label: 'Sports & Talent' },
                 { id: 'campus', label: 'Campus Life' },
