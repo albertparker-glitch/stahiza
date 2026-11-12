@@ -385,20 +385,20 @@ export const AdmissionFormSection: React.FC<AdmissionFormSectionProps> = () => {
                           type="button"
                           key={status}
                           onClick={() => setResidenceType(status)}
-                          className={`p-3.5 rounded-xl border text-left transition-all flex items-center justify-between ${
+                          className={`p-3.5 rounded-xl border text-left transition-all flex items-center justify-between cursor-pointer ${
                             isSelected
-                              ? 'bg-[#800020] text-white border-[#800020] shadow-md dark:bg-rose-950 dark:border-rose-800'
-                              : 'bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700'
+                              ? 'bg-yellow-400 text-[#0A192F] border-yellow-600 shadow-md ring-2 ring-yellow-500/60 dark:bg-yellow-400 dark:text-slate-950 dark:border-yellow-500'
+                              : 'bg-yellow-100 hover:bg-yellow-200 text-[#0A192F] border-yellow-300 dark:bg-yellow-200 dark:hover:bg-yellow-300 dark:text-slate-900 dark:border-yellow-400'
                           }`}
                         >
                           <div>
                             <div className="font-bold text-xs">{status} Section</div>
-                            <div className={`text-[10px] ${isSelected ? 'text-rose-100' : 'text-slate-500 dark:text-slate-400'}`}>
+                            <div className={`text-[10px] mt-0.5 font-medium ${isSelected ? 'text-slate-900' : 'text-slate-700'}`}>
                               UGX {currentTuition.toLocaleString()}/=
                             </div>
                           </div>
                           <div className={`w-5 h-5 rounded-full flex items-center justify-center font-bold text-xs ${
-                            isSelected ? 'bg-amber-400 text-[#0A192F]' : 'bg-slate-200 dark:bg-slate-700 text-slate-400'
+                            isSelected ? 'bg-[#0A192F] text-yellow-300' : 'bg-yellow-200 border border-yellow-400 text-transparent'
                           }`}>
                             {isSelected ? <Check className="w-3 h-3 stroke-[3]" /> : null}
                           </div>
