@@ -16,6 +16,7 @@ import {
   Building2,
   ArrowRight,
   ChevronUp,
+  ChevronDown,
   Camera,
   X,
   Maximize2,
@@ -40,6 +41,13 @@ import { AdmissionFormSection } from './components/AdmissionFormSection';
 import { Preloader } from './components/Preloader';
 import { HeroParallaxVideo } from './components/HeroParallaxVideo';
 import { Leader, fetchLeaders, fetchMarqueeStaff, SCHOOL_CONTACTS } from './data/schoolData';
+import {
+  ALL_ARTS_COMBINATIONS,
+  POPULAR_ARTS_COMBINATIONS,
+  OTHER_ARTS_COMBINATIONS,
+  ALL_SCIENCE_COMBINATIONS,
+  SCIENCE_COMBINATION_GROUPS,
+} from './data/aLevelCombinations';
 import { useTheme } from './context/ThemeContext';
 import { getSupabasePublicUrl, getSupabaseOthersUrl } from './lib/supabase';
 import { motion, AnimatePresence } from 'motion/react';
@@ -258,6 +266,13 @@ export default function App() {
   const [applySuccessAnimation, setApplySuccessAnimation] = useState(false);
   const [selectedFacility, setSelectedFacility] = useState<CampusFacility | null>(null);
   const [activeFacilityPhotoIdx, setActiveFacilityPhotoIdx] = useState(0);
+  const [selectedArtsComboCode, setSelectedArtsComboCode] = useState<string>(POPULAR_ARTS_COMBINATIONS[0]?.code || 'HEG');
+  const [selectedScienceComboCode, setSelectedScienceComboCode] = useState<string>(SCIENCE_COMBINATION_GROUPS.physics[0]?.code || 'PCM');
+
+  const selectedArtsCombo =
+    ALL_ARTS_COMBINATIONS.find((combo) => combo.code === selectedArtsComboCode) || ALL_ARTS_COMBINATIONS[0];
+  const selectedScienceCombo =
+    ALL_SCIENCE_COMBINATIONS.find((combo) => combo.code === selectedScienceComboCode) || ALL_SCIENCE_COMBINATIONS[0];
 
   const openFacilityModal = (fac: CampusFacility) => {
     setSelectedFacility(fac);
@@ -1145,10 +1160,116 @@ export default function App() {
                 <p className="text-slate-600 leading-relaxed text-sm">
                   Sciences and Arts combinations engineered for direct public and private university admissions.
                 </p>
-                <ul className="space-y-3 text-sm font-medium text-slate-700">
-                  <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-emerald-600" /> Sciences: PCM, BCM, PCB, PEM</li>
-                  <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-emerald-600" /> Arts: HEG, MEG, HED combinations</li>
-                  <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-emerald-600" /> Sub-Math & General Paper coaching</li>
+
+                <div className="space-y-5 pt-1">
+                  {/* ARTS COMBINATIONS DROPDOWN */}
+                  <div className="bg-slate-50 border border-slate-200 rounded-2xl p-4 space-y-2.5">
+                    <div className="flex items-center justify-between gap-2">
+                      <label htmlFor="a-level-arts-select" className="text-xs font-bold uppercase tracking-wider text-[#800020]">
+                        Arts Combinations ({ALL_ARTS_COMBINATIONS.length})
+                      </label>
+                      <span className="text-[11px] font-semibold text-slate-500">11 Arts Subjects</span>
+                    </div>
+                    <div className="relative">
+                      <select
+                        id="a-level-arts-select"
+                        value={selectedArtsComboCode}
+                        onChange={(e) => setSelectedArtsComboCode(e.target.value)}
+                        className="w-full appearance-none bg-white border border-slate-300 rounded-xl pl-3.5 pr-10 py-2.5 text-sm font-semibold text-[#0A192F] focus:outline-none focus:ring-2 focus:ring-[#800020]/30 focus:border-[#800020] cursor-pointer"
+                      >
+                        <optgroup label="Popular UNEB Arts Combinations">
+                          {POPULAR_ARTS_COMBINATIONS.map((combo) => (
+                            <option key={combo.code} value={combo.code}>
+                              {combo.code} — {combo.subjects.join(', ')}
+                            </option>
+                          ))}
+                        </optgroup>
+                        <optgroup label="All Generated Arts Combinations">
+                          {OTHER_ARTS_COMBINATIONS.map((combo) => (
+                            <option key={combo.code} value={combo.code}>
+                              {combo.code} — {combo.subjects.join(', ')}
+                            </option>
+                          ))}
+                        </optgroup>
+                      </select>
+                      <ChevronDown className="w-4 h-4 text-slate-500 pointer-events-none absolute right-3 top-1/2 -translate-y-1/2" />
+                    </div>
+                    {selectedArtsCombo && (
+                      <div className="text-xs text-slate-600 flex flex-col gap-1 pt-0.5">
+                        <div>
+                          <span className="font-bold text-[#0A192F]">{selectedArtsCombo.code}:</span>{' '}
+                          {selectedArtsCombo.subjects.join(' • ')}
+                        </div>
+                        <div className="text-[11px] text-slate-500">
+                          Subsidiary: {selectedArtsCombo.subsidiary}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* SCIENCES COMBINATIONS DROPDOWN */}
+                  <div className="bg-slate-50 border border-slate-200 rounded-2xl p-4 space-y-2.5">
+                    <div className="flex items-center justify-between gap-2">
+                      <label htmlFor="a-level-sciences-select" className="text-xs font-bold uppercase tracking-wider text-[#0A192F]">
+                        Sciences Combinations ({ALL_SCIENCE_COMBINATIONS.length})
+                      </label>
+                      <span className="text-[11px] font-semibold text-slate-500">Biology & Physics Separated (PCB Only)</span>
+                    </div>
+                    <div className="relative">
+                      <select
+                        id="a-level-sciences-select"
+                        value={selectedScienceComboCode}
+                        onChange={(e) => setSelectedScienceComboCode(e.target.value)}
+                        className="w-full appearance-none bg-white border border-slate-300 rounded-xl pl-3.5 pr-10 py-2.5 text-sm font-semibold text-[#0A192F] focus:outline-none focus:ring-2 focus:ring-[#0A192F]/30 focus:border-[#0A192F] cursor-pointer"
+                      >
+                        <optgroup label="Physics Combinations (No Biology)">
+                          {SCIENCE_COMBINATION_GROUPS.physics.map((combo) => (
+                            <option key={combo.code} value={combo.code}>
+                              {combo.code} — {combo.subjects.join(', ')}
+                            </option>
+                          ))}
+                        </optgroup>
+                        <optgroup label="Biology Combinations (No Physics)">
+                          {SCIENCE_COMBINATION_GROUPS.biology.map((combo) => (
+                            <option key={combo.code} value={combo.code}>
+                              {combo.code} — {combo.subjects.join(', ')}
+                            </option>
+                          ))}
+                        </optgroup>
+                        <optgroup label="Physics & Biology Joint (PCB Only)">
+                          {SCIENCE_COMBINATION_GROUPS.pcbOnly.map((combo) => (
+                            <option key={combo.code} value={combo.code}>
+                              {combo.code} — {combo.subjects.join(', ')}
+                            </option>
+                          ))}
+                        </optgroup>
+                        <optgroup label="Mathematics & Chemistry">
+                          {SCIENCE_COMBINATION_GROUPS.other.map((combo) => (
+                            <option key={combo.code} value={combo.code}>
+                              {combo.code} — {combo.subjects.join(', ')}
+                            </option>
+                          ))}
+                        </optgroup>
+                      </select>
+                      <ChevronDown className="w-4 h-4 text-slate-500 pointer-events-none absolute right-3 top-1/2 -translate-y-1/2" />
+                    </div>
+                    {selectedScienceCombo && (
+                      <div className="text-xs text-slate-600 flex flex-col gap-1 pt-0.5">
+                        <div>
+                          <span className="font-bold text-[#0A192F]">{selectedScienceCombo.code}</span>{' '}
+                          <span className="text-[#800020] font-semibold">({selectedScienceCombo.stream})</span>:{' '}
+                          {selectedScienceCombo.subjects.join(' • ')}
+                        </div>
+                        <div className="text-[11px] text-slate-500">
+                          Subsidiary: {selectedScienceCombo.subsidiary}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                <ul className="space-y-2 text-sm font-medium text-slate-700 pt-1">
+                  <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" /> Sub-Math, Sub-ICT & General Paper coaching</li>
                 </ul>
               </motion.div>
             </div>
