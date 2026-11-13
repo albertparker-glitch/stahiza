@@ -127,6 +127,7 @@ export const VideoGallery: React.FC = () => {
                     loop 
                     muted 
                     playsInline 
+                    preload="auto"
                     controls
                     className="w-full h-full object-cover group-hover:scale-105 transition duration-500"
                   >

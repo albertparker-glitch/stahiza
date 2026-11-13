@@ -161,43 +161,27 @@ export const ApplyModal: React.FC<ApplyModalProps> = ({
                 <div className="space-y-2">
                   <div className="flex items-center justify-center gap-2 flex-wrap">
                     <span className="px-3.5 py-1 bg-amber-100 text-amber-900 dark:bg-amber-950 dark:text-amber-300 rounded-full text-xs font-black uppercase font-mono tracking-wider">
-                      Application Sent, Pending Approval in 2 Business Days
+                      Pre-filled Mail Template Ready • Approval in 2 Business Days
                     </span>
-                    <span
-                      className={`px-3 py-1 rounded-full text-[11px] font-bold font-mono ${
-                        emailResult?.fallbackTriggered
-                          ? 'bg-amber-50 text-amber-800 border border-amber-200 dark:bg-amber-950/60 dark:text-amber-300 dark:border-amber-800'
-                          : 'bg-emerald-50 text-emerald-700 border border-emerald-200 dark:bg-emerald-950/60 dark:text-emerald-300 dark:border-emerald-800'
-                      }`}
-                    >
-                      Ref: {submittedRecord.id} • {emailResult?.methodUsed || 'EmailJS Server API'}
+                    <span className="px-3 py-1 rounded-full text-[11px] font-bold font-mono bg-emerald-50 text-emerald-700 border border-emerald-200 dark:bg-emerald-950/60 dark:text-emerald-300 dark:border-emerald-800">
+                      Ref: {submittedRecord.id} • {emailResult?.methodUsed || 'Mail Template'}
                     </span>
                   </div>
                   <h3 className="text-2xl font-black text-slate-900 dark:text-white font-['Montserrat'] pt-2">
-                    Application Received!
+                    Application Prepared!
                   </h3>
                   <p className="text-slate-600 dark:text-slate-300 text-xs max-w-md mx-auto leading-relaxed">
-                    {emailResult?.fallbackTriggered ? (
-                      <>
-                        Thank you, <span className="font-bold">{submittedRecord.parentName}</span>. Your application draft for <span className="font-bold text-[#800020] dark:text-amber-400">{submittedRecord.studentName}</span> ({submittedRecord.targetClass}, {submittedRecord.residenceType}) was prepared for your mail app to send to <strong className="text-slate-900 dark:text-white">{SCHOOL_CONTACTS.email}</strong>.
-                      </>
-                    ) : (
-                      <>
-                        Thank you, <span className="font-bold">{submittedRecord.parentName}</span>. Your application for <span className="font-bold text-[#800020] dark:text-amber-400">{submittedRecord.studentName}</span> ({submittedRecord.targetClass}, {submittedRecord.residenceType}) was sent directly to <strong className="text-slate-900 dark:text-white">{SCHOOL_CONTACTS.email}</strong>.
-                      </>
-                    )}
+                    Thank you, <span className="font-bold">{submittedRecord.parentName}</span>. Your pre-filled admission email template for <span className="font-bold text-[#800020] dark:text-amber-400">{submittedRecord.studentName}</span> ({submittedRecord.targetClass}, {submittedRecord.residenceType}) has been opened for your mail app to send to <strong className="text-slate-900 dark:text-white">{SCHOOL_CONTACTS.email}</strong>.
                   </p>
                 </div>
 
-                {/* WHATSAPP & FALLBACK EMAIL FOLLOW UP CARD */}
+                {/* WHATSAPP & MAIL TEMPLATE CARD */}
                 <div className="p-5 bg-slate-900 text-white rounded-2xl max-w-md mx-auto border border-slate-800 shadow-xl space-y-3 text-center">
                   <span className="text-[11px] text-amber-300 uppercase tracking-widest font-bold block">
                     We Will Contact You on WhatsApp or Email
                   </span>
                   <p className="text-xs text-slate-300">
-                    {emailResult?.fallbackTriggered
-                      ? 'If your email app did not launch automatically, click below to open your pre-filled email draft or follow up on WhatsApp:'
-                      : 'You can also follow up directly with our admissions team on WhatsApp:'}
+                    If your email app did not launch automatically, click below to open your pre-filled mail template or follow up on WhatsApp:
                   </p>
                   <div className="flex flex-col gap-2">
                     <a
@@ -209,15 +193,13 @@ export const ApplyModal: React.FC<ApplyModalProps> = ({
                       <MessageCircle className="w-4 h-4 fill-current" />
                       <span>Chat on WhatsApp ({SCHOOL_CONTACTS.phone1})</span>
                     </a>
-                    {emailResult?.fallbackTriggered && (
-                      <a
-                        href={emailResult.mailtoUrl}
-                        className="inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-amber-400 hover:bg-amber-300 text-slate-950 font-bold rounded-xl text-xs transition shadow-md w-full"
-                      >
-                        <Mail className="w-4 h-4" />
-                        <span>Open Pre-filled Email Draft</span>
-                      </a>
-                    )}
+                    <a
+                      href={emailResult?.mailtoUrl || `mailto:${SCHOOL_CONTACTS.email}`}
+                      className="inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-amber-400 hover:bg-amber-300 text-slate-950 font-bold rounded-xl text-xs transition shadow-md w-full"
+                    >
+                      <Mail className="w-4 h-4" />
+                      <span>Open Pre-filled Mail Template</span>
+                    </a>
                   </div>
                 </div>
 
@@ -229,7 +211,7 @@ export const ApplyModal: React.FC<ApplyModalProps> = ({
                     className="px-4 py-2.5 bg-slate-900 dark:bg-slate-800 hover:bg-slate-800 text-white font-bold rounded-xl text-xs transition inline-flex items-center gap-1.5 disabled:opacity-60 cursor-pointer"
                   >
                     <RefreshCw className={`w-3.5 h-3.5 text-amber-300 ${isResending ? 'animate-spin' : ''}`} />
-                    <span>{isResending ? 'Resending...' : 'Resend Email'}</span>
+                    <span>{isResending ? 'Opening...' : 'Re-open Mail Template'}</span>
                   </button>
 
                   {emailResult?.payloadSummary && (

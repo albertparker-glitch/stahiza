@@ -7,9 +7,8 @@ export interface EmailSendResult {
   recipient: string;
   sentAt: string;
   payloadSummary: string;
-  methodUsed: 'EmailJS Server API' | 'Direct Mailto Fallback';
+  methodUsed: 'Mail Template';
   mailtoUrl: string;
-  fallbackTriggered: boolean;
 }
 
 export interface ContactInquiryInput {
@@ -21,18 +20,6 @@ export interface ContactInquiryInput {
   message: string;
   submittedAt?: string;
 }
-
-interface ServerEmailDispatchPayload {
-  ok?: boolean;
-  method?: 'emailjs_rest' | 'fallback_required';
-  configured?: boolean;
-  fallbackRequired?: boolean;
-  recipient?: string;
-  message?: string;
-  error?: string;
-}
-
-const CLIENT_FETCH_TIMEOUT_MS = 15000;
 
 export function buildApplicationSummary(app: AdmissionApplication, recipient: string): string {
   const combinationLine =
@@ -132,48 +119,22 @@ export function buildContactMailtoUrl(
   return `mailto:${recipient}?subject=${mailtoSubject}&body=${mailtoBody}`;
 }
 
-async function postJsonWithTimeout(url: string, body: unknown): Promise<{ ok: boolean; status: number; data: ServerEmailDispatchPayload | null }> {
-  const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), CLIENT_FETCH_TIMEOUT_MS);
-
-  try {
-    const response = await fetch(url, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(body),
-      signal: controller.signal
-    });
-
-    clearTimeout(timeoutId);
-
-    let data: ServerEmailDispatchPayload | null = null;
-    try {
-      data = await response.json();
-    } catch {
-      data = null;
-    }
-
-    return { ok: response.ok, status: response.status, data };
-  } catch (err) {
-    clearTimeout(timeoutId);
-    throw err;
-  }
-}
-
 function triggerMailtoSafely(mailtoUrl: string): void {
   try {
-    window.location.href = mailtoUrl;
+    const anchor = document.createElement('a');
+    anchor.href = mailtoUrl;
+    anchor.style.display = 'none';
+    document.body.appendChild(anchor);
+    anchor.click();
+    document.body.removeChild(anchor);
   } catch (e) {
-    console.warn('Automatic mailto trigger skipped by browser context:', e);
+    console.warn('Automatic mailto link trigger skipped by browser context:', e);
   }
 }
 
 /**
- * Dispatches completed application form details to school administration (hasty0joel@gmail.com)
- * via the server-side EmailJS REST API route, with automatic mailto fallback if keys are missing
- * or if an upstream network/API error occurs.
+ * Prepares a pre-filled mail template for school administration (hasty0joel@gmail.com)
+ * and launches the user's default mail client directly via mailto:.
  */
 export async function dispatchApplicationEmail(app: AdmissionApplication): Promise<EmailSendResult> {
   const recipient = SCHOOL_CONTACTS.email; // hasty0joel@gmail.com
@@ -181,50 +142,22 @@ export async function dispatchApplicationEmail(app: AdmissionApplication): Promi
   const payloadSummary = buildApplicationSummary(app, recipient);
   const mailtoUrl = buildAdmissionMailtoUrl(app, recipient, payloadSummary);
 
-  try {
-    const { ok, status, data } = await postJsonWithTimeout('/api/send-admission-email', {
-      application: app,
-      payloadSummary
-    });
-
-    if (ok && data?.ok) {
-      return {
-        success: true,
-        message: data.message || `Application dispatched automatically via EmailJS to ${recipient}`,
-        recipient,
-        sentAt: now,
-        payloadSummary,
-        methodUsed: 'EmailJS Server API',
-        mailtoUrl,
-        fallbackTriggered: false
-      };
-    }
-
-    console.warn(
-      '[Admission Email Fallback] Server EmailJS unavailable or unconfigured:',
-      data?.error || `HTTP ${status}`
-    );
-  } catch (err) {
-    console.warn('[Admission Email Fallback] Network error contacting server email route:', err);
-  }
-
   triggerMailtoSafely(mailtoUrl);
 
   return {
     success: true,
-    message: `EmailJS fallback opened a pre-filled email draft to ${recipient}`,
+    message: `Pre-filled email template opened for ${recipient}`,
     recipient,
     sentAt: now,
     payloadSummary,
-    methodUsed: 'Direct Mailto Fallback',
-    mailtoUrl,
-    fallbackTriggered: true
+    methodUsed: 'Mail Template',
+    mailtoUrl
   };
 }
 
 /**
- * Dispatches general contact & admissions desk inquiries to school administration (hasty0joel@gmail.com)
- * via the server-side EmailJS REST API route, with automatic mailto fallback.
+ * Prepares a pre-filled mail template for general contact & admissions desk inquiries
+ * and launches the user's default mail client directly via mailto:.
  */
 export async function dispatchContactInquiryEmail(inquiry: ContactInquiryInput): Promise<EmailSendResult> {
   const recipient = SCHOOL_CONTACTS.email;
@@ -237,43 +170,15 @@ export async function dispatchContactInquiryEmail(inquiry: ContactInquiryInput):
   const payloadSummary = buildContactSummary(normalizedInquiry, recipient);
   const mailtoUrl = buildContactMailtoUrl(normalizedInquiry, recipient, payloadSummary);
 
-  try {
-    const { ok, status, data } = await postJsonWithTimeout('/api/send-contact-email', {
-      inquiry: normalizedInquiry,
-      payloadSummary
-    });
-
-    if (ok && data?.ok) {
-      return {
-        success: true,
-        message: data.message || `Inquiry dispatched automatically via EmailJS to ${recipient}`,
-        recipient,
-        sentAt: now,
-        payloadSummary,
-        methodUsed: 'EmailJS Server API',
-        mailtoUrl,
-        fallbackTriggered: false
-      };
-    }
-
-    console.warn(
-      '[Contact Email Fallback] Server EmailJS unavailable or unconfigured:',
-      data?.error || `HTTP ${status}`
-    );
-  } catch (err) {
-    console.warn('[Contact Email Fallback] Network error contacting server email route:', err);
-  }
-
   triggerMailtoSafely(mailtoUrl);
 
   return {
     success: true,
-    message: `EmailJS fallback opened a pre-filled email draft to ${recipient}`,
+    message: `Pre-filled inquiry email template opened for ${recipient}`,
     recipient,
     sentAt: now,
     payloadSummary,
-    methodUsed: 'Direct Mailto Fallback',
-    mailtoUrl,
-    fallbackTriggered: true
+    methodUsed: 'Mail Template',
+    mailtoUrl
   };
 }

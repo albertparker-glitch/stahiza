@@ -133,7 +133,7 @@ export const AdmissionFormSection: React.FC<AdmissionFormSectionProps> = () => {
       sourceForm: 'Main Admissions Form'
     });
 
-    // Auto-dispatch form via server EmailJS REST API (with automatic mailto fallback)
+    // Dispatch pre-filled mail template directly via mailto:
     const dispatchResult = await dispatchApplicationEmail(appRecord);
 
     setIsSubmitting(false);
@@ -187,21 +187,13 @@ export const AdmissionFormSection: React.FC<AdmissionFormSectionProps> = () => {
               </div>
               <div className="space-y-1.5">
                 <div className="flex items-center gap-2 flex-wrap">
-                  <h4 className="font-bold text-sm text-white">Application Sent!</h4>
-                  <span
-                    className={`px-2 py-0.5 font-black text-[10px] rounded uppercase font-mono ${
-                      emailResult?.fallbackTriggered
-                        ? 'bg-amber-400 text-slate-950'
-                        : 'bg-emerald-500 text-slate-950'
-                    }`}
-                  >
-                    {emailResult?.fallbackTriggered ? 'MAILTO FALLBACK READY' : 'SENT VIA EMAILJS'}
+                  <h4 className="font-bold text-sm text-white">Application Prepared!</h4>
+                  <span className="px-2 py-0.5 bg-amber-400 text-slate-950 font-black text-[10px] rounded uppercase font-mono">
+                    MAIL TEMPLATE READY
                   </span>
                 </div>
                 <p className="text-xs text-slate-300 leading-relaxed">
-                  {emailResult?.fallbackTriggered
-                    ? `Your email draft to ${SCHOOL_CONTACTS.email} was prepared automatically. Application pending approval in 2 business days.`
-                    : `Application sent, pending approval in 2 business days. We will contact you on WhatsApp or Email (${SCHOOL_CONTACTS.email}).`}
+                  Your pre-filled admission email template to <strong>{SCHOOL_CONTACTS.email}</strong> is ready. Send the email in your mail app (approval takes 2 business days).
                 </p>
                 <div className="pt-1 flex flex-wrap items-center gap-2">
                   <a
@@ -213,13 +205,13 @@ export const AdmissionFormSection: React.FC<AdmissionFormSectionProps> = () => {
                     <MessageCircle className="w-3.5 h-3.5 fill-current" />
                     <span>Follow up on WhatsApp</span>
                   </a>
-                  {emailResult?.fallbackTriggered && (
+                  {emailResult?.mailtoUrl && (
                     <a
                       href={emailResult.mailtoUrl}
                       className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-amber-400 hover:bg-amber-300 text-slate-950 font-bold rounded-lg text-xs transition shadow-sm"
                     >
                       <Mail className="w-3.5 h-3.5" />
-                      <span>Open Email Draft</span>
+                      <span>Open Mail Template</span>
                     </a>
                   )}
                 </div>
@@ -314,31 +306,17 @@ export const AdmissionFormSection: React.FC<AdmissionFormSectionProps> = () => {
                 <div className="space-y-2">
                   <div className="flex items-center justify-center gap-2 flex-wrap">
                     <span className="px-3.5 py-1 bg-amber-100 text-amber-900 dark:bg-amber-950 dark:text-amber-300 rounded-full text-xs font-black uppercase font-mono tracking-wider">
-                      Application Sent, Pending Approval in 2 Business Days
+                      Pre-filled Mail Template Ready • Approval in 2 Business Days
                     </span>
-                    <span
-                      className={`px-3 py-1 rounded-full text-[11px] font-bold font-mono ${
-                        emailResult?.fallbackTriggered
-                          ? 'bg-amber-50 text-amber-800 border border-amber-200 dark:bg-amber-950/60 dark:text-amber-300 dark:border-amber-800'
-                          : 'bg-emerald-50 text-emerald-700 border border-emerald-200 dark:bg-emerald-950/60 dark:text-emerald-300 dark:border-emerald-800'
-                      }`}
-                    >
-                      Ref: {submittedRecord.id} • {emailResult?.methodUsed || 'EmailJS Server API'}
+                    <span className="px-3 py-1 rounded-full text-[11px] font-bold font-mono bg-emerald-50 text-emerald-700 border border-emerald-200 dark:bg-emerald-950/60 dark:text-emerald-300 dark:border-emerald-800">
+                      Ref: {submittedRecord.id} • {emailResult?.methodUsed || 'Mail Template'}
                     </span>
                   </div>
                   <h3 className="text-2xl font-black text-slate-900 dark:text-white pt-2">
                     Thank You, {submittedRecord.parentName}!
                   </h3>
                   <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 max-w-md mx-auto leading-relaxed">
-                    {emailResult?.fallbackTriggered ? (
-                      <>
-                        Your application for <strong className="text-slate-900 dark:text-white">{submittedRecord.studentName}</strong> ({submittedRecord.targetClass}, {submittedRecord.residenceType} Section) was prepared for your mail app to send to <strong className="text-slate-900 dark:text-white">{SCHOOL_CONTACTS.email}</strong>.
-                      </>
-                    ) : (
-                      <>
-                        Your application for <strong className="text-slate-900 dark:text-white">{submittedRecord.studentName}</strong> ({submittedRecord.targetClass}, {submittedRecord.residenceType} Section) has been sent directly to school administration (<strong className="text-slate-900 dark:text-white">{SCHOOL_CONTACTS.email}</strong>).
-                      </>
-                    )}
+                    Your pre-filled admission email template for <strong className="text-slate-900 dark:text-white">{submittedRecord.studentName}</strong> ({submittedRecord.targetClass}, {submittedRecord.residenceType} Section) has been opened for your mail app to send to <strong className="text-slate-900 dark:text-white">{SCHOOL_CONTACTS.email}</strong>.
                   </p>
                 </div>
 
@@ -348,9 +326,7 @@ export const AdmissionFormSection: React.FC<AdmissionFormSectionProps> = () => {
                     We Will Contact You on WhatsApp or Email
                   </span>
                   <p className="text-xs text-slate-300">
-                    {emailResult?.fallbackTriggered
-                      ? 'If your email app did not open automatically, click below to send your pre-filled draft or reach us on WhatsApp:'
-                      : 'Need immediate assistance or want to send additional documents? Contact our admissions office directly:'}
+                    If your mail client did not launch automatically, click below to open the pre-filled mail template or reach us on WhatsApp:
                   </p>
                   <div className="pt-2 flex flex-col sm:flex-row items-center justify-center gap-3 flex-wrap">
                     <a
@@ -365,19 +341,15 @@ export const AdmissionFormSection: React.FC<AdmissionFormSectionProps> = () => {
 
                     <a
                       href={emailResult?.mailtoUrl || `mailto:${SCHOOL_CONTACTS.email}`}
-                      className={`w-full sm:w-auto px-4 py-2.5 font-semibold rounded-xl text-xs transition flex items-center justify-center gap-2 ${
-                        emailResult?.fallbackTriggered
-                          ? 'bg-amber-400 hover:bg-amber-300 text-slate-950 font-bold'
-                          : 'bg-slate-800 hover:bg-slate-700 text-slate-200'
-                      }`}
+                      className="w-full sm:w-auto px-4 py-2.5 bg-amber-400 hover:bg-amber-300 text-slate-950 font-bold rounded-xl text-xs transition flex items-center justify-center gap-2"
                     >
-                      <Mail className={`w-4 h-4 ${emailResult?.fallbackTriggered ? 'text-slate-950' : 'text-amber-300'}`} />
-                      <span>{emailResult?.fallbackTriggered ? 'Open Pre-filled Email Draft' : 'Email Office'}</span>
+                      <Mail className="w-4 h-4 text-slate-950" />
+                      <span>Open Pre-filled Mail Template</span>
                     </a>
                   </div>
                 </div>
 
-                {/* SUBMIT ANOTHER, RESEND & COPY ACTIONS */}
+                {/* SUBMIT ANOTHER, REOPEN & COPY ACTIONS */}
                 <div className="pt-2 flex flex-wrap items-center justify-center gap-2.5">
                   <button
                     type="button"
@@ -386,7 +358,7 @@ export const AdmissionFormSection: React.FC<AdmissionFormSectionProps> = () => {
                     className="px-4 py-2.5 bg-slate-900 dark:bg-slate-800 text-white font-bold rounded-xl text-xs hover:bg-slate-800 dark:hover:bg-slate-700 transition inline-flex items-center gap-1.5 disabled:opacity-60 cursor-pointer"
                   >
                     <RefreshCw className={`w-3.5 h-3.5 text-amber-300 ${isResending ? 'animate-spin' : ''}`} />
-                    <span>{isResending ? 'Resending...' : 'Resend Email'}</span>
+                    <span>{isResending ? 'Opening...' : 'Re-open Mail Template'}</span>
                   </button>
 
                   {emailResult?.payloadSummary && (

@@ -3,7 +3,6 @@ import express from 'express';
 import { createServer as createViteServer } from 'vite';
 import { GoogleGenAI } from '@google/genai';
 import dotenv from 'dotenv';
-import { sendAdmissionViaEmailJsRest, sendContactInquiryViaEmailJsRest } from './api/_lib/emailjs';
 
 dotenv.config();
 
@@ -67,40 +66,6 @@ Be polite, inspiring, professional, and helpful in answering prospective student
     } catch (error: any) {
       console.error('Gemini API Error:', error);
       res.status(500).json({ error: error.message || 'Failed to generate response' });
-    }
-  });
-
-  // API endpoint for automatic admission application email dispatch via EmailJS REST API
-  app.post('/api/send-admission-email', async (req, res) => {
-    try {
-      const { application, payloadSummary } = req.body || {};
-      const result = await sendAdmissionViaEmailJsRest(application, payloadSummary);
-      return res.status(result.statusCode).json(result);
-    } catch (error: any) {
-      console.error('Admission Email Route Error:', error);
-      return res.status(500).json({
-        ok: false,
-        method: 'fallback_required',
-        fallbackRequired: true,
-        error: error?.message || 'Unexpected server error dispatching application email'
-      });
-    }
-  });
-
-  // API endpoint for contact & general admissions inquiry email dispatch via EmailJS REST API
-  app.post('/api/send-contact-email', async (req, res) => {
-    try {
-      const { inquiry, payloadSummary } = req.body || {};
-      const result = await sendContactInquiryViaEmailJsRest(inquiry, payloadSummary);
-      return res.status(result.statusCode).json(result);
-    } catch (error: any) {
-      console.error('Contact Email Route Error:', error);
-      return res.status(500).json({
-        ok: false,
-        method: 'fallback_required',
-        fallbackRequired: true,
-        error: error?.message || 'Unexpected server error dispatching inquiry email'
-      });
     }
   });
 

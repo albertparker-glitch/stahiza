@@ -35,6 +35,8 @@ export const HeroParallaxVideo: React.FC = () => {
           loop
           muted
           playsInline
+          preload="auto"
+          data-hero-video="true"
           className="w-full h-auto max-h-[600px] object-cover sm:object-contain m-0 p-0 block pointer-events-none"
         >
           <source src={getSupabasePublicUrl('back.mp4')} type="video/mp4" />

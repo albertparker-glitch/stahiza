@@ -473,8 +473,8 @@ export default function App() {
       isDark ? 'bg-[#060E1A] text-slate-100 dark' : 'bg-[#F8FAFC] text-slate-800'
     }`}>
       
-      {/* 3-SECOND ROTATING DOTTED SPHERE PRELOADER WITH SITE THEME */}
-      <Preloader duration={3000} />
+      {/* MEDIA-AWARE ROTATING DOTTED SPHERE PRELOADER */}
+      <Preloader minDuration={1500} maxDuration={12000} />
 
       {/* NAVBAR */}
       <Navbar 

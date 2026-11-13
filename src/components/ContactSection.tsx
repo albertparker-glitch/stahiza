@@ -187,38 +187,27 @@ export const ContactSection: React.FC = () => {
                     <CheckCircle2 className="w-7 h-7" />
                   </div>
                   <div className="flex justify-center">
-                    <span
-                      className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider font-mono ${
-                        emailResult?.fallbackTriggered
-                          ? 'bg-amber-400 text-[#0A192F]'
-                          : 'bg-emerald-400 text-[#0A192F]'
-                      }`}
-                    >
-                      {emailResult?.fallbackTriggered ? 'Mailto Draft Prepared' : 'Dispatched via EmailJS'}
+                    <span className="px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider font-mono bg-amber-400 text-[#0A192F]">
+                      Mail Template Ready
                     </span>
                   </div>
                   <h4 className="text-xl font-bold font-['Montserrat'] text-white">
-                    {emailResult?.fallbackTriggered ? 'Email Draft Ready!' : 'Inquiry Sent!'}
+                    Email Template Opened!
                   </h4>
                   <p className="text-slate-300 text-xs leading-relaxed max-w-sm mx-auto">
-                    Thank you, <span className="text-white font-bold">{formData.name}</span>.{' '}
-                    {emailResult?.fallbackTriggered
-                      ? `Your inquiry regarding "${formData.subject}" was prepared for ${SCHOOL_CONTACTS.email}.`
-                      : `Your message regarding "${formData.subject}" has been dispatched directly to ${SCHOOL_CONTACTS.email}.`}
+                    Thank you, <span className="text-white font-bold">{formData.name}</span>. Your pre-filled inquiry template regarding <span className="text-amber-300 font-semibold">"{formData.subject}"</span> has been opened for <span className="text-white font-semibold">{SCHOOL_CONTACTS.email}</span>.
                   </p>
                   <p className="text-[11px] text-slate-300">
                     Direct office line: <span className="text-amber-300 font-mono font-bold">{SCHOOL_CONTACTS.phone1}</span>
                   </p>
                   <div className="flex flex-wrap items-center justify-center gap-2 pt-1">
-                    {emailResult?.fallbackTriggered && (
-                      <a
-                        href={emailResult.mailtoUrl}
-                        className="px-4 py-2 rounded-full bg-amber-400 hover:bg-amber-300 text-[#0A192F] text-xs font-bold transition inline-flex items-center gap-1.5"
-                      >
-                        <Mail className="w-3.5 h-3.5" />
-                        <span>Open Email Draft</span>
-                      </a>
-                    )}
+                    <a
+                      href={emailResult?.mailtoUrl || `mailto:${SCHOOL_CONTACTS.email}`}
+                      className="px-4 py-2 rounded-full bg-amber-400 hover:bg-amber-300 text-[#0A192F] text-xs font-bold transition inline-flex items-center gap-1.5"
+                    >
+                      <Mail className="w-3.5 h-3.5" />
+                      <span>Open Mail Template</span>
+                    </a>
                     <button
                       type="button"
                       onClick={handleResendInquiry}
@@ -226,7 +215,7 @@ export const ContactSection: React.FC = () => {
                       className="px-4 py-2 rounded-full bg-white/15 hover:bg-white/25 text-white text-xs font-semibold transition border border-white/20 inline-flex items-center gap-1.5 cursor-pointer disabled:opacity-60"
                     >
                       <RefreshCw className={`w-3.5 h-3.5 text-amber-300 ${isResending ? 'animate-spin' : ''}`} />
-                      <span>{isResending ? 'Resending...' : 'Resend'}</span>
+                      <span>{isResending ? 'Opening...' : 'Re-open'}</span>
                     </button>
                     {emailResult?.payloadSummary && (
                       <button
@@ -358,7 +347,7 @@ export const ContactSection: React.FC = () => {
                       disabled={isSubmitting}
                       className="bg-[#800020] hover:bg-[#600018] text-white text-xs font-bold pl-5 pr-2 py-2 rounded-full transition-all duration-300 shadow-md hover:shadow-lg flex items-center gap-3 transform hover:-translate-y-0.5 border border-rose-400/30 disabled:opacity-60 cursor-pointer"
                     >
-                      <span>{isSubmitting ? 'Sending via EmailJS...' : 'Send Message'}</span>
+                      <span>{isSubmitting ? 'Opening Mail Template...' : 'Send Message'}</span>
                       <div className="w-6 h-6 rounded-full bg-amber-400 text-[#0A192F] flex items-center justify-center font-bold">
                         {isSubmitting ? (
                           <Clock className="w-3.5 h-3.5 animate-spin" />
