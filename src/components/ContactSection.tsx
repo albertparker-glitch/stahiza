@@ -5,22 +5,18 @@ import {
   Mail, 
   Clock, 
   ArrowRight, 
-  CheckCircle2, 
   User, 
   ChevronDown, 
   ExternalLink,
   GraduationCap,
   Trophy,
   ShieldCheck,
-  Award,
-  Copy,
-  Check,
-  RefreshCw,
-  Eye
+  Award
 } from 'lucide-react';
 import { SchoolBadgeImg } from './SchoolBadgeImg';
 import { SCHOOL_CONTACTS } from '../data/schoolData';
-import { dispatchContactInquiryEmail, copyRichEmailToClipboard, EmailSendResult } from '../lib/emailService';
+import { dispatchContactInquiryEmail, EmailSendResult } from '../lib/emailService';
+import { BrandedEmailReadyCard } from './BrandedEmailReadyCard';
 import { getSupabaseVideoUrl, getSupabaseVideosUrl, getSupabasePublicUrl } from '../lib/supabase';
 import { motion } from 'motion/react';
 
@@ -33,53 +29,27 @@ export const ContactSection: React.FC = () => {
     message: ''
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isResending, setIsResending] = useState(false);
-  const [copiedSummary, setCopiedSummary] = useState(false);
-  const [showEmailPreview, setShowEmailPreview] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [emailResult, setEmailResult] = useState<EmailSendResult | null>(null);
   const [showMap, setShowMap] = useState(true);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!formData.name.trim() || !formData.email.trim() || !formData.message.trim()) return;
 
     setIsSubmitting(true);
-    const result = dispatchContactInquiryEmail({
-      name: formData.name,
-      email: formData.email,
-      phone: formData.phone,
-      subject: formData.subject,
-      message: formData.message
-    });
-    setIsSubmitting(false);
-    setEmailResult(result);
-    setSubmitted(true);
-  };
-
-  const handleResendInquiry = () => {
-    if (isResending) return;
-    setIsResending(true);
-    const result = dispatchContactInquiryEmail({
-      name: formData.name,
-      email: formData.email,
-      phone: formData.phone,
-      subject: formData.subject,
-      message: formData.message
-    });
-    setEmailResult(result);
-    setIsResending(false);
-  };
-
-  const handleCopyInquiry = async () => {
-    if (!emailResult?.payloadSummary) return;
-    const copied = await copyRichEmailToClipboard(
-      emailResult.htmlBody,
-      emailResult.payloadSummary
-    );
-    setCopiedSummary(copied);
-    if (copied) {
-      setTimeout(() => setCopiedSummary(false), 2500);
+    try {
+      const result = await dispatchContactInquiryEmail({
+        name: formData.name,
+        email: formData.email,
+        phone: formData.phone,
+        subject: formData.subject,
+        message: formData.message
+      });
+      setEmailResult(result);
+      setSubmitted(true);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -184,123 +154,25 @@ export const ContactSection: React.FC = () => {
               </div>
 
               {/* FORM */}
-              {submitted ? (
-                <div className="py-8 text-center space-y-4 bg-white/10 rounded-2xl border border-white/15 p-6 my-2 backdrop-blur-md">
-                  <div className="w-14 h-14 bg-emerald-500/20 text-emerald-300 rounded-full mx-auto flex items-center justify-center border border-emerald-400/30">
-                    <CheckCircle2 className="w-7 h-7" />
-                  </div>
-                  <div className="flex justify-center">
-                    <span className="px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider font-mono bg-amber-400 text-[#0A192F]">
-                      {emailResult?.deviceType === 'pc' ? 'PC • Gmail Web Opened' : 'Mobile • Mail App Opened'}
-                    </span>
-                  </div>
-                  <h4 className="text-xl font-bold font-['Montserrat'] text-white">
-                    {emailResult?.deviceType === 'pc' ? 'Gmail Web Compose Opened!' : 'Email App Opened!'}
-                  </h4>
-                  <p className="text-slate-300 text-xs leading-relaxed max-w-sm mx-auto">
-                    Thank you, <span className="text-white font-bold">{formData.name}</span>. Your pre-filled inquiry regarding <span className="text-amber-300 font-semibold">"{formData.subject}"</span> to <span className="text-white font-semibold">{SCHOOL_CONTACTS.email}</span> was prepared via{' '}
-                    <span className="text-amber-300 font-semibold">{emailResult?.methodUsed || 'Web Email'}</span>.
-                  </p>
-                  <p className="text-[11px] text-slate-300">
-                    Direct office line: <span className="text-amber-300 font-mono font-bold">{SCHOOL_CONTACTS.phone1}</span>
-                  </p>
-                  <div className="flex flex-wrap items-center justify-center gap-2 pt-1">
-                    {emailResult?.gmailUrl && (
-                      <a
-                        href={emailResult.gmailUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className={`px-4 py-2 rounded-full text-xs font-bold transition inline-flex items-center gap-1.5 ${
-                          emailResult.deviceType === 'pc'
-                            ? 'bg-amber-400 hover:bg-amber-300 text-[#0A192F]'
-                            : 'bg-white hover:bg-slate-100 text-[#0A192F]'
-                        }`}
-                      >
-                        <ExternalLink className="w-3.5 h-3.5 text-[#800020]" />
-                        <span>Compose in Gmail Web</span>
-                      </a>
-                    )}
-                    <a
-                      href={emailResult?.mailtoUrl || `mailto:${SCHOOL_CONTACTS.email}`}
-                      target="_top"
-                      rel="noopener noreferrer"
-                      className={`px-4 py-2 rounded-full text-xs font-bold transition inline-flex items-center gap-1.5 ${
-                        emailResult?.deviceType === 'pc'
-                          ? 'bg-white hover:bg-slate-100 text-[#0A192F]'
-                          : 'bg-amber-400 hover:bg-amber-300 text-[#0A192F]'
-                      }`}
-                    >
-                      <Mail className="w-3.5 h-3.5" />
-                      <span>Open Mail App</span>
-                    </a>
-                    <button
-                      type="button"
-                      onClick={handleResendInquiry}
-                      disabled={isResending}
-                      className="px-4 py-2 rounded-full bg-white/15 hover:bg-white/25 text-white text-xs font-semibold transition border border-white/20 inline-flex items-center gap-1.5 cursor-pointer disabled:opacity-60"
-                    >
-                      <RefreshCw className={`w-3.5 h-3.5 text-amber-300 ${isResending ? 'animate-spin' : ''}`} />
-                      <span>{isResending ? 'Opening...' : 'Re-open'}</span>
-                    </button>
-                    {emailResult?.payloadSummary && (
-                      <button
-                        type="button"
-                        onClick={handleCopyInquiry}
-                        className="px-4 py-2 rounded-full bg-white/15 hover:bg-white/25 text-white text-xs font-semibold transition border border-white/20 inline-flex items-center gap-1.5 cursor-pointer"
-                      >
-                        {copiedSummary ? (
-                          <>
-                            <Check className="w-3.5 h-3.5 text-emerald-300" />
-                            <span>Styled Email Copied</span>
-                          </>
-                        ) : (
-                          <>
-                            <Copy className="w-3.5 h-3.5" />
-                            <span>Copy Styled Email</span>
-                          </>
-                        )}
-                      </button>
-                    )}
-                    {emailResult?.htmlBody && (
-                      <button
-                        type="button"
-                        onClick={() => setShowEmailPreview((prev) => !prev)}
-                        className="px-4 py-2 rounded-full bg-white/15 hover:bg-white/25 text-white text-xs font-semibold transition border border-white/20 inline-flex items-center gap-1.5 cursor-pointer"
-                      >
-                        <Eye className="w-3.5 h-3.5 text-amber-300" />
-                        <span>{showEmailPreview ? 'Hide Preview' : 'Preview Email'}</span>
-                      </button>
-                    )}
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setSubmitted(false);
-                        setEmailResult(null);
-                        setCopiedSummary(false);
-                        setShowEmailPreview(false);
-                        setFormData({
-                          name: '',
-                          email: '',
-                          phone: '',
-                          subject: 'O-Level Admissions (Senior 1 - Senior 4)',
-                          message: ''
-                        });
-                      }}
-                      className="px-4 py-2 rounded-full bg-white/15 hover:bg-white/25 text-white text-xs font-semibold transition border border-white/20 cursor-pointer"
-                    >
-                      Send Another Inquiry
-                    </button>
-                  </div>
-                  {showEmailPreview && emailResult?.htmlBody && (
-                    <div className="mt-4 rounded-2xl overflow-hidden border border-white/20 shadow-xl bg-[#f1f3f8] text-left">
-                      <iframe
-                        title="STAHIZA Inquiry Email Preview"
-                        srcDoc={emailResult.htmlBody}
-                        className="w-full h-[360px] border-0 bg-[#f1f3f8]"
-                      />
-                    </div>
-                  )}
-                </div>
+              {submitted && emailResult ? (
+                <BrandedEmailReadyCard
+                  variant="dark"
+                  emailResult={emailResult}
+                  headline="Inquiry Letter Ready to Send"
+                  subline={`Thank you, ${formData.name}. Your branded STAHIZA inquiry regarding "${formData.subject}" to ${SCHOOL_CONTACTS.email} is previewed and copied below.`}
+                  resetLabel="New Inquiry"
+                  onReset={() => {
+                    setSubmitted(false);
+                    setEmailResult(null);
+                    setFormData({
+                      name: '',
+                      email: '',
+                      phone: '',
+                      subject: 'O-Level Admissions (Senior 1 - Senior 4)',
+                      message: ''
+                    });
+                  }}
+                />
               ) : (
                 <form onSubmit={handleSubmit} className="space-y-4 pt-1">
                   

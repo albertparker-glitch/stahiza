@@ -1,18 +1,25 @@
 import { AdmissionApplication } from '../types/admission';
-import { SCHOOL_CONTACTS } from '../data/schoolData';
+import { SCHOOL_CONTACTS, computeTerm1FeeBreakdown } from '../data/schoolData';
 import { getSupabasePublicUrl } from './supabase';
 
 export interface EmailSendResult {
   success: boolean;
   message: string;
   recipient: string;
+  subject: string;
+  refCode: string;
+  emailKind: 'admission' | 'contact';
   sentAt: string;
   payloadSummary: string;
   htmlBody: string;
+  emlContent: string;
+  emlFilename: string;
   deviceType: 'pc' | 'mobile';
   methodUsed: 'Gmail Web' | 'Mail App';
   mailtoUrl: string;
   gmailUrl: string;
+  popupBlocked?: boolean;
+  autoCopyPromise: Promise<boolean>;
 }
 
 export interface ContactInquiryInput {
@@ -36,13 +43,17 @@ function escapeHtml(raw: string): string {
     .replace(/'/g, '&#39;');
 }
 
-function getEmailBadgeUrl(): string {
+function getLocalOriginBadgeUrl(): string {
+  if (typeof window !== 'undefined' && window.location?.origin) {
+    return `${window.location.origin}/pages/images/badge.png`;
+  }
+  return '/pages/images/badge.png';
+}
+
+export function getEmailBadgeUrl(): string {
   const url = getSupabasePublicUrl('badge.png');
   if (/^https?:\/\//i.test(url)) return url;
-  if (typeof window !== 'undefined' && window.location?.origin) {
-    return `${window.location.origin}${url.startsWith('/') ? url : `/${url}`}`;
-  }
-  return url;
+  return getLocalOriginBadgeUrl();
 }
 
 export function detectDeviceType(): 'pc' | 'mobile' {
@@ -68,10 +79,12 @@ export function buildApplicationSummary(app: AdmissionApplication, recipient: st
       ? app.combination || 'Pending Selection'
       : 'O-Level General Curriculum';
 
+  const fees = computeTerm1FeeBreakdown(app.targetClass, app.residenceType);
+
   const lines = [
-    'STANDARD HIGH SCHOOL ZZANA - NEW ADMISSION APPLICATION',
+    'STANDARD HIGH SCHOOL ZZANA (STAHIZA) - OFFICIAL ADMISSION APPLICATION',
     `Selection Code: ${SCHOOL_CONTACTS.selectionCode} | UNEB Centre: ${SCHOOL_CONTACTS.centerNo}`,
-    '====================================================',
+    '====================================================================',
     `APPLICATION REFERENCE: ${app.id}`,
     `Submission Date: ${app.submittedAt}`,
     `Submission Source: ${app.sourceForm || 'Online Admissions Portal'}`,
@@ -81,30 +94,119 @@ export function buildApplicationSummary(app: AdmissionApplication, recipient: st
     `Gender: ${app.gender}`,
     `Date of Birth: ${app.dob || 'Not provided'}`,
     `Class Applying For: ${app.targetClass}`,
-    `Residence: ${app.residenceType} Section`,
-    `A-Level Combination: ${combinationText}`,
+    `Residence Option: ${app.residenceType} Section`,
+    `Curriculum / Combination: ${combinationText}`,
     '',
     '02. PARENT / GUARDIAN INFORMATION',
-    `Parent Name: ${app.parentName}`,
+    `Parent / Guardian Name: ${app.parentName}`,
     `Phone Number: ${app.parentPhone}`,
     `Email Address: ${app.parentEmail}`,
     '',
-    '03. PREVIOUS ACADEMIC INFORMATION',
+    '03. PREVIOUS ACADEMIC RECORD',
     `Previous School: ${app.previousSchool || 'Not specified'}`,
-    `Academic Results: ${app.gradesAggregate || 'Pending Verification'}`,
+    `Academic Results / Aggregates: ${app.gradesAggregate || 'Pending Verification'}`,
     '',
-    '04. ADDITIONAL INFORMATION',
+    `04. ESTIMATED TERM 1 FEE SUMMARY (${app.targetClass} ${app.residenceType})`,
+    `Tuition Fee: UGX ${fees.tuition.toLocaleString()}/=`,
+    `Admission Fee: UGX ${fees.admissionFee.toLocaleString()}/=`,
+    `Uniform (Labelling Inc.): UGX ${fees.uniform.toLocaleString()}/=`,
+    `ID Card, Sportswear & Requirements: UGX ${(fees.idCard + fees.sportsWear + fees.requirements).toLocaleString()}/=`,
+    `TOTAL TERM 1 ESTIMATE: UGX ${fees.total.toLocaleString()}/=`,
+    '',
+    '05. ADDITIONAL INFORMATION',
     app.notes || 'No additional notes provided.',
     '',
-    'ADMINISTRATIVE ACTION REQUIRED — STATUS: PENDING REVIEW',
-    `Admissions Desk: ${recipient} | Tel: ${SCHOOL_CONTACTS.phone1}`
+    'STATUS: PENDING ADMISSIONS REVIEW',
+    `Admissions Office: ${recipient} | Tel: ${SCHOOL_CONTACTS.phone1}`
   ];
 
   return lines.join('\n');
 }
 
+function renderEmailHeaderHtml(params: {
+  badgeUrl: string;
+  fallbackBadgeUrl: string;
+  ribbonText: string;
+}): string {
+  const { badgeUrl, fallbackBadgeUrl, ribbonText } = params;
+  return `<!-- EXECUTIVE NAVY, MAROON & GOLD CREST HEADER -->
+<tr>
+<td style="background:#d4af37;height:4px;font-size:0;line-height:0;">&nbsp;</td>
+</tr>
+<tr>
+<td align="center" style="background:#0a192f;padding:28px 24px 24px;">
+<table cellpadding="0" cellspacing="0" border="0" style="margin:0 auto;">
+<tr>
+<td align="center">
+<div style="width:94px;height:94px;border-radius:50%;background:#ffffff;border:3px solid #d4af37;padding:5px;box-sizing:border-box;margin:0 auto 14px;overflow:hidden;">
+<img src="${badgeUrl}" alt="Standard High School Zzana School Badge" width="80" height="80" onerror="this.onerror=null;this.src='${fallbackBadgeUrl}';" style="display:block;width:80px;height:80px;object-fit:contain;border-radius:50%;">
+</div>
+</td>
+</tr>
+<tr>
+<td align="center">
+<h1 style="margin:0;color:#ffffff;font-family:Georgia,'Times New Roman',serif;font-size:22px;font-weight:700;letter-spacing:0.8px;line-height:1.25;">
+STANDARD HIGH SCHOOL ZZANA
+</h1>
+<p style="margin:6px 0 0;color:#fcd34d;font-family:Georgia,'Times New Roman',serif;font-style:italic;font-size:13px;letter-spacing:0.4px;">
+&ldquo;Education Is The Way&rdquo;
+</p>
+</td>
+</tr>
+</table>
+</td>
+</tr>
+<tr>
+<td align="center" style="background:#800020;padding:10px 20px;border-top:1px solid #d4af37;border-bottom:1px solid #630018;">
+<p style="margin:0;color:#ffffff;font-family:Arial,Helvetica,sans-serif;font-size:11px;font-weight:700;letter-spacing:1.4px;text-transform:uppercase;">
+${ribbonText}
+</p>
+</td>
+</tr>`;
+}
+
+function renderEmailFooterHtml(params: {
+  badgeUrl: string;
+  fallbackBadgeUrl: string;
+  recipient: string;
+}): string {
+  const { badgeUrl, fallbackBadgeUrl, recipient } = params;
+  return `<!-- EXECUTIVE NAVY FOOTER SEAL -->
+<tr>
+<td style="background:#d4af37;height:2px;font-size:0;line-height:0;">&nbsp;</td>
+</tr>
+<tr>
+<td align="center" style="background:#0a192f;padding:24px 28px;">
+<table cellpadding="0" cellspacing="0" border="0" style="margin:0 auto;">
+<tr>
+<td align="center" style="padding-bottom:10px;">
+<img src="${badgeUrl}" alt="STAHIZA Crest" width="46" height="46" onerror="this.onerror=null;this.src='${fallbackBadgeUrl}';" style="display:block;width:46px;height:46px;border-radius:50%;background:#ffffff;border:2px solid #d4af37;padding:3px;object-fit:contain;">
+</td>
+</tr>
+<tr>
+<td align="center">
+<p style="margin:0;color:#ffffff;font-family:Georgia,'Times New Roman',serif;font-size:15px;font-weight:700;letter-spacing:0.5px;">
+Standard High School Zzana (STAHIZA)
+</p>
+<p style="margin:6px 0 0;color:#cbd5e1;font-family:Arial,Helvetica,sans-serif;font-size:12px;line-height:1.6;">
+${escapeHtml(SCHOOL_CONTACTS.location)}
+</p>
+<p style="margin:4px 0 0;color:#fcd34d;font-family:Arial,Helvetica,sans-serif;font-size:11px;font-weight:700;font-variant-numeric:tabular-nums;">
+Admissions: ${escapeHtml(recipient)} &nbsp;&middot;&nbsp; Tel: ${escapeHtml(SCHOOL_CONTACTS.phone1)} &nbsp;&middot;&nbsp; ${escapeHtml(SCHOOL_CONTACTS.phone2)}
+</p>
+<p style="margin:12px 0 0;color:#94a3b8;font-family:Arial,Helvetica,sans-serif;font-size:11px;">
+${escapeHtml(SCHOOL_CONTACTS.box)} &nbsp;&middot;&nbsp; Official School Correspondence
+</p>
+</td>
+</tr>
+</table>
+</td>
+</tr>`;
+}
+
 export function buildAdmissionEmailHtml(app: AdmissionApplication): string {
   const badgeUrl = escapeHtml(getEmailBadgeUrl());
+  const fallbackBadgeUrl = escapeHtml(getLocalOriginBadgeUrl());
   const ref = escapeHtml(app.id);
   const submittedAt = escapeHtml(app.submittedAt);
   const source = escapeHtml(app.sourceForm || 'Online Admissions Portal');
@@ -125,163 +227,148 @@ export function buildAdmissionEmailHtml(app: AdmissionApplication): string {
   const previousSchool = escapeHtml(app.previousSchool || 'Not specified');
   const academicResults = escapeHtml(app.gradesAggregate || 'Pending Verification');
   const additionalNotes = escapeHtml(app.notes || 'No additional notes provided.').replace(/\n/g, '<br>');
+  const fees = computeTerm1FeeBreakdown(app.targetClass, app.residenceType);
 
   return `<!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>STAHIZA Admission Application</title>
+<title>STAHIZA Official Admission Application - ${ref}</title>
 </head>
-<body style="margin:0;padding:0;background:#f1f3f8;font-family:Arial,Helvetica,sans-serif;color:#263248;">
-<table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#f1f3f8;padding:25px 10px;">
+<body style="margin:0;padding:0;background:#f4f6fa;font-family:Arial,Helvetica,sans-serif;color:#1e293b;">
+<table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#f4f6fa;padding:24px 12px;">
 <tr>
 <td align="center">
 
-<table width="650" cellpadding="0" cellspacing="0" border="0" style="max-width:650px;width:100%;background:#ffffff;border-radius:12px;overflow:hidden;border:1px solid #e2e8f0;box-shadow:0 8px 24px rgba(10,25,47,0.08);">
+<table width="650" cellpadding="0" cellspacing="0" border="0" style="max-width:650px;width:100%;background:#ffffff;border-radius:10px;overflow:hidden;border:1px solid #cbd5e1;">
 
-<!-- HEADER -->
-<tr>
-<td align="center" style="background:#800020;padding:30px 20px;">
-<img src="${badgeUrl}" alt="Standard High School Zzana Badge" width="105" height="105" style="display:block;margin:0 auto 15px;border-radius:50%;border:4px solid #ffffff;background:#ffffff;object-fit:contain;">
-<h1 style="color:#ffffff;font-size:24px;margin:8px 0;letter-spacing:1px;font-weight:800;">
-STANDARD HIGH SCHOOL ZZANA
-</h1>
-<p style="color:#ffffff;font-size:13px;margin:5px 0;letter-spacing:0.8px;font-weight:700;">
-STAHIZA | ONLINE ADMISSIONS PORTAL
-</p>
-<p style="color:#f5dce4;font-size:12px;margin:8px 0 0;">
-Selection Code: ${escapeHtml(SCHOOL_CONTACTS.selectionCode)} &nbsp; | &nbsp; UNEB Centre: ${escapeHtml(SCHOOL_CONTACTS.centerNo)}
-</p>
-</td>
-</tr>
+${renderEmailHeaderHtml({
+  badgeUrl,
+  fallbackBadgeUrl,
+  ribbonText: `Official Admission Dispatch &nbsp;&middot;&nbsp; Selection Code ${escapeHtml(SCHOOL_CONTACTS.selectionCode)} &nbsp;&middot;&nbsp; UNEB Centre ${escapeHtml(SCHOOL_CONTACTS.centerNo)}`,
+})}
 
-<!-- TITLE -->
+<!-- FORMAL SALUTATION & REFERENCE HEADER -->
 <tr>
-<td style="padding:30px 30px 15px;">
-<h2 style="color:#800020;font-size:21px;margin:0 0 10px;font-weight:800;">
-NEW ADMISSION APPLICATION
-</h2>
-<p style="font-size:14px;line-height:1.7;color:#555555;margin:0;">
-Dear Admissions Administrator,<br><br>
-A new student admission application has been submitted through the Standard High School Zzana website. Please review the applicant's details below.
-</p>
-</td>
-</tr>
-
-<!-- REFERENCE -->
-<tr>
-<td style="padding:10px 30px 20px;">
-<table width="100%" cellpadding="14" cellspacing="0" style="background:#f9edf1;border-left:5px solid #800020;border-radius:0 8px 8px 0;">
-<tr>
-<td style="font-size:13px;line-height:1.6;">
-<strong style="color:#800020;letter-spacing:0.5px;">APPLICATION REFERENCE</strong><br>
-<span style="font-size:19px;font-weight:bold;color:#1e40af;display:inline-block;margin:4px 0 8px;">${ref}</span><br>
-<strong>Submission Date:</strong> ${submittedAt}<br>
-<strong>Submission Source:</strong> ${source}
-</td>
-</tr>
-</table>
-</td>
-</tr>
-
-<!-- STUDENT DETAILS -->
-<tr>
-<td style="padding:10px 30px;">
-<h3 style="color:#800020;border-bottom:2px solid #800020;padding-bottom:8px;margin:0 0 12px;font-size:16px;">
-01. STUDENT INFORMATION
-</h3>
-<table width="100%" cellpadding="10" cellspacing="0" style="font-size:14px;border-collapse:collapse;border:1px solid #e6eaf2;">
-<tr style="border-bottom:1px solid #e6eaf2;"><td style="background:#f5f6fa;width:42%;font-weight:bold;">Student Name</td><td>${studentName}</td></tr>
-<tr style="border-bottom:1px solid #e6eaf2;"><td style="background:#f5f6fa;font-weight:bold;">Gender</td><td>${gender}</td></tr>
-<tr style="border-bottom:1px solid #e6eaf2;"><td style="background:#f5f6fa;font-weight:bold;">Date of Birth</td><td>${dob}</td></tr>
-<tr style="border-bottom:1px solid #e6eaf2;"><td style="background:#f5f6fa;font-weight:bold;">Class Applying For</td><td><strong>${targetClass}</strong></td></tr>
-<tr style="border-bottom:1px solid #e6eaf2;"><td style="background:#f5f6fa;font-weight:bold;">Residence</td><td>${residenceType}</td></tr>
-<tr><td style="background:#f5f6fa;font-weight:bold;">A-Level Combination</td><td>${combination}</td></tr>
-</table>
-</td>
-</tr>
-
-<!-- PARENT DETAILS -->
-<tr>
-<td style="padding:15px 30px;">
-<h3 style="color:#800020;border-bottom:2px solid #800020;padding-bottom:8px;margin:0 0 12px;font-size:16px;">
-02. PARENT / GUARDIAN INFORMATION
-</h3>
-<table width="100%" cellpadding="10" cellspacing="0" style="font-size:14px;border-collapse:collapse;border:1px solid #e6eaf2;">
-<tr style="border-bottom:1px solid #e6eaf2;"><td style="background:#f5f6fa;width:42%;font-weight:bold;">Parent Name</td><td>${parentName}</td></tr>
-<tr style="border-bottom:1px solid #e6eaf2;"><td style="background:#f5f6fa;font-weight:bold;">Phone Number</td><td><a href="tel:${parentPhoneHref}" style="color:#1e40af;text-decoration:none;font-weight:bold;">${parentPhone}</a></td></tr>
-<tr><td style="background:#f5f6fa;font-weight:bold;">Email Address</td><td><a href="mailto:${parentEmail}" style="color:#1e40af;text-decoration:none;">${parentEmail}</a></td></tr>
-</table>
-</td>
-</tr>
-
-<!-- ACADEMIC DETAILS -->
-<tr>
-<td style="padding:15px 30px;">
-<h3 style="color:#800020;border-bottom:2px solid #800020;padding-bottom:8px;margin:0 0 12px;font-size:16px;">
-03. PREVIOUS ACADEMIC INFORMATION
-</h3>
-<table width="100%" cellpadding="10" cellspacing="0" style="font-size:14px;border-collapse:collapse;border:1px solid #e6eaf2;">
-<tr style="border-bottom:1px solid #e6eaf2;"><td style="background:#f5f6fa;width:42%;font-weight:bold;">Previous School</td><td>${previousSchool}</td></tr>
-<tr><td style="background:#f5f6fa;font-weight:bold;">Academic Results</td><td>${academicResults}</td></tr>
-</table>
-</td>
-</tr>
-
-<!-- ADDITIONAL NOTES -->
-<tr>
-<td style="padding:15px 30px;">
-<h3 style="color:#800020;border-bottom:2px solid #800020;padding-bottom:8px;margin:0 0 12px;font-size:16px;">
-04. ADDITIONAL INFORMATION
-</h3>
-<div style="background:#f5f6fa;padding:16px;border-radius:6px;border:1px solid #e6eaf2;font-size:14px;line-height:1.7;">
-${additionalNotes}
-</div>
-</td>
-</tr>
-
-<!-- ADMIN ACTION -->
-<tr>
-<td style="padding:20px 30px 30px;">
-<table width="100%" cellpadding="15" cellspacing="0" style="background:#fff7e8;border-left:5px solid #d49a27;border-radius:0 8px 8px 0;">
+<td style="padding:28px 32px 18px;border-bottom:1px solid #e2e8f0;">
+<table width="100%" cellpadding="0" cellspacing="0" border="0">
 <tr>
 <td>
-<strong style="color:#8a5b00;font-size:15px;display:block;margin-bottom:6px;">
-ADMINISTRATIVE ACTION REQUIRED
-</strong>
-<p style="font-size:13px;line-height:1.7;color:#555555;margin:0 0 10px;">
-Please review this application, verify the submitted information and contact the parent or guardian regarding the next admission procedures.
+<p style="margin:0 0 6px;font-size:11px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;color:#800020;">
+Admissions Registry Filing
 </p>
-<strong style="font-size:13px;">Application Status:</strong>
-<span style="display:inline-block;background:#fef3c7;color:#b7791f;font-weight:bold;font-size:12px;padding:3px 10px;border-radius:999px;border:1px solid #f59e0b;margin-left:4px;">PENDING REVIEW</span>
+<h2 style="margin:0;color:#0a192f;font-size:21px;font-weight:700;line-height:1.3;">
+New Student Admission Application
+</h2>
+</td>
+<td align="right" valign="top" style="font-variant-numeric:tabular-nums;">
+<p style="margin:0;font-size:10px;font-weight:700;letter-spacing:0.8px;text-transform:uppercase;color:#64748b;">
+Reference No.
+</p>
+<p style="margin:3px 0 0;font-size:15px;font-weight:700;color:#0a192f;font-family:'Courier New',monospace;">
+${ref}
+</p>
+</td>
+</tr>
+</table>
+
+<p style="margin:14px 0 0;font-size:13px;color:#475569;line-height:1.65;">
+Dear Admissions Office, please find below an official application submitted via the Standard High School Zzana online portal for review and placement processing.
+</p>
+
+<p style="margin:14px 0 0;padding-top:12px;border-top:1px solid #f1f5f9;font-size:12px;color:#475569;font-variant-numeric:tabular-nums;">
+<strong style="color:#0a192f;">Submitted:</strong> ${submittedAt} &nbsp;&middot;&nbsp;
+<strong style="color:#0a192f;">Channel:</strong> ${source} &nbsp;&middot;&nbsp;
+<strong style="color:#800020;">Status:</strong> Pending Review
+</p>
+</td>
+</tr>
+
+<!-- 01. STUDENT INFORMATION -->
+<tr>
+<td style="padding:22px 32px 10px;">
+<h3 style="margin:0 0 10px;padding-bottom:6px;border-bottom:1px solid #0a192f;color:#0a192f;font-size:13px;font-weight:700;letter-spacing:0.8px;text-transform:uppercase;">
+01. Student Applicant Particulars
+</h3>
+<table width="100%" cellpadding="9" cellspacing="0" border="0" style="font-size:13px;border-collapse:collapse;border:1px solid #e2e8f0;">
+<tr style="border-bottom:1px solid #e2e8f0;"><td style="background:#f8fafc;width:40%;font-weight:700;color:#334155;">Full Student Name</td><td style="color:#0f172a;font-weight:700;">${studentName}</td></tr>
+<tr style="border-bottom:1px solid #e2e8f0;"><td style="background:#f8fafc;font-weight:700;color:#334155;">Gender &amp; Date of Birth</td><td style="color:#1e293b;font-variant-numeric:tabular-nums;">${gender} &nbsp;&middot;&nbsp; ${dob}</td></tr>
+<tr style="border-bottom:1px solid #e2e8f0;"><td style="background:#f8fafc;font-weight:700;color:#334155;">Class Applying For</td><td style="color:#800020;font-weight:700;">${targetClass} (${residenceType})</td></tr>
+<tr><td style="background:#f8fafc;font-weight:700;color:#334155;">Curriculum / Combination</td><td style="color:#1e293b;">${combination}</td></tr>
+</table>
+</td>
+</tr>
+
+<!-- 02. PARENT / GUARDIAN INFORMATION -->
+<tr>
+<td style="padding:14px 32px 10px;">
+<h3 style="margin:0 0 10px;padding-bottom:6px;border-bottom:1px solid #0a192f;color:#0a192f;font-size:13px;font-weight:700;letter-spacing:0.8px;text-transform:uppercase;">
+02. Parent / Guardian Contact Details
+</h3>
+<table width="100%" cellpadding="9" cellspacing="0" border="0" style="font-size:13px;border-collapse:collapse;border:1px solid #e2e8f0;">
+<tr style="border-bottom:1px solid #e2e8f0;"><td style="background:#f8fafc;width:40%;font-weight:700;color:#334155;">Parent / Guardian</td><td style="color:#0f172a;font-weight:700;">${parentName}</td></tr>
+<tr style="border-bottom:1px solid #e2e8f0;"><td style="background:#f8fafc;font-weight:700;color:#334155;">Telephone / WhatsApp</td><td style="font-variant-numeric:tabular-nums;"><a href="tel:${parentPhoneHref}" style="color:#0a192f;text-decoration:none;font-weight:700;">${parentPhone}</a></td></tr>
+<tr><td style="background:#f8fafc;font-weight:700;color:#334155;">Email Address</td><td><a href="mailto:${parentEmail}" style="color:#800020;text-decoration:none;font-weight:600;">${parentEmail}</a></td></tr>
+</table>
+</td>
+</tr>
+
+<!-- 03. PREVIOUS ACADEMIC RECORD -->
+<tr>
+<td style="padding:14px 32px 10px;">
+<h3 style="margin:0 0 10px;padding-bottom:6px;border-bottom:1px solid #0a192f;color:#0a192f;font-size:13px;font-weight:700;letter-spacing:0.8px;text-transform:uppercase;">
+03. Previous Academic Background
+</h3>
+<table width="100%" cellpadding="9" cellspacing="0" border="0" style="font-size:13px;border-collapse:collapse;border:1px solid #e2e8f0;">
+<tr style="border-bottom:1px solid #e2e8f0;"><td style="background:#f8fafc;width:40%;font-weight:700;color:#334155;">Previous School</td><td style="color:#1e293b;">${previousSchool}</td></tr>
+<tr><td style="background:#f8fafc;font-weight:700;color:#334155;">Academic Grades / Aggregate</td><td style="color:#1e293b;">${academicResults}</td></tr>
+</table>
+</td>
+</tr>
+
+<!-- 04. OFFICIAL TERM 1 FEE ESTIMATE SUMMARY -->
+<tr>
+<td style="padding:14px 32px 10px;">
+<h3 style="margin:0 0 10px;padding-bottom:6px;border-bottom:1px solid #0a192f;color:#0a192f;font-size:13px;font-weight:700;letter-spacing:0.8px;text-transform:uppercase;">
+04. Term 1 Official Fee Estimate (${targetClass} ${escapeHtml(app.residenceType)})
+</h3>
+<table width="100%" cellpadding="8" cellspacing="0" border="0" style="font-size:12.5px;border-collapse:collapse;border:1px solid #e2e8f0;font-variant-numeric:tabular-nums;">
+<tr style="border-bottom:1px solid #e2e8f0;"><td style="color:#334155;">Tuition Fee (${targetClass} ${escapeHtml(app.residenceType)})</td><td align="right" style="font-weight:700;color:#0f172a;">UGX ${fees.tuition.toLocaleString()}/=</td></tr>
+<tr style="border-bottom:1px solid #e2e8f0;"><td style="color:#334155;">Admission &amp; Registration Fee</td><td align="right" style="color:#334155;">UGX ${fees.admissionFee.toLocaleString()}/=</td></tr>
+<tr style="border-bottom:1px solid #e2e8f0;"><td style="color:#334155;">School Uniform (Labelling Inclusive)</td><td align="right" style="color:#334155;">UGX ${fees.uniform.toLocaleString()}/=</td></tr>
+<tr style="border-bottom:1px solid #e2e8f0;"><td style="color:#334155;">ID Card, Sportswear &amp; Entry Requirements</td><td align="right" style="color:#334155;">UGX ${(fees.idCard + fees.sportsWear + fees.requirements).toLocaleString()}/=</td></tr>
+<tr style="background:#0a192f;color:#ffffff;"><td style="font-weight:700;padding:10px 8px;">Total Estimated Term 1 Reporting Fee</td><td align="right" style="font-weight:700;color:#fcd34d;padding:10px 8px;font-size:14px;">UGX ${fees.total.toLocaleString()}/=</td></tr>
+</table>
+</td>
+</tr>
+
+<!-- 05. NOTES & ADMINISTRATIVE NOTICE -->
+<tr>
+<td style="padding:14px 32px 28px;">
+<h3 style="margin:0 0 8px;color:#0a192f;font-size:12px;font-weight:700;letter-spacing:0.8px;text-transform:uppercase;">
+05. Additional Notes
+</h3>
+<div style="background:#f8fafc;padding:12px 14px;border:1px solid #e2e8f0;border-radius:6px;font-size:13px;line-height:1.6;color:#334155;">
+${additionalNotes}
+</div>
+
+<table width="100%" cellpadding="14" cellspacing="0" border="0" style="margin-top:16px;background:#fffbeb;border:1px solid #fde68a;border-radius:6px;">
+<tr>
+<td style="font-size:12.5px;line-height:1.6;color:#78350f;">
+<strong style="color:#0a192f;display:block;margin-bottom:4px;font-size:13px;">Next Steps for Admissions Review</strong>
+Please verify the candidate&rsquo;s academic records and contact the parent or guardian within 2 business days regarding interview scheduling and official admission clearance.
 </td>
 </tr>
 </table>
 </td>
 </tr>
 
-<!-- FOOTER -->
-<tr>
-<td align="center" style="background:#0a192f;padding:28px 20px;">
-<img src="${badgeUrl}" alt="STAHIZA Badge" width="65" height="65" style="display:block;margin:0 auto 12px;border-radius:50%;background:#ffffff;padding:4px;object-fit:contain;">
-<h3 style="color:#ffffff;margin:5px 0;font-size:18px;letter-spacing:0.6px;">
-STANDARD HIGH SCHOOL ZZANA
-</h3>
-<p style="color:#d8deeb;font-size:12px;line-height:1.7;margin:6px 0;">
-Fostering Academic Excellence, Moral Discipline and Championship Talent.
-</p>
-<p style="color:#f5dce4;font-size:11px;margin:8px 0;">
-${escapeHtml(SCHOOL_CONTACTS.location)} &nbsp; | &nbsp; ${escapeHtml(SCHOOL_CONTACTS.phone1)}
-</p>
-<p style="color:#aebbd0;font-size:11px;margin:14px 0 4px;">
-This is an automatically generated admission notification.
-</p>
-<p style="color:#aebbd0;font-size:11px;margin:0;">
-STAHIZA &copy; 2026 | All Rights Reserved
-</p>
-</td>
-</tr>
+${renderEmailFooterHtml({
+  badgeUrl,
+  fallbackBadgeUrl,
+  recipient: SCHOOL_CONTACTS.email,
+})}
 
 </table>
 
@@ -290,35 +377,6 @@ STAHIZA &copy; 2026 | All Rights Reserved
 </table>
 </body>
 </html>`;
-}
-
-function buildSafeMailtoUrl(recipient: string, subject: string, body: string): string {
-  const base = `mailto:${recipient}?subject=${encodeURIComponent(subject)}&body=`;
-  const maxEncodedBodyLen = Math.max(200, MAX_MAILTO_URL_LENGTH - base.length);
-  let encodedBody = encodeURIComponent(body);
-
-  if (encodedBody.length > maxEncodedBodyLen) {
-    let trimmed = body;
-    while (trimmed.length > 80 && encodeURIComponent(`${trimmed}\n[Truncated - use Copy Summary]`).length > maxEncodedBodyLen) {
-      trimmed = trimmed.slice(0, Math.floor(trimmed.length * 0.85));
-    }
-    encodedBody = encodeURIComponent(`${trimmed}\n[Truncated - use Copy Summary]`);
-  }
-
-  return `${base}${encodedBody}`;
-}
-
-function buildGmailComposeUrl(recipient: string, subject: string, body: string): string {
-  return `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(recipient)}&su=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-}
-
-export function buildAdmissionMailtoUrl(
-  app: AdmissionApplication,
-  recipient: string,
-  payloadSummary: string
-): string {
-  const subject = `STAHIZA Admission Application - ${app.studentName} (${app.targetClass}) [${app.id}]`;
-  return buildSafeMailtoUrl(recipient, subject, payloadSummary);
 }
 
 export function buildContactSummary(inquiry: ContactInquiryInput, recipient: string): string {
@@ -326,14 +384,14 @@ export function buildContactSummary(inquiry: ContactInquiryInput, recipient: str
   const timestamp = inquiry.submittedAt || new Date().toLocaleString();
 
   return [
-    'STANDARD HIGH SCHOOL ZZANA - ADMISSIONS & GENERAL INQUIRY',
+    'STANDARD HIGH SCHOOL ZZANA (STAHIZA) - OFFICIAL INQUIRY DISPATCH',
     `Selection Code: ${SCHOOL_CONTACTS.selectionCode} | UNEB Centre: ${SCHOOL_CONTACTS.centerNo}`,
-    '=========================================================',
+    '====================================================================',
     `INQUIRY REFERENCE: ${refCode}`,
     `Submission Date: ${timestamp}`,
-    `Inquiry Subject: ${inquiry.subject}`,
+    `Subject: ${inquiry.subject}`,
     '',
-    '01. SENDER INFORMATION',
+    '01. SENDER CONTACT DETAILS',
     `Full Name: ${inquiry.name}`,
     `Email Address: ${inquiry.email}`,
     `Phone / WhatsApp: ${inquiry.phone || 'Not provided'}`,
@@ -341,77 +399,115 @@ export function buildContactSummary(inquiry: ContactInquiryInput, recipient: str
     '02. INQUIRY MESSAGE',
     inquiry.message,
     '',
-    `School Email: ${recipient} | Tel: ${SCHOOL_CONTACTS.phone1}`
+    `Official Desk: ${recipient} | Tel: ${SCHOOL_CONTACTS.phone1}`
   ].join('\n');
 }
 
 export function buildContactEmailHtml(inquiry: ContactInquiryInput, recipient: string): string {
   const badgeUrl = escapeHtml(getEmailBadgeUrl());
+  const fallbackBadgeUrl = escapeHtml(getLocalOriginBadgeUrl());
   const refCode = escapeHtml(inquiry.id || 'INQ-2026');
   const submittedAt = escapeHtml(inquiry.submittedAt || new Date().toLocaleString());
   const subject = escapeHtml(inquiry.subject);
   const name = escapeHtml(inquiry.name);
   const email = escapeHtml(inquiry.email);
   const phone = escapeHtml(inquiry.phone || 'Not provided');
+  const phoneHref = escapeHtml((inquiry.phone || '').replace(/\s+/g, ''));
   const messageHtml = escapeHtml(inquiry.message).replace(/\n/g, '<br>');
 
   return `<!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>STAHIZA Contact Inquiry</title>
+<title>STAHIZA Official Inquiry - ${refCode}</title>
 </head>
-<body style="margin:0;padding:0;background:#f1f3f8;font-family:Arial,Helvetica,sans-serif;color:#263248;">
-<table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#f1f3f8;padding:25px 10px;">
+<body style="margin:0;padding:0;background:#f4f6fa;font-family:Arial,Helvetica,sans-serif;color:#1e293b;">
+<table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#f4f6fa;padding:24px 12px;">
 <tr>
 <td align="center">
-<table width="650" cellpadding="0" cellspacing="0" border="0" style="max-width:650px;width:100%;background:#ffffff;border-radius:12px;overflow:hidden;border:1px solid #e2e8f0;">
+
+<table width="650" cellpadding="0" cellspacing="0" border="0" style="max-width:650px;width:100%;background:#ffffff;border-radius:10px;overflow:hidden;border:1px solid #cbd5e1;">
+
+${renderEmailHeaderHtml({
+  badgeUrl,
+  fallbackBadgeUrl,
+  ribbonText: `Admissions &amp; Inquiries Desk &nbsp;&middot;&nbsp; Selection Code ${escapeHtml(SCHOOL_CONTACTS.selectionCode)} &nbsp;&middot;&nbsp; UNEB Centre ${escapeHtml(SCHOOL_CONTACTS.centerNo)}`,
+})}
+
+<!-- FORMAL HEADER ROW -->
 <tr>
-<td align="center" style="background:#0a192f;padding:28px 20px;">
-<img src="${badgeUrl}" alt="STAHIZA Badge" width="90" height="90" style="display:block;margin:0 auto 12px;border-radius:50%;border:3px solid #ffffff;background:#ffffff;object-fit:contain;">
-<h1 style="color:#ffffff;font-size:22px;margin:6px 0;letter-spacing:0.8px;">STANDARD HIGH SCHOOL ZZANA</h1>
-<p style="color:#fcd34d;font-size:12px;margin:4px 0 0;font-weight:bold;">ONLINE ADMISSIONS &amp; INQUIRIES DESK • CODE 2624</p>
+<td style="padding:28px 32px 18px;border-bottom:1px solid #e2e8f0;">
+<table width="100%" cellpadding="0" cellspacing="0" border="0">
+<tr>
+<td>
+<p style="margin:0 0 6px;font-size:11px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;color:#800020;">
+Website Inquiry Correspondence
+</p>
+<h2 style="margin:0;color:#0a192f;font-size:21px;font-weight:700;line-height:1.3;">
+${subject}
+</h2>
 </td>
-</tr>
-<tr>
-<td style="padding:26px 30px 14px;">
-<h2 style="color:#800020;font-size:20px;margin:0 0 10px;">NEW WEBSITE INQUIRY</h2>
-<table width="100%" cellpadding="12" cellspacing="0" style="background:#f9edf1;border-left:5px solid #800020;">
-<tr>
-<td style="font-size:13px;line-height:1.6;">
-<strong style="color:#800020;">REFERENCE:</strong> <strong style="color:#1e40af;">${refCode}</strong><br>
-<strong>Date:</strong> ${submittedAt}<br>
-<strong>Subject:</strong> ${subject}
+<td align="right" valign="top" style="font-variant-numeric:tabular-nums;">
+<p style="margin:0;font-size:10px;font-weight:700;letter-spacing:0.8px;text-transform:uppercase;color:#64748b;">
+Inquiry Ref.
+</p>
+<p style="margin:3px 0 0;font-size:15px;font-weight:700;color:#0a192f;font-family:'Courier New',monospace;">
+${refCode}
+</p>
 </td>
 </tr>
 </table>
+
+<p style="margin:12px 0 0;font-size:12px;color:#475569;font-variant-numeric:tabular-nums;">
+<strong style="color:#0a192f;">Submitted:</strong> ${submittedAt} &nbsp;&middot;&nbsp;
+<strong style="color:#0a192f;">Recipient Desk:</strong> ${escapeHtml(recipient)}
+</p>
 </td>
 </tr>
+
+<!-- 01. SENDER DETAILS -->
 <tr>
-<td style="padding:10px 30px;">
-<h3 style="color:#800020;border-bottom:2px solid #800020;padding-bottom:8px;font-size:15px;">01. SENDER DETAILS</h3>
-<table width="100%" cellpadding="10" cellspacing="0" style="font-size:14px;border-collapse:collapse;border:1px solid #e6eaf2;">
-<tr style="border-bottom:1px solid #e6eaf2;"><td style="background:#f5f6fa;width:40%;font-weight:bold;">Full Name</td><td>${name}</td></tr>
-<tr style="border-bottom:1px solid #e6eaf2;"><td style="background:#f5f6fa;font-weight:bold;">Email Address</td><td><a href="mailto:${email}" style="color:#1e40af;">${email}</a></td></tr>
-<tr><td style="background:#f5f6fa;font-weight:bold;">Phone / WhatsApp</td><td>${phone}</td></tr>
+<td style="padding:22px 32px 10px;">
+<h3 style="margin:0 0 10px;padding-bottom:6px;border-bottom:1px solid #0a192f;color:#0a192f;font-size:13px;font-weight:700;letter-spacing:0.8px;text-transform:uppercase;">
+01. Sender Contact Particulars
+</h3>
+<table width="100%" cellpadding="9" cellspacing="0" border="0" style="font-size:13px;border-collapse:collapse;border:1px solid #e2e8f0;">
+<tr style="border-bottom:1px solid #e2e8f0;"><td style="background:#f8fafc;width:40%;font-weight:700;color:#334155;">Full Name</td><td style="color:#0f172a;font-weight:700;">${name}</td></tr>
+<tr style="border-bottom:1px solid #e2e8f0;"><td style="background:#f8fafc;font-weight:700;color:#334155;">Email Address</td><td><a href="mailto:${email}" style="color:#800020;text-decoration:none;font-weight:600;">${email}</a></td></tr>
+<tr><td style="background:#f8fafc;font-weight:700;color:#334155;">Phone / WhatsApp</td><td style="font-variant-numeric:tabular-nums;">${
+  inquiry.phone
+    ? `<a href="tel:${phoneHref}" style="color:#0a192f;text-decoration:none;font-weight:700;">${phone}</a>`
+    : phone
+}</td></tr>
 </table>
 </td>
 </tr>
+
+<!-- 02. MESSAGE -->
 <tr>
-<td style="padding:15px 30px 26px;">
-<h3 style="color:#800020;border-bottom:2px solid #800020;padding-bottom:8px;font-size:15px;">02. MESSAGE</h3>
-<div style="background:#f5f6fa;padding:16px;border-radius:6px;border:1px solid #e6eaf2;font-size:14px;line-height:1.7;">
+<td style="padding:14px 32px 28px;">
+<h3 style="margin:0 0 10px;padding-bottom:6px;border-bottom:1px solid #0a192f;color:#0a192f;font-size:13px;font-weight:700;letter-spacing:0.8px;text-transform:uppercase;">
+02. Inquiry Message
+</h3>
+<div style="background:#f8fafc;padding:16px 18px;border:1px solid #e2e8f0;border-radius:6px;font-size:13.5px;line-height:1.7;color:#1e293b;">
 ${messageHtml}
 </div>
+
+<p style="margin:14px 0 0;font-size:12px;color:#64748b;line-height:1.6;">
+Please reply directly to <a href="mailto:${email}" style="color:#800020;font-weight:700;text-decoration:none;">${email}</a>${inquiry.phone ? ` or reach out via telephone/WhatsApp at <strong style="color:#0a192f;">${phone}</strong>` : ''}.
+</p>
 </td>
 </tr>
-<tr>
-<td align="center" style="background:#800020;padding:20px;color:#ffffff;font-size:11px;">
-Standard High School Zzana • Recipient: ${escapeHtml(recipient)} • ${escapeHtml(SCHOOL_CONTACTS.phone1)}
-</td>
-</tr>
+
+${renderEmailFooterHtml({
+  badgeUrl,
+  fallbackBadgeUrl,
+  recipient,
+})}
+
 </table>
+
 </td>
 </tr>
 </table>
@@ -419,20 +515,139 @@ Standard High School Zzana • Recipient: ${escapeHtml(recipient)} • ${escapeH
 </html>`;
 }
 
+export function buildEmlFileContent(params: {
+  recipient: string;
+  subject: string;
+  htmlBody: string;
+  plainTextBody: string;
+  replyTo?: string;
+}): string {
+  const { recipient, subject, htmlBody, plainTextBody, replyTo } = params;
+  const boundary = `----=_STAHIZA_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
+  const dateHeader = new Date().toUTCString();
+
+  const lines = [
+    `To: ${recipient}`,
+    `Subject: ${subject}`,
+    `Date: ${dateHeader}`,
+    ...(replyTo ? [`Reply-To: ${replyTo}`] : []),
+    'X-Unsent: 1',
+    'MIME-Version: 1.0',
+    `Content-Type: multipart/alternative; boundary="${boundary}"`,
+    '',
+    `--${boundary}`,
+    'Content-Type: text/plain; charset=UTF-8',
+    'Content-Transfer-Encoding: 8bit',
+    '',
+    plainTextBody,
+    '',
+    `--${boundary}`,
+    'Content-Type: text/html; charset=UTF-8',
+    'Content-Transfer-Encoding: 8bit',
+    '',
+    htmlBody,
+    '',
+    `--${boundary}--`,
+  ];
+
+  return lines.join('\r\n');
+}
+
+export function downloadEmlFile(emlContent: string, filename: string): void {
+  const blob = new Blob([emlContent], { type: 'message/rfc822;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const anchor = document.createElement('a');
+  anchor.href = url;
+  anchor.download = filename;
+  anchor.style.display = 'none';
+  document.body.appendChild(anchor);
+  anchor.click();
+  document.body.removeChild(anchor);
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+
+function buildSafeMailtoUrl(recipient: string, subject: string, body?: string): string {
+  if (!body) {
+    return `mailto:${recipient}?subject=${encodeURIComponent(subject)}`;
+  }
+  const base = `mailto:${recipient}?subject=${encodeURIComponent(subject)}&body=`;
+  const maxEncodedBodyLen = Math.max(200, MAX_MAILTO_URL_LENGTH - base.length);
+  let encodedBody = encodeURIComponent(body);
+
+  if (encodedBody.length > maxEncodedBodyLen) {
+    let trimmed = body;
+    while (trimmed.length > 80 && encodeURIComponent(`${trimmed}\n[Truncated - paste copied branded email]`).length > maxEncodedBodyLen) {
+      trimmed = trimmed.slice(0, Math.floor(trimmed.length * 0.85));
+    }
+    encodedBody = encodeURIComponent(`${trimmed}\n[Truncated - paste copied branded email]`);
+  }
+
+  return `${base}${encodedBody}`;
+}
+
+function buildGmailComposeUrl(recipient: string, subject: string): string {
+  return `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(recipient)}&su=${encodeURIComponent(subject)}`;
+}
+
+export function buildAdmissionMailtoUrl(
+  app: AdmissionApplication,
+  recipient: string,
+  _payloadSummary: string
+): string {
+  const subject = `STAHIZA Admission Application - ${app.studentName} (${app.targetClass}) [${app.id}]`;
+  return buildSafeMailtoUrl(recipient, subject);
+}
+
 export function buildContactMailtoUrl(
   inquiry: ContactInquiryInput,
   recipient: string,
-  payloadSummary: string
+  _payloadSummary: string
 ): string {
   const subject = `STAHIZA Inquiry: ${inquiry.subject} - ${inquiry.name}`;
-  return buildSafeMailtoUrl(recipient, subject, payloadSummary);
+  return buildSafeMailtoUrl(recipient, subject);
+}
+
+function extractEmailFragmentForClipboard(htmlBody: string): string {
+  const bodyMatch = htmlBody.match(/<body[^>]*>([\s\S]*?)<\/body>/i);
+  const fragment = bodyMatch ? bodyMatch[1].trim() : htmlBody;
+  // Strip inline JS handlers so Gmail / Mail compose rich-text sanitizers preserve <img> and layout cleanly
+  return fragment.replace(/\sonerror="[^"]*"/gi, '');
+}
+
+function copyHtmlViaDomSelection(htmlFragment: string): boolean {
+  if (typeof document === 'undefined') return false;
+  const container = document.createElement('div');
+  container.setAttribute('contenteditable', 'true');
+  container.style.position = 'fixed';
+  container.style.left = '-99999px';
+  container.style.top = '0';
+  container.style.pointerEvents = 'none';
+  container.innerHTML = htmlFragment;
+  document.body.appendChild(container);
+
+  let copied = false;
+  try {
+    const selection = window.getSelection();
+    const range = document.createRange();
+    range.selectNodeContents(container);
+    selection?.removeAllRanges();
+    selection?.addRange(range);
+    copied = document.execCommand('copy');
+    selection?.removeAllRanges();
+  } catch {
+    copied = false;
+  } finally {
+    document.body.removeChild(container);
+  }
+  return copied;
 }
 
 /**
- * Copies the formatted HTML email template (with plain-text fallback) to the clipboard
- * so pasting into Gmail Web compose renders the full maroon & navy branded HTML table.
+ * Copies the branded HTML email fragment (with plain-text fallback) to the clipboard
+ * so pasting into Gmail Web compose or mobile Mail App renders the full Navy, Maroon & Gold STAHIZA crest layout.
  */
 export async function copyRichEmailToClipboard(htmlBody: string, plainTextBody: string): Promise<boolean> {
+  const htmlFragment = extractEmailFragmentForClipboard(htmlBody);
   try {
     if (
       typeof navigator !== 'undefined' &&
@@ -440,7 +655,7 @@ export async function copyRichEmailToClipboard(htmlBody: string, plainTextBody: 
       typeof navigator.clipboard.write === 'function' &&
       typeof ClipboardItem !== 'undefined'
     ) {
-      const htmlBlob = new Blob([htmlBody], { type: 'text/html' });
+      const htmlBlob = new Blob([htmlFragment], { type: 'text/html' });
       const textBlob = new Blob([plainTextBody], { type: 'text/plain' });
       await navigator.clipboard.write([
         new ClipboardItem({
@@ -451,11 +666,18 @@ export async function copyRichEmailToClipboard(htmlBody: string, plainTextBody: 
       return true;
     }
 
+    if (copyHtmlViaDomSelection(htmlFragment)) {
+      return true;
+    }
+
     if (typeof navigator !== 'undefined' && navigator.clipboard?.writeText) {
       await navigator.clipboard.writeText(plainTextBody);
       return true;
     }
   } catch {
+    if (copyHtmlViaDomSelection(htmlFragment)) {
+      return true;
+    }
     try {
       if (typeof navigator !== 'undefined' && navigator.clipboard?.writeText) {
         await navigator.clipboard.writeText(plainTextBody);
@@ -466,6 +688,19 @@ export async function copyRichEmailToClipboard(htmlBody: string, plainTextBody: 
     }
   }
   return false;
+}
+
+/**
+ * Performs synchronous DOM-selection HTML copy FIRST (0ms, preserves browser user-gesture activation
+ * so window.open isn't blocked by popup blockers), with ClipboardItem fallback when needed.
+ */
+function copyRichEmailPreservingGesture(htmlBody: string, plainTextBody: string): Promise<boolean> {
+  const htmlFragment = extractEmailFragmentForClipboard(htmlBody);
+  const syncCopied = copyHtmlViaDomSelection(htmlFragment);
+  if (syncCopied) {
+    return Promise.resolve(true);
+  }
+  return copyRichEmailToClipboard(htmlBody, plainTextBody);
 }
 
 function triggerMailtoSafely(mailtoUrl: string): void {
@@ -483,8 +718,12 @@ function triggerMailtoSafely(mailtoUrl: string): void {
   }
 }
 
-function triggerWebEmailSafely(gmailUrl: string): void {
+function triggerWebEmailSafely(gmailUrl: string): boolean {
   try {
+    const opened = window.open(gmailUrl, '_blank', 'noopener,noreferrer');
+    if (opened) {
+      return true;
+    }
     const anchor = document.createElement('a');
     anchor.href = gmailUrl;
     anchor.target = '_blank';
@@ -493,89 +732,146 @@ function triggerWebEmailSafely(gmailUrl: string): void {
     document.body.appendChild(anchor);
     anchor.click();
     document.body.removeChild(anchor);
+    return false;
   } catch (e) {
     console.warn('Automatic web email trigger skipped by browser context:', e);
+    return false;
   }
 }
 
+export async function openGmailAndCopyStyledEmail(result: EmailSendResult): Promise<boolean> {
+  const copyPromise = copyRichEmailPreservingGesture(result.htmlBody, result.payloadSummary);
+  triggerWebEmailSafely(result.gmailUrl);
+  return copyPromise;
+}
+
+export async function openMailAppAndCopyStyledEmail(result: EmailSendResult): Promise<boolean> {
+  const copyPromise = copyRichEmailPreservingGesture(result.htmlBody, result.payloadSummary);
+  triggerMailtoSafely(result.mailtoUrl);
+  return copyPromise;
+}
+
 /**
- * Automatically detects whether the user is on PC or Mobile:
- * - PC / Desktop: opens Gmail Web compose directly in a new tab with pre-filled application details.
- * - Mobile: opens the device's default mail app via standard HTML5 mailto: URI.
- * Also builds the branded STAHIZA HTML email template (`htmlBody`) for preview and rich clipboard paste.
+ * Automatically detects PC vs Mobile:
+ * 1. Copies the live finished branded HTML email (with STAHIZA badge) to clipboard while focused.
+ * 2. On PC: opens clean Gmail Web compose (ready to Ctrl+V / Cmd+V & send).
+ * 3. On Mobile: opens the device's Mail App directly (ready to tap Paste & send).
  */
-export function dispatchApplicationEmail(app: AdmissionApplication): EmailSendResult {
-  const recipient = SCHOOL_CONTACTS.email; // hasty0joel@gmail.com
+export async function dispatchApplicationEmail(app: AdmissionApplication): Promise<EmailSendResult> {
+  const recipient = SCHOOL_CONTACTS.email;
   const now = new Date().toLocaleString();
   const deviceType = detectDeviceType();
   const payloadSummary = buildApplicationSummary(app, recipient);
   const htmlBody = buildAdmissionEmailHtml(app);
   const subject = `STAHIZA Admission Application - ${app.studentName} (${app.targetClass}) [${app.id}]`;
-  const mailtoUrl = buildSafeMailtoUrl(recipient, subject, payloadSummary);
-  const gmailUrl = buildGmailComposeUrl(recipient, subject, payloadSummary);
+  const mailtoUrl = buildSafeMailtoUrl(recipient, subject);
+  const gmailUrl = buildGmailComposeUrl(recipient, subject);
+  const emlContent = buildEmlFileContent({
+    recipient,
+    subject,
+    htmlBody,
+    plainTextBody: payloadSummary,
+    replyTo: app.parentEmail,
+  });
+  const emlFilename = `STAHIZA-Application-${app.id}.eml`;
+
+  // Copy rich HTML synchronously before launching compose so browser user-gesture activation stays intact
+  const autoCopyPromise = copyRichEmailPreservingGesture(htmlBody, payloadSummary);
+  let popupBlocked = false;
 
   if (deviceType === 'pc') {
-    triggerWebEmailSafely(gmailUrl);
+    popupBlocked = !triggerWebEmailSafely(gmailUrl);
   } else {
     triggerMailtoSafely(mailtoUrl);
   }
+
+  const autoCopied = await autoCopyPromise;
 
   return {
     success: true,
     message:
       deviceType === 'pc'
-        ? `PC detected: Pre-filled Gmail Web compose opened for ${recipient}`
-        : `Mobile detected: Pre-filled mail app opened for ${recipient}`,
+        ? `PC detected: Finished preview copied & Gmail Web opened for ${recipient}`
+        : `Mobile detected: Finished preview copied & Mail App opened for ${recipient}`,
     recipient,
+    subject,
+    refCode: app.id,
+    emailKind: 'admission',
     sentAt: now,
     payloadSummary,
     htmlBody,
+    emlContent,
+    emlFilename,
     deviceType,
     methodUsed: deviceType === 'pc' ? 'Gmail Web' : 'Mail App',
     mailtoUrl,
-    gmailUrl
+    gmailUrl,
+    popupBlocked,
+    autoCopyPromise: Promise.resolve(autoCopied),
   };
 }
 
 /**
- * Automatically detects PC vs Mobile for general contact & admissions desk inquiries:
- * - PC / Desktop: opens Gmail Web compose directly.
- * - Mobile: opens the native mail app via mailto:.
+ * Automatically detects PC vs Mobile for general contact inquiries:
+ * 1. Copies the live finished branded HTML email (with STAHIZA badge) to clipboard synchronously while focused.
+ * 2. On PC: opens clean Gmail Web compose (ready to Ctrl+V / Cmd+V & send).
+ * 3. On Mobile: opens the device's Mail App directly (ready to tap Paste & send).
  */
-export function dispatchContactInquiryEmail(inquiry: ContactInquiryInput): EmailSendResult {
+export async function dispatchContactInquiryEmail(inquiry: ContactInquiryInput): Promise<EmailSendResult> {
   const recipient = SCHOOL_CONTACTS.email;
   const now = new Date().toLocaleString();
   const deviceType = detectDeviceType();
+  const refCode = inquiry.id || `INQ-2026-${Math.floor(1000 + Math.random() * 9000)}`;
   const normalizedInquiry: ContactInquiryInput = {
     ...inquiry,
-    id: inquiry.id || `INQ-2026-${Math.floor(1000 + Math.random() * 9000)}`,
+    id: refCode,
     submittedAt: inquiry.submittedAt || now
   };
   const payloadSummary = buildContactSummary(normalizedInquiry, recipient);
   const htmlBody = buildContactEmailHtml(normalizedInquiry, recipient);
-  const subject = `STAHIZA Inquiry: ${normalizedInquiry.subject} - ${normalizedInquiry.name}`;
-  const mailtoUrl = buildSafeMailtoUrl(recipient, subject, payloadSummary);
-  const gmailUrl = buildGmailComposeUrl(recipient, subject, payloadSummary);
+  const subject = `STAHIZA Inquiry: ${normalizedInquiry.subject} - ${normalizedInquiry.name} [${refCode}]`;
+  const mailtoUrl = buildSafeMailtoUrl(recipient, subject);
+  const gmailUrl = buildGmailComposeUrl(recipient, subject);
+  const emlContent = buildEmlFileContent({
+    recipient,
+    subject,
+    htmlBody,
+    plainTextBody: payloadSummary,
+    replyTo: normalizedInquiry.email,
+  });
+  const emlFilename = `STAHIZA-Inquiry-${refCode}.eml`;
+
+  const autoCopyPromise = copyRichEmailPreservingGesture(htmlBody, payloadSummary);
+  let popupBlocked = false;
 
   if (deviceType === 'pc') {
-    triggerWebEmailSafely(gmailUrl);
+    popupBlocked = !triggerWebEmailSafely(gmailUrl);
   } else {
     triggerMailtoSafely(mailtoUrl);
   }
+
+  const autoCopied = await autoCopyPromise;
 
   return {
     success: true,
     message:
       deviceType === 'pc'
-        ? `PC detected: Pre-filled Gmail Web compose opened for ${recipient}`
-        : `Mobile detected: Pre-filled inquiry email opened for ${recipient}`,
+        ? `PC detected: Finished preview copied & Gmail Web opened for ${recipient}`
+        : `Mobile detected: Finished preview copied & Mail App opened for ${recipient}`,
     recipient,
+    subject,
+    refCode,
+    emailKind: 'contact',
     sentAt: now,
     payloadSummary,
     htmlBody,
+    emlContent,
+    emlFilename,
     deviceType,
     methodUsed: deviceType === 'pc' ? 'Gmail Web' : 'Mail App',
     mailtoUrl,
-    gmailUrl
+    gmailUrl,
+    popupBlocked,
+    autoCopyPromise: Promise.resolve(autoCopied),
   };
 }

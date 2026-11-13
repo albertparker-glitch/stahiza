@@ -423,3 +423,41 @@ export const SCHOOL_CONTACTS = {
   embedMapUrl: "https://maps.google.com/maps?q=Standard+High+School+Zzana+Entebbe+Road+Kampala+Uganda&t=&z=15&ie=UTF8&iwloc=&output=embed"
 };
 
+export const CLASS_TUITION_MAP: Record<'S.1' | 'S.2' | 'S.3' | 'S.4' | 'S.5' | 'S.6', { boarding: number; day: number }> = {
+  'S.1': { boarding: 1316000, day: 726000 },
+  'S.2': { boarding: 1316000, day: 726000 },
+  'S.3': { boarding: 1316000, day: 726000 },
+  'S.4': { boarding: 1416000, day: 826000 },
+  'S.5': { boarding: 1362000, day: 772000 },
+  'S.6': { boarding: 1416000, day: 826000 }
+};
+
+export const OFFICIAL_ITEMIZED_FEES = {
+  admissionFee: 50000,
+  uniform: 275000,
+  idCard: 10000,
+  sportsWear: 50000,
+  requirements: 50000,
+};
+
+export function computeTerm1FeeBreakdown(
+  targetClass: 'S.1' | 'S.2' | 'S.3' | 'S.4' | 'S.5' | 'S.6',
+  residenceType: 'Boarding' | 'Day'
+) {
+  const row = CLASS_TUITION_MAP[targetClass] || CLASS_TUITION_MAP['S.1'];
+  const tuition = residenceType === 'Boarding' ? row.boarding : row.day;
+  const total =
+    OFFICIAL_ITEMIZED_FEES.admissionFee +
+    tuition +
+    OFFICIAL_ITEMIZED_FEES.uniform +
+    OFFICIAL_ITEMIZED_FEES.idCard +
+    OFFICIAL_ITEMIZED_FEES.sportsWear +
+    OFFICIAL_ITEMIZED_FEES.requirements;
+
+  return {
+    tuition,
+    ...OFFICIAL_ITEMIZED_FEES,
+    total,
+  };
+}
+

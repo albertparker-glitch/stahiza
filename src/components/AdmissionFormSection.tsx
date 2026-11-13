@@ -1,49 +1,37 @@
 import React, { useState, useEffect } from 'react';
 import { SchoolBadgeImg } from './SchoolBadgeImg';
-import { SCHOOL_CONTACTS } from '../data/schoolData';
+import {
+  SCHOOL_CONTACTS,
+  CLASS_TUITION_MAP,
+  OFFICIAL_ITEMIZED_FEES,
+} from '../data/schoolData';
 import { ALL_SCIENCE_COMBINATIONS, POPULAR_ARTS_COMBINATIONS } from '../data/aLevelCombinations';
 import { ClassLevel, ResidenceType, AdmissionApplication } from '../types/admission';
 import { submitNewApplication } from '../lib/admissionStore';
-import { dispatchApplicationEmail, copyRichEmailToClipboard, EmailSendResult } from '../lib/emailService';
+import {
+  dispatchApplicationEmail,
+  openGmailAndCopyStyledEmail,
+  openMailAppAndCopyStyledEmail,
+  EmailSendResult,
+} from '../lib/emailService';
+import { BrandedEmailReadyCard } from './BrandedEmailReadyCard';
 import { 
-  Printer, 
   CheckCircle2, 
   GraduationCap, 
   Building2, 
   FileText, 
-  Sparkles, 
   ShieldCheck, 
   Award,
   Check,
   Clock,
   Send,
   Mail,
-  Phone,
   MessageCircle,
-  MessageSquare,
-  Copy,
-  RefreshCw,
-  ExternalLink,
-  Eye
+  ExternalLink
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 
-export const CLASS_TUITION_MAP: Record<ClassLevel, { boarding: number; day: number }> = {
-  'S.1': { boarding: 1316000, day: 726000 },
-  'S.2': { boarding: 1316000, day: 726000 },
-  'S.3': { boarding: 1316000, day: 726000 },
-  'S.4': { boarding: 1416000, day: 826000 },
-  'S.5': { boarding: 1362000, day: 772000 },
-  'S.6': { boarding: 1416000, day: 826000 }
-};
-
-export const OFFICIAL_ITEMIZED_FEES = {
-  admissionFee: 50000,
-  uniform: 275000, // Labelling inclusive
-  idCard: 10000,
-  sportsWear: 50000,
-  requirements: 50000,
-};
+export { CLASS_TUITION_MAP, OFFICIAL_ITEMIZED_FEES };
 
 export const A_LEVEL_SCIENCE_OPTIONS = ALL_SCIENCE_COMBINATIONS.map(
   (c) => `${c.code} (${c.subjects.join(', ')})`
@@ -88,9 +76,6 @@ export const AdmissionFormSection: React.FC<AdmissionFormSectionProps> = () => {
 
   // Submission Flow & Email Status State
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isResending, setIsResending] = useState(false);
-  const [copiedSummary, setCopiedSummary] = useState(false);
-  const [showEmailPreview, setShowEmailPreview] = useState(false);
   const [submittedRecord, setSubmittedRecord] = useState<AdmissionApplication | null>(null);
   const [emailResult, setEmailResult] = useState<EmailSendResult | null>(null);
   const [showToast, setShowToast] = useState(false);
@@ -114,55 +99,36 @@ export const AdmissionFormSection: React.FC<AdmissionFormSectionProps> = () => {
     OFFICIAL_ITEMIZED_FEES.sportsWear +
     OFFICIAL_ITEMIZED_FEES.requirements;
 
-  const handleFormSubmit = (e: React.FormEvent) => {
+  const handleFormSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!studentName || !parentPhone || !parentEmail) return;
 
     setIsSubmitting(true);
+    try {
+      // Save to local persistence application store
+      const appRecord = submitNewApplication({
+        studentName,
+        gender,
+        dob: dob || undefined,
+        targetClass: selectedClass,
+        residenceType,
+        combination: isALevel ? combination : undefined,
+        parentName,
+        parentPhone,
+        parentEmail,
+        previousSchool: previousSchool || 'Primary/Secondary School',
+        gradesAggregate: gradesAggregate || 'Standard Entry Record',
+        sourceForm: 'Main Admissions Form'
+      });
 
-    // Save to local persistence application store
-    const appRecord = submitNewApplication({
-      studentName,
-      gender,
-      dob: dob || undefined,
-      targetClass: selectedClass,
-      residenceType,
-      combination: isALevel ? combination : undefined,
-      parentName,
-      parentPhone,
-      parentEmail,
-      previousSchool: previousSchool || 'Primary/Secondary School',
-      gradesAggregate: gradesAggregate || 'Standard Entry Record',
-      sourceForm: 'Main Admissions Form'
-    });
+      // Copy finished rich HTML email preview while focused, then open Gmail Web (PC) or Mail App (Mobile)
+      const dispatchResult = await dispatchApplicationEmail(appRecord);
 
-    // Dispatch pre-filled mail template synchronously inside user submit gesture
-    const dispatchResult = dispatchApplicationEmail(appRecord);
-
-    setIsSubmitting(false);
-    setEmailResult(dispatchResult);
-    setSubmittedRecord(appRecord);
-    setShowToast(true);
-  };
-
-  const handleResendEmail = () => {
-    if (!submittedRecord || isResending) return;
-    setIsResending(true);
-    const dispatchResult = dispatchApplicationEmail(submittedRecord);
-    setEmailResult(dispatchResult);
-    setIsResending(false);
-    setShowToast(true);
-  };
-
-  const handleCopySummary = async () => {
-    if (!emailResult?.payloadSummary) return;
-    const copied = await copyRichEmailToClipboard(
-      emailResult.htmlBody,
-      emailResult.payloadSummary
-    );
-    setCopiedSummary(copied);
-    if (copied) {
-      setTimeout(() => setCopiedSummary(false), 2500);
+      setEmailResult(dispatchResult);
+      setSubmittedRecord(appRecord);
+      setShowToast(true);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -191,68 +157,73 @@ export const AdmissionFormSection: React.FC<AdmissionFormSectionProps> = () => {
               </div>
               <div className="space-y-1.5">
                 <div className="flex items-center gap-2 flex-wrap">
-                  <h4 className="font-bold text-sm text-white">Application Prepared!</h4>
-                  <span className="px-2 py-0.5 bg-amber-400 text-slate-950 font-black text-[10px] rounded uppercase font-mono">
-                    {emailResult?.deviceType === 'pc' ? 'PC • GMAIL WEB OPENED' : 'MOBILE • MAIL APP OPENED'}
+                  <h4 className="font-bold text-sm text-white">Branded Email Ready</h4>
+                  <span className="text-[11px] text-amber-300 font-semibold">
+                    {emailResult?.deviceType === 'pc' ? 'PC · Gmail Web' : 'Mobile · Mail App'}
                   </span>
                 </div>
                 <p className="text-xs text-slate-300 leading-relaxed">
-                  {emailResult?.deviceType === 'pc' ? (
+                  {emailResult?.deviceType === 'mobile' ? (
                     <>
-                      Your pre-filled admission email to <strong>{SCHOOL_CONTACTS.email}</strong> has been opened in <strong>Gmail Web</strong>. Click Send in the compose tab to submit.
+                      Mobile Mail App opened &amp; finished STAHIZA badge letter copied for <strong>{SCHOOL_CONTACTS.email}</strong>. Tap <strong>Paste</strong> in the compose box and send.
                     </>
                   ) : (
                     <>
-                      Your pre-filled admission email template to <strong>{SCHOOL_CONTACTS.email}</strong> has been opened in your mail app.
+                      Gmail Web opened &amp; finished STAHIZA badge letter copied for <strong>{SCHOOL_CONTACTS.email}</strong>. Press <strong>Ctrl+V</strong> (or <strong>Cmd+V</strong>) in Gmail and send.
                     </>
                   )}
                 </p>
                 <div className="pt-1 flex flex-wrap items-center gap-2">
-                  {emailResult?.deviceType === 'pc' && emailResult?.gmailUrl && (
-                    <a
-                      href={emailResult.gmailUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-amber-400 hover:bg-amber-300 text-slate-950 font-bold rounded-lg text-xs transition shadow-sm"
-                    >
-                      <ExternalLink className="w-3.5 h-3.5" />
-                      <span>Open Gmail Web</span>
-                    </a>
+                  {emailResult && (
+                    emailResult.deviceType === 'mobile' ? (
+                      <button
+                        type="button"
+                        onClick={() => openMailAppAndCopyStyledEmail(emailResult)}
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-amber-400 hover:bg-amber-300 text-slate-950 font-bold rounded-lg text-xs transition shadow-sm cursor-pointer whitespace-nowrap"
+                      >
+                        <Mail className="w-3.5 h-3.5" />
+                        <span>Open Mail App &amp; Paste</span>
+                      </button>
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={() => openGmailAndCopyStyledEmail(emailResult)}
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-amber-400 hover:bg-amber-300 text-slate-950 font-bold rounded-lg text-xs transition shadow-sm cursor-pointer whitespace-nowrap"
+                      >
+                        <ExternalLink className="w-3.5 h-3.5" />
+                        <span>Open Gmail &amp; Paste</span>
+                      </button>
+                    )
                   )}
                   <a
                     href={getWhatsAppUrl()}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#25D366] hover:bg-[#1ebd59] text-slate-950 font-bold rounded-lg text-xs transition shadow-sm"
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#25D366] hover:bg-[#1ebd59] text-slate-950 font-bold rounded-lg text-xs transition shadow-sm whitespace-nowrap"
                   >
                     <MessageCircle className="w-3.5 h-3.5 fill-current" />
-                    <span>Follow up on WhatsApp</span>
+                    <span>WhatsApp</span>
                   </a>
-                  {emailResult?.mailtoUrl && (
-                    <a
-                      href={emailResult.mailtoUrl}
-                      target="_top"
-                      rel="noopener noreferrer"
-                      className={`inline-flex items-center gap-1.5 px-3 py-1.5 font-bold rounded-lg text-xs transition shadow-sm ${
-                        emailResult?.deviceType === 'pc'
-                          ? 'bg-white hover:bg-slate-100 text-slate-950'
-                          : 'bg-amber-400 hover:bg-amber-300 text-slate-950'
-                      }`}
-                    >
-                      <Mail className="w-3.5 h-3.5" />
-                      <span>Open Mail App</span>
-                    </a>
-                  )}
-                  {emailResult?.deviceType !== 'pc' && emailResult?.gmailUrl && (
-                    <a
-                      href={emailResult.gmailUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white hover:bg-slate-100 text-slate-950 font-bold rounded-lg text-xs transition shadow-sm"
-                    >
-                      <ExternalLink className="w-3.5 h-3.5" />
-                      <span>Gmail Web</span>
-                    </a>
+                  {emailResult && (
+                    emailResult.deviceType === 'mobile' ? (
+                      <button
+                        type="button"
+                        onClick={() => openGmailAndCopyStyledEmail(emailResult)}
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white hover:bg-slate-100 text-slate-950 font-bold rounded-lg text-xs transition shadow-sm cursor-pointer whitespace-nowrap"
+                      >
+                        <ExternalLink className="w-3.5 h-3.5" />
+                        <span>Gmail Web</span>
+                      </button>
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={() => openMailAppAndCopyStyledEmail(emailResult)}
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white hover:bg-slate-100 text-slate-950 font-bold rounded-lg text-xs transition shadow-sm cursor-pointer whitespace-nowrap"
+                      >
+                        <Mail className="w-3.5 h-3.5" />
+                        <span>Mail App</span>
+                      </button>
+                    )
                   )}
                 </div>
               </div>
@@ -260,7 +231,7 @@ export const AdmissionFormSection: React.FC<AdmissionFormSectionProps> = () => {
 
             <button
               onClick={() => setShowToast(false)}
-              className="text-slate-400 hover:text-white p-1 rounded-lg hover:bg-slate-800"
+              className="text-slate-400 hover:text-white p-1 rounded-lg hover:bg-slate-800 cursor-pointer"
             >
               ✕
             </button>
@@ -336,170 +307,25 @@ export const AdmissionFormSection: React.FC<AdmissionFormSectionProps> = () => {
             animate={{ opacity: 1, x: 0 }}
             className="lg:col-span-7 bg-white dark:bg-slate-900 rounded-3xl p-6 sm:p-8 shadow-xl border border-slate-200 dark:border-slate-800 space-y-6"
           >
-            {submittedRecord ? (
-              /* SUBMISSION CONFIRMATION SUCCESS CARD */
-              <div className="space-y-6 text-center py-6">
-                <div className="w-16 h-16 rounded-full bg-emerald-100 dark:bg-emerald-950/80 text-emerald-600 dark:text-emerald-400 flex items-center justify-center mx-auto shadow-inner">
-                  <CheckCircle2 className="w-10 h-10" />
-                </div>
-
-                <div className="space-y-2">
-                  <div className="flex items-center justify-center gap-2 flex-wrap">
-                    <span className="px-3.5 py-1 bg-amber-100 text-amber-900 dark:bg-amber-950 dark:text-amber-300 rounded-full text-xs font-black uppercase font-mono tracking-wider">
-                      {emailResult?.deviceType === 'pc'
-                        ? 'PC Detected • Opened in Gmail Web'
-                        : 'Mobile Detected • Mail App Opened'}
-                    </span>
-                    <span className="px-3 py-1 rounded-full text-[11px] font-bold font-mono bg-emerald-50 text-emerald-700 border border-emerald-200 dark:bg-emerald-950/60 dark:text-emerald-300 dark:border-emerald-800">
-                      Ref: {submittedRecord.id} • {emailResult?.methodUsed || 'Mail Template'}
-                    </span>
-                  </div>
-                  <h3 className="text-2xl font-black text-slate-900 dark:text-white pt-2">
-                    Thank You, {submittedRecord.parentName}!
-                  </h3>
-                  <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 max-w-md mx-auto leading-relaxed">
-                    Your pre-filled admission email for <strong className="text-slate-900 dark:text-white">{submittedRecord.studentName}</strong> ({submittedRecord.targetClass}, {submittedRecord.residenceType} Section) to <strong className="text-slate-900 dark:text-white">{SCHOOL_CONTACTS.email}</strong> has been prepared via{' '}
-                    <strong>{emailResult?.methodUsed || 'Web Email'}</strong>.
-                  </p>
-                </div>
-
-                {/* WHATSAPP & CONTACT ACTION CARD */}
-                <div className="p-6 bg-slate-900 text-white rounded-2xl space-y-3 max-w-md mx-auto border border-slate-800 shadow-xl text-center">
-                  <span className="text-[11px] text-amber-300 font-bold uppercase tracking-wider block">
-                    We Will Contact You on WhatsApp or Email
-                  </span>
-                  <p className="text-xs text-slate-300">
-                    {emailResult?.deviceType === 'pc'
-                      ? 'Your PC automatically opened Gmail Web compose. If a popup blocker stopped it, click Open Gmail Web below:'
-                      : 'Your mobile mail app should open automatically. You can also compose in Gmail Web or reach us on WhatsApp:'}
-                  </p>
-                  <div className="pt-2 flex flex-col sm:flex-row items-center justify-center gap-3 flex-wrap">
-                    {emailResult?.gmailUrl && (
-                      <a
-                        href={emailResult.gmailUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className={`w-full sm:w-auto px-4 py-2.5 font-bold rounded-xl text-xs transition flex items-center justify-center gap-2 ${
-                          emailResult.deviceType === 'pc'
-                            ? 'bg-amber-400 hover:bg-amber-300 text-slate-950 shadow-md'
-                            : 'bg-white hover:bg-slate-100 text-slate-950'
-                        }`}
-                      >
-                        <ExternalLink className="w-4 h-4 text-[#800020]" />
-                        <span>Compose in Gmail Web</span>
-                      </a>
-                    )}
-
-                    <a
-                      href={emailResult?.mailtoUrl || `mailto:${SCHOOL_CONTACTS.email}`}
-                      target="_top"
-                      rel="noopener noreferrer"
-                      className={`w-full sm:w-auto px-4 py-2.5 font-bold rounded-xl text-xs transition flex items-center justify-center gap-2 ${
-                        emailResult?.deviceType === 'pc'
-                          ? 'bg-white hover:bg-slate-100 text-slate-950'
-                          : 'bg-amber-400 hover:bg-amber-300 text-slate-950 shadow-md'
-                      }`}
-                    >
-                      <Mail className="w-4 h-4 text-slate-950" />
-                      <span>Open Mail App (mailto)</span>
-                    </a>
-
-                    <a
-                      href={getWhatsAppUrl()}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="w-full sm:w-auto px-5 py-2.5 bg-[#25D366] hover:bg-[#1ebd59] text-slate-950 font-bold rounded-xl text-xs transition shadow-md flex items-center justify-center gap-2"
-                    >
-                      <MessageCircle className="w-4 h-4 fill-current" />
-                      <span>Chat on WhatsApp ({SCHOOL_CONTACTS.phone1})</span>
-                    </a>
-                  </div>
-                </div>
-
-                {/* SUBMIT ANOTHER, REOPEN & COPY ACTIONS */}
-                <div className="pt-2 flex flex-wrap items-center justify-center gap-2.5">
-                  <button
-                    type="button"
-                    onClick={handleResendEmail}
-                    disabled={isResending}
-                    className="px-4 py-2.5 bg-slate-900 dark:bg-slate-800 text-white font-bold rounded-xl text-xs hover:bg-slate-800 dark:hover:bg-slate-700 transition inline-flex items-center gap-1.5 disabled:opacity-60 cursor-pointer"
-                  >
-                    <RefreshCw className={`w-3.5 h-3.5 text-amber-300 ${isResending ? 'animate-spin' : ''}`} />
-                    <span>{isResending ? 'Opening...' : 'Re-open Mail Template'}</span>
-                  </button>
-
-                  {emailResult?.payloadSummary && (
-                    <button
-                      type="button"
-                      onClick={handleCopySummary}
-                      className="px-4 py-2.5 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 font-bold rounded-xl text-xs hover:bg-slate-200 dark:hover:bg-slate-700 transition inline-flex items-center gap-1.5 cursor-pointer"
-                    >
-                      {copiedSummary ? (
-                        <>
-                          <Check className="w-3.5 h-3.5 text-emerald-600" />
-                          <span>Styled Email Copied</span>
-                        </>
-                      ) : (
-                        <>
-                          <Copy className="w-3.5 h-3.5" />
-                          <span>Copy Styled Email</span>
-                        </>
-                      )}
-                    </button>
-                  )}
-
-                  {emailResult?.htmlBody && (
-                    <button
-                      type="button"
-                      onClick={() => setShowEmailPreview((prev) => !prev)}
-                      className="px-4 py-2.5 bg-[#800020]/10 dark:bg-rose-950/50 text-[#800020] dark:text-rose-300 border border-[#800020]/20 font-bold rounded-xl text-xs hover:bg-[#800020]/15 transition inline-flex items-center gap-1.5 cursor-pointer"
-                    >
-                      <Eye className="w-3.5 h-3.5" />
-                      <span>{showEmailPreview ? 'Hide Email Preview' : 'Preview Branded Email'}</span>
-                    </button>
-                  )}
-
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setSubmittedRecord(null);
-                      setEmailResult(null);
-                      setCopiedSummary(false);
-                      setShowEmailPreview(false);
-                      setStudentName('');
-                      setDob('');
-                      setParentName('');
-                      setParentPhone('');
-                      setParentEmail('');
-                      setPreviousSchool('');
-                      setGradesAggregate('');
-                    }}
-                    className="px-5 py-2.5 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold rounded-xl text-xs hover:bg-slate-200 transition cursor-pointer"
-                  >
-                    Submit Another Student Application
-                  </button>
-                </div>
-
-                {showEmailPreview && emailResult?.htmlBody && (
-                  <div className="mt-4 rounded-2xl overflow-hidden border border-slate-200 dark:border-slate-700 shadow-lg bg-[#f1f3f8] text-left">
-                    <div className="px-4 py-2.5 bg-slate-900 text-white flex items-center justify-between text-xs font-bold">
-                      <span>Official STAHIZA Admission Email Preview (Paste into Gmail after copying)</span>
-                      <button
-                        type="button"
-                        onClick={() => setShowEmailPreview(false)}
-                        className="text-slate-300 hover:text-white cursor-pointer"
-                      >
-                        Close
-                      </button>
-                    </div>
-                    <iframe
-                      title="STAHIZA Admission Email Preview"
-                      srcDoc={emailResult.htmlBody}
-                      className="w-full h-[520px] border-0 bg-[#f1f3f8]"
-                    />
-                  </div>
-                )}
-              </div>
+            {submittedRecord && emailResult ? (
+              <BrandedEmailReadyCard
+                emailResult={emailResult}
+                headline={`Admission Letter Ready — ${submittedRecord.studentName}`}
+                subline={`Prepared for ${submittedRecord.targetClass} (${submittedRecord.residenceType} Section) and addressed to ${SCHOOL_CONTACTS.email}.`}
+                whatsappUrl={getWhatsAppUrl()}
+                resetLabel="New Application"
+                onReset={() => {
+                  setSubmittedRecord(null);
+                  setEmailResult(null);
+                  setStudentName('');
+                  setDob('');
+                  setParentName('');
+                  setParentPhone('');
+                  setParentEmail('');
+                  setPreviousSchool('');
+                  setGradesAggregate('');
+                }}
+              />
             ) : (
               /* APPLICATION ENTRY FORM */
               <form onSubmit={handleFormSubmit} className="space-y-5">
