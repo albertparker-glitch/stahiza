@@ -12,10 +12,14 @@ import {
   GraduationCap,
   Trophy,
   ShieldCheck,
-  Award
+  Award,
+  Copy,
+  Check,
+  RefreshCw
 } from 'lucide-react';
 import { SchoolBadgeImg } from './SchoolBadgeImg';
 import { SCHOOL_CONTACTS } from '../data/schoolData';
+import { dispatchContactInquiryEmail, EmailSendResult } from '../lib/emailService';
 import { getSupabaseVideoUrl, getSupabaseVideosUrl, getSupabasePublicUrl } from '../lib/supabase';
 import { motion } from 'motion/react';
 
@@ -27,12 +31,53 @@ export const ContactSection: React.FC = () => {
     subject: 'O-Level Admissions (Senior 1 - Senior 4)',
     message: ''
   });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isResending, setIsResending] = useState(false);
+  const [copiedSummary, setCopiedSummary] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const [emailResult, setEmailResult] = useState<EmailSendResult | null>(null);
   const [showMap, setShowMap] = useState(true);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!formData.name.trim() || !formData.email.trim() || !formData.message.trim()) return;
+
+    setIsSubmitting(true);
+    const result = await dispatchContactInquiryEmail({
+      name: formData.name,
+      email: formData.email,
+      phone: formData.phone,
+      subject: formData.subject,
+      message: formData.message
+    });
+    setIsSubmitting(false);
+    setEmailResult(result);
     setSubmitted(true);
+  };
+
+  const handleResendInquiry = async () => {
+    if (isResending) return;
+    setIsResending(true);
+    const result = await dispatchContactInquiryEmail({
+      name: formData.name,
+      email: formData.email,
+      phone: formData.phone,
+      subject: formData.subject,
+      message: formData.message
+    });
+    setEmailResult(result);
+    setIsResending(false);
+  };
+
+  const handleCopyInquiry = async () => {
+    if (!emailResult?.payloadSummary) return;
+    try {
+      await navigator.clipboard.writeText(emailResult.payloadSummary);
+      setCopiedSummary(true);
+      setTimeout(() => setCopiedSummary(false), 2500);
+    } catch {
+      setCopiedSummary(false);
+    }
   };
 
   return (
@@ -137,23 +182,90 @@ export const ContactSection: React.FC = () => {
 
               {/* FORM */}
               {submitted ? (
-                <div className="py-10 text-center space-y-4 bg-white/10 rounded-2xl border border-white/15 p-6 my-2 backdrop-blur-md">
+                <div className="py-8 text-center space-y-4 bg-white/10 rounded-2xl border border-white/15 p-6 my-2 backdrop-blur-md">
                   <div className="w-14 h-14 bg-emerald-500/20 text-emerald-300 rounded-full mx-auto flex items-center justify-center border border-emerald-400/30">
                     <CheckCircle2 className="w-7 h-7" />
                   </div>
-                  <h4 className="text-xl font-bold font-['Montserrat'] text-white">Inquiry Received!</h4>
+                  <div className="flex justify-center">
+                    <span
+                      className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider font-mono ${
+                        emailResult?.fallbackTriggered
+                          ? 'bg-amber-400 text-[#0A192F]'
+                          : 'bg-emerald-400 text-[#0A192F]'
+                      }`}
+                    >
+                      {emailResult?.fallbackTriggered ? 'Mailto Draft Prepared' : 'Dispatched via EmailJS'}
+                    </span>
+                  </div>
+                  <h4 className="text-xl font-bold font-['Montserrat'] text-white">
+                    {emailResult?.fallbackTriggered ? 'Email Draft Ready!' : 'Inquiry Sent!'}
+                  </h4>
                   <p className="text-slate-300 text-xs leading-relaxed max-w-sm mx-auto">
-                    Thank you, <span className="text-white font-bold">{formData.name}</span>. The STAHIZA Admissions Office has received your message regarding <span className="text-amber-300 font-semibold">"{formData.subject}"</span> and will respond promptly.
+                    Thank you, <span className="text-white font-bold">{formData.name}</span>.{' '}
+                    {emailResult?.fallbackTriggered
+                      ? `Your inquiry regarding "${formData.subject}" was prepared for ${SCHOOL_CONTACTS.email}.`
+                      : `Your message regarding "${formData.subject}" has been dispatched directly to ${SCHOOL_CONTACTS.email}.`}
                   </p>
                   <p className="text-[11px] text-slate-300">
                     Direct office line: <span className="text-amber-300 font-mono font-bold">{SCHOOL_CONTACTS.phone1}</span>
                   </p>
-                  <button
-                    onClick={() => setSubmitted(false)}
-                    className="mt-2 px-5 py-2 rounded-full bg-white/15 hover:bg-white/25 text-white text-xs font-semibold transition border border-white/20"
-                  >
-                    Send Another Inquiry
-                  </button>
+                  <div className="flex flex-wrap items-center justify-center gap-2 pt-1">
+                    {emailResult?.fallbackTriggered && (
+                      <a
+                        href={emailResult.mailtoUrl}
+                        className="px-4 py-2 rounded-full bg-amber-400 hover:bg-amber-300 text-[#0A192F] text-xs font-bold transition inline-flex items-center gap-1.5"
+                      >
+                        <Mail className="w-3.5 h-3.5" />
+                        <span>Open Email Draft</span>
+                      </a>
+                    )}
+                    <button
+                      type="button"
+                      onClick={handleResendInquiry}
+                      disabled={isResending}
+                      className="px-4 py-2 rounded-full bg-white/15 hover:bg-white/25 text-white text-xs font-semibold transition border border-white/20 inline-flex items-center gap-1.5 cursor-pointer disabled:opacity-60"
+                    >
+                      <RefreshCw className={`w-3.5 h-3.5 text-amber-300 ${isResending ? 'animate-spin' : ''}`} />
+                      <span>{isResending ? 'Resending...' : 'Resend'}</span>
+                    </button>
+                    {emailResult?.payloadSummary && (
+                      <button
+                        type="button"
+                        onClick={handleCopyInquiry}
+                        className="px-4 py-2 rounded-full bg-white/15 hover:bg-white/25 text-white text-xs font-semibold transition border border-white/20 inline-flex items-center gap-1.5 cursor-pointer"
+                      >
+                        {copiedSummary ? (
+                          <>
+                            <Check className="w-3.5 h-3.5 text-emerald-300" />
+                            <span>Copied</span>
+                          </>
+                        ) : (
+                          <>
+                            <Copy className="w-3.5 h-3.5" />
+                            <span>Copy</span>
+                          </>
+                        )}
+                      </button>
+                    )}
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setSubmitted(false);
+                        setEmailResult(null);
+                        setCopiedSummary(false);
+                        setFormData({
+                          name: '',
+                          email: '',
+                          phone: '',
+                          subject: 'O-Level Admissions (Senior 1 - Senior 4)',
+                          message: ''
+                        });
+                      }}
+                      className="px-4 py-2 rounded-full bg-white/15 hover:bg-white/25 text-white text-xs font-semibold transition border border-white/20 cursor-pointer"
+                    >
+                      Send Another Inquiry
+                    </button>
+                  </div>
                 </div>
               ) : (
                 <form onSubmit={handleSubmit} className="space-y-4 pt-1">
@@ -243,11 +355,16 @@ export const ContactSection: React.FC = () => {
                   <div className="pt-2">
                     <button
                       type="submit"
-                      className="bg-[#800020] hover:bg-[#600018] text-white text-xs font-bold pl-5 pr-2 py-2 rounded-full transition-all duration-300 shadow-md hover:shadow-lg flex items-center gap-3 transform hover:-translate-y-0.5 border border-rose-400/30"
+                      disabled={isSubmitting}
+                      className="bg-[#800020] hover:bg-[#600018] text-white text-xs font-bold pl-5 pr-2 py-2 rounded-full transition-all duration-300 shadow-md hover:shadow-lg flex items-center gap-3 transform hover:-translate-y-0.5 border border-rose-400/30 disabled:opacity-60 cursor-pointer"
                     >
-                      <span>Send Message</span>
+                      <span>{isSubmitting ? 'Sending via EmailJS...' : 'Send Message'}</span>
                       <div className="w-6 h-6 rounded-full bg-amber-400 text-[#0A192F] flex items-center justify-center font-bold">
-                        <ArrowRight className="w-3.5 h-3.5" />
+                        {isSubmitting ? (
+                          <Clock className="w-3.5 h-3.5 animate-spin" />
+                        ) : (
+                          <ArrowRight className="w-3.5 h-3.5" />
+                        )}
                       </div>
                     </button>
                   </div>

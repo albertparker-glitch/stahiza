@@ -1,11 +1,19 @@
 import React, { useState } from 'react';
-import { X, CheckCircle2, Sparkles, MessageCircle, Mail, Clock } from 'lucide-react';
+import { X, CheckCircle2, Sparkles, MessageCircle, Mail, Clock, Copy, Check, RefreshCw } from 'lucide-react';
 import { SchoolBadgeImg } from './SchoolBadgeImg';
 import { SCHOOL_CONTACTS } from '../data/schoolData';
+import { ALL_SCIENCE_COMBINATIONS, POPULAR_ARTS_COMBINATIONS } from '../data/aLevelCombinations';
 import { ClassLevel, ResidenceType, AdmissionApplication } from '../types/admission';
 import { submitNewApplication } from '../lib/admissionStore';
 import { dispatchApplicationEmail, EmailSendResult } from '../lib/emailService';
 import { motion, AnimatePresence } from 'motion/react';
+
+const SCIENCE_COMBO_OPTIONS = ALL_SCIENCE_COMBINATIONS.map(
+  (c) => `${c.code} (${c.subjects.join(', ')})`
+);
+const ARTS_COMBO_OPTIONS = POPULAR_ARTS_COMBINATIONS.map(
+  (c) => `${c.code} (${c.subjects.join(', ')})`
+);
 
 interface ApplyModalProps {
   isOpen: boolean;
@@ -26,18 +34,21 @@ export const ApplyModal: React.FC<ApplyModalProps> = ({
     email: '',
     selectedClass: 'S.1' as ClassLevel,
     boardingStatus: 'Boarding' as ResidenceType,
-    combination: 'PCM / ICT (Physics, Chemistry, Mathematics)',
+    combination: SCIENCE_COMBO_OPTIONS[0],
     previousSchool: '',
     notes: ''
   });
   
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isResending, setIsResending] = useState(false);
+  const [copiedSummary, setCopiedSummary] = useState(false);
   const [submittedRecord, setSubmittedRecord] = useState<AdmissionApplication | null>(null);
   const [emailResult, setEmailResult] = useState<EmailSendResult | null>(null);
 
   const resetModalState = () => {
     setSubmittedRecord(null);
     setEmailResult(null);
+    setCopiedSummary(false);
     setApplyForm({
       studentName: '',
       gender: 'Male',
@@ -46,7 +57,7 @@ export const ApplyModal: React.FC<ApplyModalProps> = ({
       email: '',
       selectedClass: 'S.1',
       boardingStatus: 'Boarding',
-      combination: 'PCM / ICT (Physics, Chemistry, Mathematics)',
+      combination: SCIENCE_COMBO_OPTIONS[0],
       previousSchool: '',
       notes: ''
     });
@@ -83,6 +94,25 @@ export const ApplyModal: React.FC<ApplyModalProps> = ({
     setIsSubmitting(false);
     setEmailResult(result);
     setSubmittedRecord(created);
+  };
+
+  const handleResendEmail = async () => {
+    if (!submittedRecord || isResending) return;
+    setIsResending(true);
+    const result = await dispatchApplicationEmail(submittedRecord);
+    setEmailResult(result);
+    setIsResending(false);
+  };
+
+  const handleCopySummary = async () => {
+    if (!emailResult?.payloadSummary) return;
+    try {
+      await navigator.clipboard.writeText(emailResult.payloadSummary);
+      setCopiedSummary(true);
+      setTimeout(() => setCopiedSummary(false), 2500);
+    } catch {
+      setCopiedSummary(false);
+    }
   };
 
   const getWhatsAppUrl = () => {
@@ -191,10 +221,41 @@ export const ApplyModal: React.FC<ApplyModalProps> = ({
                   </div>
                 </div>
 
-                <div className="flex justify-center pt-2">
+                <div className="flex flex-wrap justify-center gap-2 pt-2">
                   <button
+                    type="button"
+                    onClick={handleResendEmail}
+                    disabled={isResending}
+                    className="px-4 py-2.5 bg-slate-900 dark:bg-slate-800 hover:bg-slate-800 text-white font-bold rounded-xl text-xs transition inline-flex items-center gap-1.5 disabled:opacity-60 cursor-pointer"
+                  >
+                    <RefreshCw className={`w-3.5 h-3.5 text-amber-300 ${isResending ? 'animate-spin' : ''}`} />
+                    <span>{isResending ? 'Resending...' : 'Resend Email'}</span>
+                  </button>
+
+                  {emailResult?.payloadSummary && (
+                    <button
+                      type="button"
+                      onClick={handleCopySummary}
+                      className="px-4 py-2.5 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 text-slate-700 dark:text-slate-200 font-bold rounded-xl text-xs transition inline-flex items-center gap-1.5 cursor-pointer"
+                    >
+                      {copiedSummary ? (
+                        <>
+                          <Check className="w-3.5 h-3.5 text-emerald-600" />
+                          <span>Details Copied</span>
+                        </>
+                      ) : (
+                        <>
+                          <Copy className="w-3.5 h-3.5" />
+                          <span>Copy Summary</span>
+                        </>
+                      )}
+                    </button>
+                  )}
+
+                  <button
+                    type="button"
                     onClick={handleClose}
-                    className="px-6 py-2.5 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 text-slate-700 dark:text-slate-300 font-bold rounded-xl text-xs transition"
+                    className="px-6 py-2.5 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 text-slate-700 dark:text-slate-300 font-bold rounded-xl text-xs transition cursor-pointer"
                   >
                     Done / Close
                   </button>
@@ -333,11 +394,16 @@ export const ApplyModal: React.FC<ApplyModalProps> = ({
                       onChange={e => setApplyForm({ ...applyForm, combination: e.target.value })}
                       className="w-full px-3 py-2 rounded-xl border border-amber-300 bg-amber-50 dark:bg-slate-800 text-xs font-bold text-slate-900 dark:text-white"
                     >
-                      <option value="PCM / ICT (Physics, Chemistry, Mathematics)">PCM / ICT (Sciences)</option>
-                      <option value="BCM / Sub-Math (Biology, Chemistry, Mathematics)">BCM / Sub-Math (Sciences)</option>
-                      <option value="PCB / Sub-Math (Physics, Chemistry, Biology)">PCB / Sub-Math (Medical Sciences)</option>
-                      <option value="PEM / ICT (Physics, Economics, Mathematics)">PEM / ICT (Engineering)</option>
-                      <option value="HEG / Sub-Math (History, Economics, Geography)">HEG / Sub-Math (Arts & Humanities)</option>
+                      <optgroup label="Sciences & Technical Combinations">
+                        {SCIENCE_COMBO_OPTIONS.map((c) => (
+                          <option key={c} value={c}>{c}</option>
+                        ))}
+                      </optgroup>
+                      <optgroup label="Arts & Humanities Combinations">
+                        {ARTS_COMBO_OPTIONS.map((c) => (
+                          <option key={c} value={c}>{c}</option>
+                        ))}
+                      </optgroup>
                     </select>
                   </div>
                 )}

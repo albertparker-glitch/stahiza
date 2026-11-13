@@ -3,7 +3,7 @@ import express from 'express';
 import { createServer as createViteServer } from 'vite';
 import { GoogleGenAI } from '@google/genai';
 import dotenv from 'dotenv';
-import { sendAdmissionViaEmailJsRest } from './api/_lib/emailjs';
+import { sendAdmissionViaEmailJsRest, sendContactInquiryViaEmailJsRest } from './api/_lib/emailjs';
 
 dotenv.config();
 
@@ -83,6 +83,23 @@ Be polite, inspiring, professional, and helpful in answering prospective student
         method: 'fallback_required',
         fallbackRequired: true,
         error: error?.message || 'Unexpected server error dispatching application email'
+      });
+    }
+  });
+
+  // API endpoint for contact & general admissions inquiry email dispatch via EmailJS REST API
+  app.post('/api/send-contact-email', async (req, res) => {
+    try {
+      const { inquiry, payloadSummary } = req.body || {};
+      const result = await sendContactInquiryViaEmailJsRest(inquiry, payloadSummary);
+      return res.status(result.statusCode).json(result);
+    } catch (error: any) {
+      console.error('Contact Email Route Error:', error);
+      return res.status(500).json({
+        ok: false,
+        method: 'fallback_required',
+        fallbackRequired: true,
+        error: error?.message || 'Unexpected server error dispatching inquiry email'
       });
     }
   });
