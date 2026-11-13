@@ -20,32 +20,32 @@ export const Footer: React.FC<FooterProps> = ({ setActiveTab, setApplyModalOpen 
   const socialLinks = [
     {
       name: 'Facebook',
-      handle: '@STAHIZAZzana',
-      url: 'https://facebook.com/STAHIZAZzana',
+      handle: '@Standardhighschool',
+      url: 'https://www.facebook.com/Standardhighschool/',
       icon: Facebook,
       color: 'hover:bg-[#1877F2] hover:border-[#1877F2]',
       badge: 'Official Page'
     },
     {
       name: 'X (Twitter)',
-      handle: '@STAHIZAZzana',
-      url: 'https://x.com/STAHIZAZzana',
+      handle: '@STAHIZA_School',
+      url: 'https://x.com/STAHIZA_School',
       icon: XIcon,
       color: 'hover:bg-slate-700 hover:border-slate-500',
       badge: 'Official Handle'
     },
     {
       name: 'Instagram',
-      handle: '@stahiza_zzana',
-      url: 'https://instagram.com/stahiza_zzana',
+      handle: '@stahiza',
+      url: 'https://www.instagram.com/stahiza/',
       icon: Instagram,
       color: 'hover:bg-[#E4405F] hover:border-[#E4405F]',
       badge: 'Campus Highlights'
     },
     {
       name: 'YouTube',
-      handle: 'STAHIZA Media',
-      url: 'https://youtube.com/@stahizazzana',
+      handle: '@stahizatv3402',
+      url: 'https://www.youtube.com/@stahizatv3402',
       icon: Youtube,
       color: 'hover:bg-[#FF0000] hover:border-[#FF0000]',
       badge: 'Match & Gala Clips'
