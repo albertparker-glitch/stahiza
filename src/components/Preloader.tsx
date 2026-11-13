@@ -1,25 +1,143 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { SchoolBadgeImg } from './SchoolBadgeImg';
+import {
+  getHeroPreloadImageUrls,
+  getFacilityGalleryImageUrls,
+  getCampusVideoPosterUrls
+} from '../data/campusMediaManifest';
 import { motion, AnimatePresence } from 'motion/react';
 
 interface PreloaderProps {
-  duration?: number; // Backwards-compatible alias for minimum reveal duration
-  minDuration?: number; // Minimum smooth reveal time (default 1500ms)
-  maxDuration?: number; // Safety cap so stalled remote assets never block entry (default 12000ms)
+  duration?: number;
+  minDuration?: number; // Minimum brand visibility duration (enforced >= 2000ms)
+  maxDuration?: number; // Safety upper bound so unreachable remote assets never block entry
+  dataHydrated?: boolean; // True once async Supabase hero/marquee/leader data settles
+  heroVideoReady?: boolean; // True once HeroParallaxVideo reports buffered readiness
+  dynamicHeroUrls?: string[]; // Live marquee/leader image URLs rendered on landing
   onComplete?: () => void;
+}
+
+interface MediaReadinessState {
+  heroImagesReady: boolean;
+  facilityGalleriesReady: boolean;
+  campusPostersReady: boolean;
+  domMediaReady: boolean;
+  minTimeoutPassed: boolean;
+  maxTimeoutPassed: boolean;
+}
+
+function preloadAndDecodeImageUrl(url: string): Promise<void> {
+  return new Promise((resolve) => {
+    if (!url) {
+      resolve();
+      return;
+    }
+
+    const img = new Image();
+    let settled = false;
+    const finish = () => {
+      if (settled) return;
+      settled = true;
+      resolve();
+    };
+
+    // Per-asset guard so a single dead external URL cannot stall forever
+    const perImageTimeout = window.setTimeout(finish, 8000);
+
+    img.onload = () => {
+      window.clearTimeout(perImageTimeout);
+      if (typeof img.decode === 'function') {
+        img.decode().catch(() => undefined).finally(finish);
+      } else {
+        finish();
+      }
+    };
+
+    img.onerror = () => {
+      window.clearTimeout(perImageTimeout);
+      finish();
+    };
+
+    img.src = url;
+    if (img.complete) {
+      window.clearTimeout(perImageTimeout);
+      if (typeof img.decode === 'function' && img.naturalWidth > 0) {
+        img.decode().catch(() => undefined).finally(finish);
+      } else {
+        finish();
+      }
+    }
+  });
+}
+
+function preloadBatch(
+  urls: string[],
+  onProgress: (completed: number, total: number) => void,
+  isCancelled: () => boolean
+): Promise<void> {
+  const uniqueUrls = Array.from(new Set(urls.filter(Boolean)));
+  const total = uniqueUrls.length;
+  if (total === 0) {
+    onProgress(1, 1);
+    return Promise.resolve();
+  }
+
+  let completed = 0;
+  onProgress(0, total);
+
+  return Promise.all(
+    uniqueUrls.map((url) =>
+      preloadAndDecodeImageUrl(url).then(() => {
+        if (isCancelled()) return;
+        completed += 1;
+        onProgress(completed, total);
+      })
+    )
+  ).then(() => undefined);
 }
 
 export const Preloader: React.FC<PreloaderProps> = ({
   duration,
-  minDuration = 1500,
-  maxDuration = 12000,
+  minDuration = 2000,
+  maxDuration = 15000,
+  dataHydrated = true,
+  heroVideoReady = false,
+  dynamicHeroUrls = [],
   onComplete
 }) => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const [isVisible, setIsVisible] = useState(true);
   const [progress, setProgress] = useState(8);
 
-  const effectiveMinDuration = duration ?? minDuration;
+  const [readiness, setReadiness] = useState<MediaReadinessState>({
+    heroImagesReady: false,
+    facilityGalleriesReady: false,
+    campusPostersReady: false,
+    domMediaReady: false,
+    minTimeoutPassed: false,
+    maxTimeoutPassed: false
+  });
+
+  const [ratios, setRatios] = useState({
+    hero: 0,
+    facilities: 0,
+    posters: 0,
+    dom: 0
+  });
+
+  // Guarantee at least 2000ms brand visibility timeout
+  const effectiveMinDuration = Math.max(2000, duration ?? minDuration);
+  const dynamicHeroKey = dynamicHeroUrls.join('|');
+
+  // Lock body scroll while overlay persists
+  useEffect(() => {
+    if (!isVisible) return;
+    const prevOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.body.style.overflow = prevOverflow;
+    };
+  }, [isVisible]);
 
   // 3D DOTTED SPHERICAL ROTATION CANVAS
   useEffect(() => {
@@ -33,12 +151,11 @@ export const Preloader: React.FC<PreloaderProps> = ({
     const width = (canvas.width = 300);
     const height = (canvas.height = 300);
 
-    // Generate ~260 points on a sphere using Fibonacci distribution
     const numPoints = 260;
     const radius = 110;
     const points: Array<{ x: number; y: number; z: number; color: string; size: number }> = [];
 
-    const phi = Math.PI * (3 - Math.sqrt(5)); // Golden angle
+    const phi = Math.PI * (3 - Math.sqrt(5));
 
     for (let i = 0; i < numPoints; i++) {
       const y = 1 - (i / (numPoints - 1)) * 2;
@@ -48,10 +165,9 @@ export const Preloader: React.FC<PreloaderProps> = ({
       const x = Math.cos(theta) * radiusAtY;
       const z = Math.sin(theta) * radiusAtY;
 
-      // Color variation in STAHIZA theme (Gold, Maroon, Sky Blue)
-      let color = '#FCD34D'; // Gold
-      if (i % 3 === 0) color = '#800020'; // Maroon
-      if (i % 5 === 0) color = '#38BDF8'; // Accent Blue
+      let color = '#FCD34D';
+      if (i % 3 === 0) color = '#800020';
+      if (i % 5 === 0) color = '#38BDF8';
 
       points.push({
         x: x * radius,
@@ -118,70 +234,121 @@ export const Preloader: React.FC<PreloaderProps> = ({
     };
   }, [isVisible]);
 
-  // WAIT FOR DOCUMENT, IMAGES & VIDEOS TO LOAD PROPERLY
+  // 1. MINIMUM 2-SECOND TIMEOUT & MAXIMUM SAFETY TIMEOUT
   useEffect(() => {
-    let isCancelled = false;
-    const trackedElements = new Set<Element>();
+    const minTimer = window.setTimeout(() => {
+      setReadiness((prev) => ({ ...prev, minTimeoutPassed: true }));
+    }, effectiveMinDuration);
+
+    const maxTimer = window.setTimeout(() => {
+      setReadiness((prev) => ({ ...prev, maxTimeoutPassed: true }));
+    }, maxDuration);
+
+    return () => {
+      window.clearTimeout(minTimer);
+      window.clearTimeout(maxTimer);
+    };
+  }, [effectiveMinDuration, maxDuration]);
+
+  // 2. PRE-CACHE FACILITY GALLERIES & CAMPUS VIDEO POSTERS
+  useEffect(() => {
+    let cancelled = false;
+
+    const facilityUrls = getFacilityGalleryImageUrls();
+    const posterUrls = getCampusVideoPosterUrls();
+
+    preloadBatch(
+      facilityUrls,
+      (done, total) => {
+        if (cancelled) return;
+        setRatios((prev) => ({ ...prev, facilities: done / Math.max(1, total) }));
+      },
+      () => cancelled
+    ).then(() => {
+      if (cancelled) return;
+      setRatios((prev) => ({ ...prev, facilities: 1 }));
+      setReadiness((prev) => ({ ...prev, facilityGalleriesReady: true }));
+    });
+
+    preloadBatch(
+      posterUrls,
+      (done, total) => {
+        if (cancelled) return;
+        setRatios((prev) => ({ ...prev, posters: done / Math.max(1, total) }));
+      },
+      () => cancelled
+    ).then(() => {
+      if (cancelled) return;
+      setRatios((prev) => ({ ...prev, posters: 1 }));
+      setReadiness((prev) => ({ ...prev, campusPostersReady: true }));
+    });
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  // 3. PRE-CACHE HERO IMAGES & DYNAMIC MARQUEE/LEADER IMAGES AFTER DATA HYDRATES
+  useEffect(() => {
+    if (!dataHydrated) return;
+    let cancelled = false;
+
+    const urls = getHeroPreloadImageUrls(dynamicHeroUrls);
+    preloadBatch(
+      urls,
+      (done, total) => {
+        if (cancelled) return;
+        setRatios((prev) => ({ ...prev, hero: done / Math.max(1, total) }));
+      },
+      () => cancelled
+    ).then(() => {
+      if (cancelled) return;
+      setRatios((prev) => ({ ...prev, hero: 1 }));
+      setReadiness((prev) => ({ ...prev, heroImagesReady: true }));
+    });
+
+    return () => {
+      cancelled = true;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dataHydrated, dynamicHeroKey]);
+
+  // 4. VERIFY ALL RENDERED DOM IMAGES, VIDEOS & VIDEO POSTERS ARE READY
+  useEffect(() => {
+    let cancelled = false;
+    const tracked = new Set<Element>();
     const cleanups: Array<() => void> = [];
 
-    let totalTracked = 0;
-    let completedTracked = 0;
+    let total = 0;
+    let done = 0;
     let windowLoaded = document.readyState === 'complete';
-    let minTimeElapsed = false;
-    let settleCheckDone = false;
+    let initialSettled = false;
 
-    const updateProgress = () => {
-      if (isCancelled) return;
-      const mediaRatio = totalTracked > 0 ? completedTracked / totalTracked : 1;
-      const windowWeight = windowLoaded ? 0.15 : 0;
-      const computed = Math.min(96, Math.round(12 + mediaRatio * 72 + windowWeight * 100));
-      setProgress((prev) => Math.max(prev, computed));
-    };
-
-    const finish = () => {
-      if (isCancelled) return;
-      isCancelled = true;
-      setProgress(100);
-      observer.disconnect();
-      cleanups.forEach((fn) => fn());
-      setTimeout(() => {
-        setIsVisible(false);
-        if (onComplete) onComplete();
-      }, 180);
-    };
-
-    const tryFinish = () => {
-      updateProgress();
-      if (
-        !isCancelled &&
-        windowLoaded &&
-        settleCheckDone &&
-        minTimeElapsed &&
-        completedTracked >= totalTracked
-      ) {
-        finish();
+    const evaluateDomReady = () => {
+      if (cancelled) return;
+      const ratio = total > 0 ? done / total : 1;
+      setRatios((prev) => ({ ...prev, dom: ratio }));
+      if (windowLoaded && initialSettled && done >= total && heroVideoReady) {
+        setReadiness((prev) => ({ ...prev, domMediaReady: true }));
       }
     };
 
-    const markItemDone = () => {
-      completedTracked += 1;
-      tryFinish();
+    const markOneDone = () => {
+      done += 1;
+      evaluateDomReady();
     };
 
-    const trackImage = (img: HTMLImageElement) => {
-      if (trackedElements.has(img)) return;
-      if (img.loading === 'lazy') return;
-      if (!img.getAttribute('src')) return;
-
-      trackedElements.add(img);
-      totalTracked += 1;
-      updateProgress();
+    const trackDomImage = (img: HTMLImageElement) => {
+      if (tracked.has(img) || img.loading === 'lazy' || !img.getAttribute('src')) return;
+      tracked.add(img);
+      total += 1;
+      evaluateDomReady();
 
       if (img.complete) {
         if (typeof img.decode === 'function' && img.naturalWidth > 0) {
-          img.decode().catch(() => undefined).finally(markItemDone);
+          img.decode().catch(() => undefined).finally(markOneDone);
         } else {
-          markItemDone();
+          markOneDone();
         }
         return;
       }
@@ -192,9 +359,8 @@ export const Preloader: React.FC<PreloaderProps> = ({
         settled = true;
         img.removeEventListener('load', onDone);
         img.removeEventListener('error', onDone);
-        markItemDone();
+        markOneDone();
       };
-
       img.addEventListener('load', onDone, { once: true });
       img.addEventListener('error', onDone, { once: true });
       cleanups.push(() => {
@@ -203,16 +369,24 @@ export const Preloader: React.FC<PreloaderProps> = ({
       });
     };
 
-    const trackVideo = (video: HTMLVideoElement) => {
-      if (trackedElements.has(video)) return;
-      trackedElements.add(video);
+    const trackDomVideo = (video: HTMLVideoElement) => {
+      if (tracked.has(video)) return;
+      tracked.add(video);
 
       const targetReadyState = video.hasAttribute('data-hero-video') ? 3 : 2;
-      totalTracked += 1;
-      updateProgress();
+      const posterAttr = video.getAttribute('poster');
+      const hasPoster = Boolean(posterAttr);
+      total += hasPoster ? 2 : 1;
+      evaluateDomReady();
+
+      if (hasPoster && posterAttr) {
+        preloadAndDecodeImageUrl(posterAttr).then(() => {
+          if (!cancelled) markOneDone();
+        });
+      }
 
       if (video.readyState >= targetReadyState) {
-        markItemDone();
+        markOneDone();
         return;
       }
 
@@ -221,10 +395,10 @@ export const Preloader: React.FC<PreloaderProps> = ({
         if (settled) return;
         settled = true;
         cleanupVideo();
-        markItemDone();
+        markOneDone();
       };
 
-      const checkVideoReady = () => {
+      const checkReady = () => {
         if (video.readyState >= targetReadyState) {
           finishVideo();
         }
@@ -234,7 +408,7 @@ export const Preloader: React.FC<PreloaderProps> = ({
       const lastSource = sources.length > 0 ? sources[sources.length - 1] : null;
 
       const cleanupVideo = () => {
-        video.removeEventListener('loadeddata', checkVideoReady);
+        video.removeEventListener('loadeddata', checkReady);
         video.removeEventListener('canplay', finishVideo);
         video.removeEventListener('canplaythrough', finishVideo);
         video.removeEventListener('error', finishVideo);
@@ -243,49 +417,41 @@ export const Preloader: React.FC<PreloaderProps> = ({
         }
       };
 
-      video.addEventListener('loadeddata', checkVideoReady);
+      video.addEventListener('loadeddata', checkReady);
       video.addEventListener('canplay', finishVideo, { once: true });
       video.addEventListener('canplaythrough', finishVideo, { once: true });
       video.addEventListener('error', finishVideo, { once: true });
       if (lastSource) {
         lastSource.addEventListener('error', finishVideo, { once: true });
       }
-
       cleanups.push(cleanupVideo);
     };
 
-    const scanNode = (root: ParentNode | Element) => {
-      if (root instanceof HTMLImageElement) {
-        trackImage(root);
-      } else if (root instanceof HTMLVideoElement) {
-        trackVideo(root);
-      }
+    const scanDom = (root: ParentNode | Element) => {
+      if (root instanceof HTMLImageElement) trackDomImage(root);
+      else if (root instanceof HTMLVideoElement) trackDomVideo(root);
+
       if ('querySelectorAll' in root) {
-        root.querySelectorAll('img').forEach((img) => trackImage(img));
-        root.querySelectorAll('video').forEach((vid) => trackVideo(vid));
+        root.querySelectorAll('img').forEach(trackDomImage);
+        root.querySelectorAll('video').forEach(trackDomVideo);
       }
     };
 
-    // Initial scan
-    scanNode(document);
+    scanDom(document);
 
-    // Watch dynamically mounted media (e.g. async Supabase gallery/leaders hydration)
     const observer = new MutationObserver((mutations) => {
       for (const mutation of mutations) {
         mutation.addedNodes.forEach((node) => {
-          if (node instanceof Element) {
-            scanNode(node);
-          }
+          if (node instanceof Element) scanDom(node);
         });
       }
     });
-
     observer.observe(document.body, { childList: true, subtree: true });
 
     const onWindowLoad = () => {
       windowLoaded = true;
-      scanNode(document);
-      tryFinish();
+      scanDom(document);
+      evaluateDomReady();
     };
 
     if (!windowLoaded) {
@@ -293,30 +459,48 @@ export const Preloader: React.FC<PreloaderProps> = ({
       cleanups.push(() => window.removeEventListener('load', onWindowLoad));
     }
 
-    const settleTimer = setTimeout(() => {
-      settleCheckDone = true;
-      scanNode(document);
-      tryFinish();
-    }, 500);
-
-    const minTimer = setTimeout(() => {
-      minTimeElapsed = true;
-      tryFinish();
-    }, effectiveMinDuration);
-
-    const maxTimer = setTimeout(() => {
-      finish();
-    }, maxDuration);
+    const settleTimer = window.setTimeout(() => {
+      initialSettled = true;
+      scanDom(document);
+      evaluateDomReady();
+    }, 350);
 
     return () => {
-      isCancelled = true;
-      clearTimeout(settleTimer);
-      clearTimeout(minTimer);
-      clearTimeout(maxTimer);
+      cancelled = true;
+      window.clearTimeout(settleTimer);
       observer.disconnect();
       cleanups.forEach((fn) => fn());
     };
-  }, [effectiveMinDuration, maxDuration, onComplete]);
+  }, [dataHydrated, heroVideoReady]);
+
+  // 5. COMPUTE PROGRESS & DISMISS ONLY WHEN ALL STATES + MINIMUM 2s TIMEOUT ARE SATISFIED
+  useEffect(() => {
+    const weighted =
+      ratios.hero * 28 +
+      ratios.facilities * 26 +
+      ratios.posters * 26 +
+      ratios.dom * 20;
+    setProgress((prev) => Math.max(prev, Math.min(98, Math.round(weighted))));
+  }, [ratios]);
+
+  useEffect(() => {
+    if (!isVisible) return;
+
+    const allMediaReady =
+      readiness.heroImagesReady &&
+      readiness.facilityGalleriesReady &&
+      readiness.campusPostersReady &&
+      readiness.domMediaReady;
+
+    if ((allMediaReady || readiness.maxTimeoutPassed) && readiness.minTimeoutPassed) {
+      setProgress(100);
+      const exitTimer = window.setTimeout(() => {
+        setIsVisible(false);
+        onComplete?.();
+      }, 180);
+      return () => window.clearTimeout(exitTimer);
+    }
+  }, [readiness, isVisible, onComplete]);
 
   return (
     <AnimatePresence>

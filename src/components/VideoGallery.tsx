@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { supabase, getSupabaseVideosUrl } from '../lib/supabase';
+import { CAMPUS_VIDEO_POSTERS } from '../data/campusMediaManifest';
 import { SchoolBadgeImg } from './SchoolBadgeImg';
 import { Film, Play } from 'lucide-react';
 import { motion } from 'motion/react';
@@ -8,28 +9,33 @@ interface VideoItem {
   name: string;
   url: string;
   title: string;
+  poster: string;
 }
 
 const DEFAULT_VIDEOS: VideoItem[] = [
   {
     name: 'life1.mp4',
     url: getSupabaseVideosUrl('life1.mp4'),
-    title: 'STAHIZA Campus Life Highlight 1'
+    title: 'STAHIZA Campus Life Highlight 1',
+    poster: CAMPUS_VIDEO_POSTERS.life1
   },
   {
     name: 'life2.mp4',
     url: getSupabaseVideosUrl('life2.mp4'),
-    title: 'STAHIZA Campus Life Highlight 2'
+    title: 'STAHIZA Campus Life Highlight 2',
+    poster: CAMPUS_VIDEO_POSTERS.life2
   },
   {
     name: 'life3.mp4',
     url: getSupabaseVideosUrl('life3.mp4'),
-    title: 'STAHIZA Campus Life Highlight 3'
+    title: 'STAHIZA Campus Life Highlight 3',
+    poster: CAMPUS_VIDEO_POSTERS.life3
   },
   {
     name: 'life4.mp4',
     url: getSupabaseVideosUrl('life4.mp4'),
-    title: 'STAHIZA Campus Life Highlight 4'
+    title: 'STAHIZA Campus Life Highlight 4',
+    poster: CAMPUS_VIDEO_POSTERS.life4
   }
 ];
 
@@ -51,10 +57,12 @@ export const VideoGallery: React.FC = () => {
 
         const items: VideoItem[] = lifeFiles.map((filename, index) => {
           const { data } = client.storage.from('IMAGES').getPublicUrl(`videos/${filename}`);
+          const fileKey = filename.replace('.mp4', '');
           return {
             name: filename,
             url: data?.publicUrl || getSupabaseVideosUrl(filename),
-            title: `STAHIZA Campus Life Highlight ${index + 1}`
+            title: `STAHIZA Campus Life Highlight ${index + 1}`,
+            poster: CAMPUS_VIDEO_POSTERS[fileKey] || CAMPUS_VIDEO_POSTERS.life1
           };
         });
 
@@ -128,6 +136,7 @@ export const VideoGallery: React.FC = () => {
                     muted 
                     playsInline 
                     preload="auto"
+                    poster={vid.poster}
                     controls
                     className="w-full h-full object-cover group-hover:scale-105 transition duration-500"
                   >

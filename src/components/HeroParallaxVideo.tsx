@@ -1,10 +1,57 @@
-import React, { useRef } from 'react';
+import React, { useRef, useEffect } from 'react';
 import { motion, useScroll, useTransform, useReducedMotion } from 'motion/react';
 import { getSupabasePublicUrl, getSupabaseOthersUrl, getSupabaseVideosUrl } from '../lib/supabase';
+import { HERO_VIDEO_POSTER_URL } from '../data/campusMediaManifest';
 
-export const HeroParallaxVideo: React.FC = () => {
+interface HeroParallaxVideoProps {
+  onReady?: () => void;
+}
+
+export const HeroParallaxVideo: React.FC<HeroParallaxVideoProps> = ({ onReady }) => {
   const containerRef = useRef<HTMLDivElement>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
   const shouldReduceMotion = useReducedMotion();
+
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video || !onReady) return;
+
+    if (video.readyState >= 3) {
+      onReady();
+      return;
+    }
+
+    const handleReady = () => {
+      if (video.readyState >= 3) {
+        onReady();
+      }
+    };
+
+    const handleSettled = () => {
+      onReady();
+    };
+
+    const sources = Array.from(video.querySelectorAll('source'));
+    const lastSource = sources.length > 0 ? sources[sources.length - 1] : null;
+
+    video.addEventListener('loadeddata', handleReady);
+    video.addEventListener('canplay', handleSettled, { once: true });
+    video.addEventListener('canplaythrough', handleSettled, { once: true });
+    video.addEventListener('error', handleSettled, { once: true });
+    if (lastSource) {
+      lastSource.addEventListener('error', handleSettled, { once: true });
+    }
+
+    return () => {
+      video.removeEventListener('loadeddata', handleReady);
+      video.removeEventListener('canplay', handleSettled);
+      video.removeEventListener('canplaythrough', handleSettled);
+      video.removeEventListener('error', handleSettled);
+      if (lastSource) {
+        lastSource.removeEventListener('error', handleSettled);
+      }
+    };
+  }, [onReady]);
 
   // Track scroll progress of this container relative to the viewport
   const { scrollYProgress } = useScroll({
@@ -31,11 +78,13 @@ export const HeroParallaxVideo: React.FC = () => {
         className="w-full h-full will-change-transform transform-gpu"
       >
         <video
+          ref={videoRef}
           autoPlay
           loop
           muted
           playsInline
           preload="auto"
+          poster={HERO_VIDEO_POSTER_URL}
           data-hero-video="true"
           className="w-full h-auto max-h-[600px] object-cover sm:object-contain m-0 p-0 block pointer-events-none"
         >

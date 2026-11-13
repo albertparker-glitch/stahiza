@@ -58,7 +58,8 @@ import {
   O_LEVEL_ELECTIVE_SUBJECTS,
 } from './data/oLevelSubjects';
 import { useTheme } from './context/ThemeContext';
-import { getSupabasePublicUrl, getSupabaseOthersUrl } from './lib/supabase';
+import { getSupabaseOthersUrl } from './lib/supabase';
+import { CAMPUS_FACILITIES, CampusFacility, FacilityPhoto } from './data/campusMediaManifest';
 import { motion, AnimatePresence } from 'motion/react';
 
 const TYPEWRITER_PHRASES = [
@@ -110,158 +111,8 @@ function TypewriterMotto() {
   );
 }
 
-export interface FacilityPhoto {
-  url: string;
-  caption: string;
-  fallbackUrl?: string;
-}
-
-export interface CampusFacility {
-  id: string;
-  title: string;
-  desc: string;
-  tag: string;
-  img: string;
-  fallbackImg?: string;
-  gallery: FacilityPhoto[];
-}
-
-export const CAMPUS_FACILITIES: CampusFacility[] = [
-  { 
-    id: "science-labs",
-    title: "Modern Science Labs", 
-    desc: "Equipped Physics, Chemistry, and Biology laboratories for hands-on experiments and UNEB practical exams.",
-    tag: "Physics, Chem & Biology",
-    img: "https://images.unsplash.com/photo-1532094349884-543bc11b234d?auto=format&fit=crop&w=1200&q=80",
-    fallbackImg: "/pages/images/odeke.jpeg",
-    gallery: [
-      {
-        url: "https://images.unsplash.com/photo-1532094349884-543bc11b234d?auto=format&fit=crop&w=1200&q=80",
-        caption: "Equipped UNEB Physics & Chemistry Practical Stations",
-        fallbackUrl: "/pages/images/odeke.jpeg"
-      },
-      {
-        url: "https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&w=1200&q=80",
-        caption: "Hands-on Science Apparatus & Reagents Demonstration"
-      },
-      {
-        url: "https://images.unsplash.com/photo-1576086213369-97a306d36557?auto=format&fit=crop&w=1200&q=80",
-        caption: "Biology Specimen Analysis & Scientific Research"
-      }
-    ]
-  },
-  { 
-    id: "computer-lab",
-    title: "Computer Laboratory", 
-    desc: "High-speed internet workstations for ICT practicals, coding, and national examinations.",
-    tag: "ICT & Digital Research",
-    img: getSupabaseOthersUrl("complab.jpeg"),
-    fallbackImg: "https://images.unsplash.com/photo-1581092921461-eab62e97a780?auto=format&fit=crop&w=1200&q=80",
-    gallery: [
-      {
-        url: getSupabaseOthersUrl("complab.jpeg"),
-        caption: "STAHIZA Modern High-Speed Computer Laboratory",
-        fallbackUrl: "https://images.unsplash.com/photo-1581092921461-eab62e97a780?auto=format&fit=crop&w=1200&q=80"
-      },
-      {
-        url: "https://images.unsplash.com/photo-1581092921461-eab62e97a780?auto=format&fit=crop&w=1200&q=80",
-        caption: "Digital Workstations for UNEB ICT Practicals"
-      },
-      {
-        url: "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=1200&q=80",
-        caption: "Student Coding, Digital Research & E-Learning"
-      }
-    ]
-  },
-  { 
-    id: "dormitories",
-    title: "Comfortable Dormitories", 
-    desc: "Secure, warden-supervised boarding residences with running water and quiet study areas.",
-    tag: "Boarding & Resident Life",
-    img: "https://images.unsplash.com/photo-1555854877-bab0e564b8d5?auto=format&fit=crop&w=1200&q=80",
-    fallbackImg: "/pages/images/bena.jpeg",
-    gallery: [
-      {
-        url: "https://images.unsplash.com/photo-1555854877-bab0e564b8d5?auto=format&fit=crop&w=1200&q=80",
-        caption: "Secure & Spacious Student Boarding Quarters",
-        fallbackUrl: "/pages/images/bena.jpeg"
-      },
-      {
-        url: "https://images.unsplash.com/photo-1595526114035-0d45ed16cfbf?auto=format&fit=crop&w=1200&q=80",
-        caption: "Supervised Evening Study Desks & Restful Living"
-      }
-    ]
-  },
-  { 
-    id: "dining-hall",
-    title: "Spacious Dining Hall", 
-    desc: "Nutritious, balanced meals prepared under strict culinary hygiene standards.",
-    tag: "Food & Nutrition Center",
-    img: getSupabaseOthersUrl("fnst.jpeg"),
-    fallbackImg: "https://images.unsplash.com/photo-1577495508048-b635879837f1?auto=format&fit=crop&w=1200&q=80",
-    gallery: [
-      {
-        url: getSupabaseOthersUrl("fnst.jpeg"),
-        caption: "STAHIZA Main Student Dining & Nutrition Complex",
-        fallbackUrl: "https://images.unsplash.com/photo-1577495508048-b635879837f1?auto=format&fit=crop&w=1200&q=80"
-      },
-      {
-        url: "https://images.unsplash.com/photo-1577495508048-b635879837f1?auto=format&fit=crop&w=1200&q=80",
-        caption: "Spacious Seating & Orderly Meal Serving Hall"
-      },
-      {
-        url: "https://images.unsplash.com/photo-1567521464027-f127ff144326?auto=format&fit=crop&w=1200&q=80",
-        caption: "Clean Food Service & Quality Student Catering"
-      }
-    ]
-  },
-  { 
-    id: "sports-grounds",
-    title: "Sports Grounds & Courts", 
-    desc: "Full-size football pitch, basketball, and netball courts home to national champions.",
-    tag: "Football, Netball & Courts",
-    img: getSupabaseOthersUrl("hand.jpeg"),
-    fallbackImg: "https://images.unsplash.com/photo-1574629810360-7efbbe195018?auto=format&fit=crop&w=1200&q=80",
-    gallery: [
-      {
-        url: getSupabaseOthersUrl("hand.jpeg"),
-        caption: "STAHIZA National Championship Handball & Sports Arena",
-        fallbackUrl: "https://images.unsplash.com/photo-1574629810360-7efbbe195018?auto=format&fit=crop&w=1200&q=80"
-      },
-      {
-        url: "https://images.unsplash.com/photo-1574629810360-7efbbe195018?auto=format&fit=crop&w=1200&q=80",
-        caption: "Full-Size Football Pitch & Athletics Track"
-      },
-      {
-        url: "https://images.unsplash.com/photo-1546519638-68e109498ffc?auto=format&fit=crop&w=1200&q=80",
-        caption: "Tournament Basketball & Netball Courts"
-      }
-    ]
-  },
-  { 
-    id: "library",
-    title: "School Library & Resource Center", 
-    desc: "Curriculum textbooks, encyclopedias, past UNEB papers, and dedicated silent study zones.",
-    tag: "Quiet Study & Archives",
-    img: getSupabaseOthersUrl("dedication 2026 s4.jpeg"),
-    fallbackImg: "https://images.unsplash.com/photo-1521587760476-6c12a4b040da?auto=format&fit=crop&w=1200&q=80",
-    gallery: [
-      {
-        url: getSupabaseOthersUrl("dedication 2026 s4.jpeg"),
-        caption: "STAHIZA Candidate Dedication & Resource Center",
-        fallbackUrl: "https://images.unsplash.com/photo-1521587760476-6c12a4b040da?auto=format&fit=crop&w=1200&q=80"
-      },
-      {
-        url: "https://images.unsplash.com/photo-1521587760476-6c12a4b040da?auto=format&fit=crop&w=1200&q=80",
-        caption: "Quiet Individual Study Desks & Reference Sections"
-      },
-      {
-        url: "https://images.unsplash.com/photo-1497633762265-9d179a990aa6?auto=format&fit=crop&w=1200&q=80",
-        caption: "Comprehensive UNEB Archives & National Curriculum Texts"
-      }
-    ]
-  },
-];
+export type { FacilityPhoto, CampusFacility };
+export { CAMPUS_FACILITIES };
 
 const dropdownContainerVariants = {
   hidden: { opacity: 0 },
@@ -286,6 +137,9 @@ export default function App() {
   const [applyModalOpen, setApplyModalOpen] = useState(false);
   const [leaders, setLeaders] = useState<Leader[]>([]);
   const [marqueeStaff, setMarqueeStaff] = useState<Leader[]>([]);
+  const [leadersLoaded, setLeadersLoaded] = useState(false);
+  const [marqueeLoaded, setMarqueeLoaded] = useState(false);
+  const [heroVideoReady, setHeroVideoReady] = useState(false);
   const [campusSection, setCampusSection] = useState<'all' | 'facilities' | 'clubs' | 'prefects' | 'teachers' | 'videos' | 'gallery'>('all');
   const [showBackToTop, setShowBackToTop] = useState(false);
   const [applySuccessAnimation, setApplySuccessAnimation] = useState(false);
@@ -464,17 +318,32 @@ export default function App() {
   };
 
   useEffect(() => {
-    fetchLeaders().then(data => setLeaders(data));
-    fetchMarqueeStaff().then(data => setMarqueeStaff(data));
+    fetchLeaders()
+      .then((data) => setLeaders(data))
+      .finally(() => setLeadersLoaded(true));
+    fetchMarqueeStaff()
+      .then((data) => setMarqueeStaff(data))
+      .finally(() => setMarqueeLoaded(true));
   }, []);
+
+  const dynamicHeroUrls = React.useMemo(
+    () => [...marqueeStaff.map((s) => s.img), ...leaders.map((l) => l.img)],
+    [marqueeStaff, leaders]
+  );
 
   return (
     <div className={`min-h-screen transition-colors duration-300 font-['Inter',sans-serif] selection:bg-[#800020] selection:text-white ${
       isDark ? 'bg-[#060E1A] text-slate-100 dark' : 'bg-[#F8FAFC] text-slate-800'
     }`}>
       
-      {/* MEDIA-AWARE ROTATING DOTTED SPHERE PRELOADER */}
-      <Preloader minDuration={1500} maxDuration={12000} />
+      {/* STATE-BASED MEDIA PRELOADER (MINIMUM 2s FOR BRAND VISIBILITY) */}
+      <Preloader
+        minDuration={2000}
+        maxDuration={15000}
+        dataHydrated={leadersLoaded && marqueeLoaded}
+        heroVideoReady={heroVideoReady}
+        dynamicHeroUrls={dynamicHeroUrls}
+      />
 
       {/* NAVBAR */}
       <Navbar 
@@ -496,7 +365,7 @@ export default function App() {
           {activeTab === 'home' && (
           <div>
             {/* FULL BLEED 100% WIDTH VIDEO BANNER WITH PARALLAX (Home page only) */}
-            <HeroParallaxVideo />
+            <HeroParallaxVideo onReady={() => setHeroVideoReady(true)} />
 
             {/* HERO SECTION */}
             <section className="relative py-12 sm:py-16 overflow-hidden bg-[#F5F2EB] border-b border-stone-200">

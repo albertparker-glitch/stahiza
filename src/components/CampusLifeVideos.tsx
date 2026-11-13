@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { getSupabaseVideosUrl } from '../lib/supabase';
+import { CAMPUS_VIDEO_POSTERS } from '../data/campusMediaManifest';
 import { SchoolBadgeImg } from './SchoolBadgeImg';
 import { Video, Play, ExternalLink, Sparkles, Youtube } from 'lucide-react';
 import { motion } from 'motion/react';
@@ -113,6 +114,8 @@ export const CampusLifeVideos: React.FC = () => {
               <div className="relative aspect-video w-full bg-slate-900 overflow-hidden">
                 <video
                   src={videoUrl}
+                  poster={CAMPUS_VIDEO_POSTERS[vid.fileKey]}
+                  preload="auto"
                   controls
                   loop
                   muted
