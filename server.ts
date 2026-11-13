@@ -9,20 +9,27 @@ dotenv.config();
 async function startServer() {
   const app = express();
   const httpServer = http.createServer(app);
-  const PORT = Number(process.env.PORT) || 3000;
+  const portArgIdx = process.argv.indexOf('--port');
+  const cliPort = portArgIdx !== -1 ? Number(process.argv[portArgIdx + 1]) : NaN;
+  const PORT =
+    Number.isFinite(cliPort) && cliPort > 0
+      ? cliPort
+      : process.env.NODE_ENV === 'production'
+        ? Number(process.env.PORT) || 3000
+        : 3000;
 
   app.use(express.json());
 
-  // Initialize Gemini AI
+  // Initialize Gemini AI lazily/only when API key is configured
   const apiKey = process.env.GEMINI_API_KEY;
-  const ai = new GoogleGenAI({ apiKey: apiKey || '' });
+  const ai = apiKey ? new GoogleGenAI({ apiKey }) : null;
 
   // API endpoint for STAHIZA AI Admissions / Guidance Counselor
   app.post('/api/chat', async (req, res) => {
     try {
       const { message, history } = req.body;
       
-      if (!apiKey) {
+      if (!ai || !apiKey) {
         return res.status(500).json({ 
           error: 'Gemini API key is not configured. Please add GEMINI_API_KEY in secrets.' 
         });

@@ -52,6 +52,11 @@ import {
   SCIENCE_COMBINATION_GROUPS,
   getCombinationGuidance,
 } from './data/aLevelCombinations';
+import {
+  O_LEVEL_SUBJECTS,
+  O_LEVEL_CORE_SUBJECTS,
+  O_LEVEL_ELECTIVE_SUBJECTS,
+} from './data/oLevelSubjects';
 import { useTheme } from './context/ThemeContext';
 import { getSupabasePublicUrl, getSupabaseOthersUrl } from './lib/supabase';
 import { motion, AnimatePresence } from 'motion/react';
@@ -272,17 +277,22 @@ export default function App() {
   const [activeFacilityPhotoIdx, setActiveFacilityPhotoIdx] = useState(0);
   const [selectedArtsComboCode, setSelectedArtsComboCode] = useState<string>(POPULAR_ARTS_COMBINATIONS[0]?.code || 'HEG');
   const [selectedScienceComboCode, setSelectedScienceComboCode] = useState<string>(SCIENCE_COMBINATION_GROUPS.physics[0]?.code || 'PCM');
-  const [openComboDropdown, setOpenComboDropdown] = useState<'arts' | 'sciences' | null>(null);
+  const [selectedOLevelSubjectCode, setSelectedOLevelSubjectCode] = useState<string>(O_LEVEL_SUBJECTS[0]?.code || 'ENG');
+  const [openComboDropdown, setOpenComboDropdown] = useState<'arts' | 'sciences' | 'olevel' | null>(null);
   const [artsSearchQuery, setArtsSearchQuery] = useState('');
+  const [oLevelSearchQuery, setOLevelSearchQuery] = useState('');
   const [activeCombinationModal, setActiveCombinationModal] = useState<ALevelCombination | null>(null);
 
   const artsDropdownRef = React.useRef<HTMLDivElement>(null);
   const sciencesDropdownRef = React.useRef<HTMLDivElement>(null);
+  const oLevelDropdownRef = React.useRef<HTMLDivElement>(null);
 
   const selectedArtsCombo =
     ALL_ARTS_COMBINATIONS.find((combo) => combo.code === selectedArtsComboCode) || ALL_ARTS_COMBINATIONS[0];
   const selectedScienceCombo =
     ALL_SCIENCE_COMBINATIONS.find((combo) => combo.code === selectedScienceComboCode) || ALL_SCIENCE_COMBINATIONS[0];
+  const selectedOLevelSubject =
+    O_LEVEL_SUBJECTS.find((subj) => subj.code === selectedOLevelSubjectCode) || O_LEVEL_SUBJECTS[0];
 
   const handleSelectCombination = (combo: ALevelCombination, stream: 'arts' | 'sciences') => {
     if (stream === 'arts') {
@@ -302,6 +312,9 @@ export default function App() {
         setOpenComboDropdown(null);
       }
       if (openComboDropdown === 'sciences' && sciencesDropdownRef.current && !sciencesDropdownRef.current.contains(target)) {
+        setOpenComboDropdown(null);
+      }
+      if (openComboDropdown === 'olevel' && oLevelDropdownRef.current && !oLevelDropdownRef.current.contains(target)) {
         setOpenComboDropdown(null);
       }
     };
@@ -498,7 +511,7 @@ export default function App() {
                     <TypewriterMotto />
                   </p>
                   <p className="text-slate-700 text-base sm:text-lg leading-relaxed max-w-2xl font-medium">
-                    Fostering academic excellence, moral discipline, and championship talent along Entebbe Road.
+                    Fostering academic excellence, moral discipline, and championship talent.
                   </p>
                   <div className="flex flex-wrap gap-4 pt-4">
                     <motion.button
@@ -1173,7 +1186,7 @@ export default function App() {
                 viewport={{ once: true }}
                 transition={{ duration: 0.45 }}
                 whileHover={{ y: -4 }}
-                className="bg-white rounded-3xl p-8 sm:p-10 shadow-sm border border-slate-200 space-y-6"
+                className={`bg-white rounded-3xl p-8 sm:p-10 shadow-sm border border-slate-200 space-y-6 relative ${openComboDropdown === 'olevel' ? 'z-20' : 'z-0'}`}
               >
                 <div className="flex items-center justify-between">
                   <div className="w-14 h-14 rounded-2xl bg-rose-50 text-[#800020] flex items-center justify-center">
@@ -1185,6 +1198,163 @@ export default function App() {
                 <p className="text-slate-600 leading-relaxed text-sm">
                   Complete UNEB curriculum emphasizing sciences, mathematics, digital literacy, and continuous assessment.
                 </p>
+
+                {/* O-LEVEL SUBJECTS DROPDOWN */}
+                <div ref={oLevelDropdownRef} className={`bg-slate-50 border border-slate-200 rounded-2xl p-4 space-y-2.5 relative ${openComboDropdown === 'olevel' ? 'z-30' : 'z-10'}`}>
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="text-xs font-bold uppercase tracking-wider text-[#800020]">
+                      Subjects Taught ({O_LEVEL_SUBJECTS.length})
+                    </span>
+                    <span className="text-[11px] font-semibold text-slate-500">S.1 – S.4 UNEB Curriculum</span>
+                  </div>
+
+                  <div className="relative">
+                    <button
+                      type="button"
+                      aria-haspopup="listbox"
+                      aria-expanded={openComboDropdown === 'olevel'}
+                      onClick={() => setOpenComboDropdown((prev) => (prev === 'olevel' ? null : 'olevel'))}
+                      className="w-full bg-white border border-slate-300 rounded-xl pl-3.5 pr-10 py-2.5 text-left text-sm font-semibold text-[#0A192F] focus:outline-none focus:ring-2 focus:ring-[#800020]/30 focus:border-[#800020] cursor-pointer flex items-center justify-between transition"
+                    >
+                      <span className="truncate">
+                        {selectedOLevelSubject.name} ({selectedOLevelSubject.category})
+                      </span>
+                      <ChevronDown
+                        className={`w-4 h-4 text-slate-500 shrink-0 absolute right-3 top-1/2 -translate-y-1/2 transition-transform duration-200 ${
+                          openComboDropdown === 'olevel' ? 'rotate-180 text-[#800020]' : ''
+                        }`}
+                      />
+                    </button>
+
+                    <AnimatePresence>
+                      {openComboDropdown === 'olevel' && (
+                        <motion.div
+                          initial={{ opacity: 0, y: -6 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          exit={{ opacity: 0, y: -6 }}
+                          transition={{ duration: 0.16 }}
+                          role="listbox"
+                          aria-label="O-Level Subjects"
+                          className="absolute left-0 right-0 mt-2 z-30 bg-white border border-slate-200 rounded-2xl shadow-2xl overflow-hidden"
+                        >
+                          <div className="p-2.5 border-b border-slate-100 bg-slate-50 flex items-center gap-2">
+                            <Search className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                            <input
+                              type="text"
+                              value={oLevelSearchQuery}
+                              onChange={(e) => setOLevelSearchQuery(e.target.value)}
+                              placeholder="Search O-Level subject (e.g. Physics, ICT, French)..."
+                              className="w-full bg-white border border-slate-200 rounded-lg px-2.5 py-1.5 text-xs text-[#0A192F] focus:outline-none focus:border-[#800020]"
+                            />
+                          </div>
+                          <div className="max-h-64 overflow-y-auto divide-y divide-slate-100">
+                            {(() => {
+                              const query = oLevelSearchQuery.trim().toLowerCase();
+                              const matchSubject = (s: typeof O_LEVEL_SUBJECTS[number]) =>
+                                !query ||
+                                s.name.toLowerCase().includes(query) ||
+                                s.code.toLowerCase().includes(query);
+
+                              const coreFiltered = O_LEVEL_CORE_SUBJECTS.filter(matchSubject);
+                              const electiveFiltered = O_LEVEL_ELECTIVE_SUBJECTS.filter(matchSubject);
+
+                              if (coreFiltered.length === 0 && electiveFiltered.length === 0) {
+                                return (
+                                  <div className="px-4 py-6 text-center text-xs text-slate-500">
+                                    No O-Level subjects match "{oLevelSearchQuery}".
+                                  </div>
+                                );
+                              }
+
+                              return (
+                                <>
+                                  {coreFiltered.length > 0 && (
+                                    <div className="py-1">
+                                      <div className="px-3.5 py-1.5 text-[10px] font-extrabold uppercase tracking-wider text-[#800020] bg-rose-50/70">
+                                        Compulsory Core Subjects
+                                      </div>
+                                      {coreFiltered.map((subj) => {
+                                        const isActive = subj.code === selectedOLevelSubjectCode;
+                                        return (
+                                          <button
+                                            type="button"
+                                            key={subj.code}
+                                            role="option"
+                                            aria-selected={isActive}
+                                            onClick={() => {
+                                              setSelectedOLevelSubjectCode(subj.code);
+                                              setOpenComboDropdown(null);
+                                            }}
+                                            className={`w-full px-3.5 py-2 text-left text-xs flex items-center justify-between gap-2 transition cursor-pointer ${
+                                              isActive
+                                                ? 'bg-rose-50 text-[#800020] font-bold'
+                                                : 'text-[#0A192F] hover:bg-slate-50 font-medium'
+                                            }`}
+                                          >
+                                            <span className="truncate">{subj.name}</span>
+                                            <span className="text-[10px] font-semibold text-slate-400 shrink-0">
+                                              Core
+                                            </span>
+                                          </button>
+                                        );
+                                      })}
+                                    </div>
+                                  )}
+
+                                  {electiveFiltered.length > 0 && (
+                                    <div className="py-1">
+                                      <div className="px-3.5 py-1.5 text-[10px] font-extrabold uppercase tracking-wider text-[#0A192F] bg-blue-50/70">
+                                        Elective, Vocational & Language Subjects
+                                      </div>
+                                      {electiveFiltered.map((subj) => {
+                                        const isActive = subj.code === selectedOLevelSubjectCode;
+                                        return (
+                                          <button
+                                            type="button"
+                                            key={subj.code}
+                                            role="option"
+                                            aria-selected={isActive}
+                                            onClick={() => {
+                                              setSelectedOLevelSubjectCode(subj.code);
+                                              setOpenComboDropdown(null);
+                                            }}
+                                            className={`w-full px-3.5 py-2 text-left text-xs flex items-center justify-between gap-2 transition cursor-pointer ${
+                                              isActive
+                                                ? 'bg-rose-50 text-[#800020] font-bold'
+                                                : 'text-[#0A192F] hover:bg-slate-50 font-medium'
+                                            }`}
+                                          >
+                                            <span className="truncate">{subj.name}</span>
+                                            <span className="text-[10px] font-semibold text-slate-400 shrink-0">
+                                              Elective
+                                            </span>
+                                          </button>
+                                        );
+                                      })}
+                                    </div>
+                                  )}
+                                </>
+                              );
+                            })()}
+                          </div>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </div>
+
+                  {selectedOLevelSubject && (
+                    <div className="text-xs text-slate-600 space-y-1 pt-0.5">
+                      <div>
+                        <span className="font-bold text-[#0A192F]">{selectedOLevelSubject.name}:</span>{' '}
+                        {selectedOLevelSubject.focus}
+                      </div>
+                      <div className="text-[11px] text-slate-500">
+                        Assessment: {selectedOLevelSubject.assessment}
+                      </div>
+                    </div>
+                  )}
+                </div>
+
                 <ul className="space-y-3 text-sm font-medium text-slate-700">
                   <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-emerald-600" /> Practical labs in Physics, Chemistry & Biology</li>
                   <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-emerald-600" /> ICT training and digital research</li>
