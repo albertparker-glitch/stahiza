@@ -516,12 +516,12 @@ export default function App() {
                     <SchoolBadgeImg size={22} className="w-5 h-5" />
                     <span>Official STAHIZA Administrative Portal</span>
                   </motion.div>
-                  <h1 className="text-4xl sm:text-6xl font-black font-['Montserrat'] tracking-tight leading-tight text-[#1E40AF] dark:text-blue-300">
-                    <span className="text-[#800020]">S</span><span className="text-[#1E40AF] dark:text-blue-300">tandard</span>{' '}
-                    <span className="text-[#800020]">H</span><span className="text-[#1E40AF] dark:text-blue-300">igh</span>{' '}
-                    <span className="text-[#800020]">S</span><span className="text-[#1E40AF] dark:text-blue-300">chool</span>{' '}
-                    <span className="text-[#1E40AF] dark:text-blue-300">-</span>{' '}
-                    <span className="text-[#800020]">Z</span><span className="text-[#1E40AF] dark:text-blue-300">zana</span>
+                  <h1 className="text-4xl sm:text-6xl font-black font-['Montserrat'] tracking-tight leading-tight text-[#0A192F]">
+                    <span className="text-[#800020]">S</span><span className="text-[#0A192F]">tandard</span>{' '}
+                    <span className="text-[#800020]">H</span><span className="text-[#0A192F]">igh</span>{' '}
+                    <span className="text-[#800020]">S</span><span className="text-[#0A192F]">chool</span>{' '}
+                    <span className="text-[#0A192F]">-</span>{' '}
+                    <span className="text-[#800020]">Z</span><span className="text-[#0A192F]">zana</span>
                   </h1>
                   <p className="text-xl sm:text-2xl font-semibold text-[#800020] italic font-serif min-h-[2rem] sm:min-h-[2.5rem] flex items-center">
                     <TypewriterMotto />
