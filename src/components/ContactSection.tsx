@@ -188,39 +188,48 @@ export const ContactSection: React.FC = () => {
                   </div>
                   <div className="flex justify-center">
                     <span className="px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider font-mono bg-amber-400 text-[#0A192F]">
-                      Mail Template Ready
+                      {emailResult?.deviceType === 'pc' ? 'PC • Gmail Web Opened' : 'Mobile • Mail App Opened'}
                     </span>
                   </div>
                   <h4 className="text-xl font-bold font-['Montserrat'] text-white">
-                    Email Template Opened!
+                    {emailResult?.deviceType === 'pc' ? 'Gmail Web Compose Opened!' : 'Email App Opened!'}
                   </h4>
                   <p className="text-slate-300 text-xs leading-relaxed max-w-sm mx-auto">
-                    Thank you, <span className="text-white font-bold">{formData.name}</span>. Your pre-filled inquiry template regarding <span className="text-amber-300 font-semibold">"{formData.subject}"</span> has been opened for <span className="text-white font-semibold">{SCHOOL_CONTACTS.email}</span>.
+                    Thank you, <span className="text-white font-bold">{formData.name}</span>. Your pre-filled inquiry regarding <span className="text-amber-300 font-semibold">"{formData.subject}"</span> to <span className="text-white font-semibold">{SCHOOL_CONTACTS.email}</span> was prepared via{' '}
+                    <span className="text-amber-300 font-semibold">{emailResult?.methodUsed || 'Web Email'}</span>.
                   </p>
                   <p className="text-[11px] text-slate-300">
                     Direct office line: <span className="text-amber-300 font-mono font-bold">{SCHOOL_CONTACTS.phone1}</span>
                   </p>
                   <div className="flex flex-wrap items-center justify-center gap-2 pt-1">
-                    <a
-                      href={emailResult?.mailtoUrl || `mailto:${SCHOOL_CONTACTS.email}`}
-                      target="_top"
-                      rel="noopener noreferrer"
-                      className="px-4 py-2 rounded-full bg-amber-400 hover:bg-amber-300 text-[#0A192F] text-xs font-bold transition inline-flex items-center gap-1.5"
-                    >
-                      <Mail className="w-3.5 h-3.5" />
-                      <span>Open Mail App</span>
-                    </a>
                     {emailResult?.gmailUrl && (
                       <a
                         href={emailResult.gmailUrl}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="px-4 py-2 rounded-full bg-white hover:bg-slate-100 text-[#0A192F] text-xs font-bold transition inline-flex items-center gap-1.5"
+                        className={`px-4 py-2 rounded-full text-xs font-bold transition inline-flex items-center gap-1.5 ${
+                          emailResult.deviceType === 'pc'
+                            ? 'bg-amber-400 hover:bg-amber-300 text-[#0A192F]'
+                            : 'bg-white hover:bg-slate-100 text-[#0A192F]'
+                        }`}
                       >
                         <ExternalLink className="w-3.5 h-3.5 text-[#800020]" />
                         <span>Compose in Gmail Web</span>
                       </a>
                     )}
+                    <a
+                      href={emailResult?.mailtoUrl || `mailto:${SCHOOL_CONTACTS.email}`}
+                      target="_top"
+                      rel="noopener noreferrer"
+                      className={`px-4 py-2 rounded-full text-xs font-bold transition inline-flex items-center gap-1.5 ${
+                        emailResult?.deviceType === 'pc'
+                          ? 'bg-white hover:bg-slate-100 text-[#0A192F]'
+                          : 'bg-amber-400 hover:bg-amber-300 text-[#0A192F]'
+                      }`}
+                    >
+                      <Mail className="w-3.5 h-3.5" />
+                      <span>Open Mail App</span>
+                    </a>
                     <button
                       type="button"
                       onClick={handleResendInquiry}

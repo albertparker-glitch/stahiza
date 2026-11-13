@@ -7,7 +7,8 @@ export interface EmailSendResult {
   recipient: string;
   sentAt: string;
   payloadSummary: string;
-  methodUsed: 'Mail Template';
+  deviceType: 'pc' | 'mobile';
+  methodUsed: 'Gmail Web' | 'Mail App';
   mailtoUrl: string;
   gmailUrl: string;
 }
@@ -23,6 +24,23 @@ export interface ContactInquiryInput {
 }
 
 const MAX_MAILTO_URL_LENGTH = 1800;
+
+export function detectDeviceType(): 'pc' | 'mobile' {
+  if (typeof navigator === 'undefined') return 'pc';
+
+  const navWithUAData = navigator as Navigator & {
+    userAgentData?: { mobile?: boolean };
+  };
+  if (typeof navWithUAData.userAgentData?.mobile === 'boolean') {
+    return navWithUAData.userAgentData.mobile ? 'mobile' : 'pc';
+  }
+
+  const ua = navigator.userAgent || '';
+  const isTouchMac = /Macintosh/i.test(ua) && navigator.maxTouchPoints > 1;
+  const isMobileUA = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini|Mobile|Tablet/i.test(ua);
+
+  return isMobileUA || isTouchMac ? 'mobile' : 'pc';
+}
 
 export function buildApplicationSummary(app: AdmissionApplication, recipient: string): string {
   const lines = [
@@ -61,7 +79,7 @@ function buildSafeMailtoUrl(recipient: string, subject: string, body: string): s
   let encodedBody = encodeURIComponent(body);
 
   if (encodedBody.length > maxEncodedBodyLen) {
-    // Trim cleanly before encoding so Windows/desktop mailto handlers never silently drop oversized URLs
+    // Trim cleanly before encoding so mobile/desktop mailto handlers never drop oversized URLs
     let trimmed = body;
     while (trimmed.length > 80 && encodeURIComponent(`${trimmed}\n[Truncated - use Copy Summary]`).length > maxEncodedBodyLen) {
       trimmed = trimmed.slice(0, Math.floor(trimmed.length * 0.85));
@@ -131,40 +149,66 @@ function triggerMailtoSafely(mailtoUrl: string): void {
   }
 }
 
+function triggerWebEmailSafely(gmailUrl: string): void {
+  try {
+    const anchor = document.createElement('a');
+    anchor.href = gmailUrl;
+    anchor.target = '_blank';
+    anchor.rel = 'noopener noreferrer';
+    anchor.style.display = 'none';
+    document.body.appendChild(anchor);
+    anchor.click();
+    document.body.removeChild(anchor);
+  } catch (e) {
+    console.warn('Automatic web email trigger skipped by browser context:', e);
+  }
+}
+
 /**
- * Prepares a pre-filled mail template for school administration (hasty0joel@gmail.com),
- * triggers the standard HTML5 mailto: link synchronously in the submit gesture, and
- * also provides a Gmail web compose URL for PC users without a desktop mail client.
+ * Automatically detects whether the user is on PC or Mobile:
+ * - PC / Desktop: opens Gmail Web compose directly in a new tab with pre-filled application details.
+ * - Mobile: opens the device's default mail app via standard HTML5 mailto: URI.
  */
 export function dispatchApplicationEmail(app: AdmissionApplication): EmailSendResult {
   const recipient = SCHOOL_CONTACTS.email; // hasty0joel@gmail.com
   const now = new Date().toLocaleString();
+  const deviceType = detectDeviceType();
   const payloadSummary = buildApplicationSummary(app, recipient);
   const subject = `STAHIZA Admission Application - ${app.studentName} (${app.targetClass}) [${app.id}]`;
   const mailtoUrl = buildSafeMailtoUrl(recipient, subject, payloadSummary);
   const gmailUrl = buildGmailComposeUrl(recipient, subject, payloadSummary);
 
-  triggerMailtoSafely(mailtoUrl);
+  if (deviceType === 'pc') {
+    triggerWebEmailSafely(gmailUrl);
+  } else {
+    triggerMailtoSafely(mailtoUrl);
+  }
 
   return {
     success: true,
-    message: `Pre-filled email template opened for ${recipient}`,
+    message:
+      deviceType === 'pc'
+        ? `PC detected: Pre-filled Gmail Web compose opened for ${recipient}`
+        : `Mobile detected: Pre-filled mail app opened for ${recipient}`,
     recipient,
     sentAt: now,
     payloadSummary,
-    methodUsed: 'Mail Template',
+    deviceType,
+    methodUsed: deviceType === 'pc' ? 'Gmail Web' : 'Mail App',
     mailtoUrl,
     gmailUrl
   };
 }
 
 /**
- * Prepares a pre-filled mail template for general contact & admissions desk inquiries,
- * triggers the standard HTML5 mailto: link synchronously, and returns a Gmail web compose URL.
+ * Automatically detects PC vs Mobile for general contact & admissions desk inquiries:
+ * - PC / Desktop: opens Gmail Web compose directly.
+ * - Mobile: opens the native mail app via mailto:.
  */
 export function dispatchContactInquiryEmail(inquiry: ContactInquiryInput): EmailSendResult {
   const recipient = SCHOOL_CONTACTS.email;
   const now = new Date().toLocaleString();
+  const deviceType = detectDeviceType();
   const normalizedInquiry: ContactInquiryInput = {
     ...inquiry,
     id: inquiry.id || `INQ-2026-${Math.floor(1000 + Math.random() * 9000)}`,
@@ -175,15 +219,23 @@ export function dispatchContactInquiryEmail(inquiry: ContactInquiryInput): Email
   const mailtoUrl = buildSafeMailtoUrl(recipient, subject, payloadSummary);
   const gmailUrl = buildGmailComposeUrl(recipient, subject, payloadSummary);
 
-  triggerMailtoSafely(mailtoUrl);
+  if (deviceType === 'pc') {
+    triggerWebEmailSafely(gmailUrl);
+  } else {
+    triggerMailtoSafely(mailtoUrl);
+  }
 
   return {
     success: true,
-    message: `Pre-filled inquiry email template opened for ${recipient}`,
+    message:
+      deviceType === 'pc'
+        ? `PC detected: Pre-filled Gmail Web compose opened for ${recipient}`
+        : `Mobile detected: Pre-filled inquiry email opened for ${recipient}`,
     recipient,
     sentAt: now,
     payloadSummary,
-    methodUsed: 'Mail Template',
+    deviceType,
+    methodUsed: deviceType === 'pc' ? 'Gmail Web' : 'Mail App',
     mailtoUrl,
     gmailUrl
   };

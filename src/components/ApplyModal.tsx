@@ -161,7 +161,9 @@ export const ApplyModal: React.FC<ApplyModalProps> = ({
                 <div className="space-y-2">
                   <div className="flex items-center justify-center gap-2 flex-wrap">
                     <span className="px-3.5 py-1 bg-amber-100 text-amber-900 dark:bg-amber-950 dark:text-amber-300 rounded-full text-xs font-black uppercase font-mono tracking-wider">
-                      Pre-filled Mail Template Ready • Approval in 2 Business Days
+                      {emailResult?.deviceType === 'pc'
+                        ? 'PC Detected • Opened in Gmail Web'
+                        : 'Mobile Detected • Mail App Opened'}
                     </span>
                     <span className="px-3 py-1 rounded-full text-[11px] font-bold font-mono bg-emerald-50 text-emerald-700 border border-emerald-200 dark:bg-emerald-950/60 dark:text-emerald-300 dark:border-emerald-800">
                       Ref: {submittedRecord.id} • {emailResult?.methodUsed || 'Mail Template'}
@@ -171,7 +173,8 @@ export const ApplyModal: React.FC<ApplyModalProps> = ({
                     Application Prepared!
                   </h3>
                   <p className="text-slate-600 dark:text-slate-300 text-xs max-w-md mx-auto leading-relaxed">
-                    Thank you, <span className="font-bold">{submittedRecord.parentName}</span>. Your pre-filled admission email template for <span className="font-bold text-[#800020] dark:text-amber-400">{submittedRecord.studentName}</span> ({submittedRecord.targetClass}, {submittedRecord.residenceType}) has been opened for your mail app to send to <strong className="text-slate-900 dark:text-white">{SCHOOL_CONTACTS.email}</strong>.
+                    Thank you, <span className="font-bold">{submittedRecord.parentName}</span>. Your pre-filled admission email for <span className="font-bold text-[#800020] dark:text-amber-400">{submittedRecord.studentName}</span> ({submittedRecord.targetClass}, {submittedRecord.residenceType}) to <strong className="text-slate-900 dark:text-white">{SCHOOL_CONTACTS.email}</strong> has been prepared via{' '}
+                    <strong>{emailResult?.methodUsed || 'Web Email'}</strong>.
                   </p>
                 </div>
 
@@ -181,29 +184,39 @@ export const ApplyModal: React.FC<ApplyModalProps> = ({
                     We Will Contact You on WhatsApp or Email
                   </span>
                   <p className="text-xs text-slate-300">
-                    If your PC does not have a default mail app, click <strong>Compose in Gmail Web</strong> below or follow up on WhatsApp:
+                    {emailResult?.deviceType === 'pc'
+                      ? 'Your PC automatically opened Gmail Web compose. If a popup blocker stopped it, click Compose in Gmail Web below:'
+                      : 'Your mobile mail app should open automatically. You can also use Gmail Web or follow up on WhatsApp:'}
                   </p>
                   <div className="flex flex-col gap-2">
-                    <a
-                      href={emailResult?.mailtoUrl || `mailto:${SCHOOL_CONTACTS.email}`}
-                      target="_top"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-amber-400 hover:bg-amber-300 text-slate-950 font-bold rounded-xl text-xs transition shadow-md w-full"
-                    >
-                      <Mail className="w-4 h-4" />
-                      <span>Open Mail App (mailto)</span>
-                    </a>
                     {emailResult?.gmailUrl && (
                       <a
                         href={emailResult.gmailUrl}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-white hover:bg-slate-100 text-slate-950 font-bold rounded-xl text-xs transition shadow-md w-full"
+                        className={`inline-flex items-center justify-center gap-2 px-5 py-2.5 font-bold rounded-xl text-xs transition shadow-md w-full ${
+                          emailResult.deviceType === 'pc'
+                            ? 'bg-amber-400 hover:bg-amber-300 text-slate-950'
+                            : 'bg-white hover:bg-slate-100 text-slate-950'
+                        }`}
                       >
                         <ExternalLink className="w-4 h-4 text-[#800020]" />
                         <span>Compose in Gmail Web</span>
                       </a>
                     )}
+                    <a
+                      href={emailResult?.mailtoUrl || `mailto:${SCHOOL_CONTACTS.email}`}
+                      target="_top"
+                      rel="noopener noreferrer"
+                      className={`inline-flex items-center justify-center gap-2 px-5 py-2.5 font-bold rounded-xl text-xs transition shadow-md w-full ${
+                        emailResult?.deviceType === 'pc'
+                          ? 'bg-white hover:bg-slate-100 text-slate-950'
+                          : 'bg-amber-400 hover:bg-amber-300 text-slate-950'
+                      }`}
+                    >
+                      <Mail className="w-4 h-4" />
+                      <span>Open Mail App (mailto)</span>
+                    </a>
                     <a
                       href={getWhatsAppUrl()}
                       target="_blank"
