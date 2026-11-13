@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, CheckCircle2, Sparkles, MessageCircle, Mail, Clock, Copy, Check, RefreshCw } from 'lucide-react';
+import { X, CheckCircle2, Sparkles, MessageCircle, Mail, Clock, Copy, Check, RefreshCw, ExternalLink } from 'lucide-react';
 import { SchoolBadgeImg } from './SchoolBadgeImg';
 import { SCHOOL_CONTACTS } from '../data/schoolData';
 import { ALL_SCIENCE_COMBINATIONS, POPULAR_ARTS_COMBINATIONS } from '../data/aLevelCombinations';
@@ -68,7 +68,7 @@ export const ApplyModal: React.FC<ApplyModalProps> = ({
     resetModalState();
   };
 
-  const handleApplySubmit = async (e: React.FormEvent) => {
+  const handleApplySubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!applyForm.studentName || !applyForm.phone || !applyForm.email) return;
 
@@ -89,17 +89,17 @@ export const ApplyModal: React.FC<ApplyModalProps> = ({
       notes: applyForm.notes || undefined
     });
 
-    const result = await dispatchApplicationEmail(created);
+    const result = dispatchApplicationEmail(created);
 
     setIsSubmitting(false);
     setEmailResult(result);
     setSubmittedRecord(created);
   };
 
-  const handleResendEmail = async () => {
+  const handleResendEmail = () => {
     if (!submittedRecord || isResending) return;
     setIsResending(true);
-    const result = await dispatchApplicationEmail(submittedRecord);
+    const result = dispatchApplicationEmail(submittedRecord);
     setEmailResult(result);
     setIsResending(false);
   };
@@ -181,9 +181,29 @@ export const ApplyModal: React.FC<ApplyModalProps> = ({
                     We Will Contact You on WhatsApp or Email
                   </span>
                   <p className="text-xs text-slate-300">
-                    If your email app did not launch automatically, click below to open your pre-filled mail template or follow up on WhatsApp:
+                    If your PC does not have a default mail app, click <strong>Compose in Gmail Web</strong> below or follow up on WhatsApp:
                   </p>
                   <div className="flex flex-col gap-2">
+                    <a
+                      href={emailResult?.mailtoUrl || `mailto:${SCHOOL_CONTACTS.email}`}
+                      target="_top"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-amber-400 hover:bg-amber-300 text-slate-950 font-bold rounded-xl text-xs transition shadow-md w-full"
+                    >
+                      <Mail className="w-4 h-4" />
+                      <span>Open Mail App (mailto)</span>
+                    </a>
+                    {emailResult?.gmailUrl && (
+                      <a
+                        href={emailResult.gmailUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-white hover:bg-slate-100 text-slate-950 font-bold rounded-xl text-xs transition shadow-md w-full"
+                      >
+                        <ExternalLink className="w-4 h-4 text-[#800020]" />
+                        <span>Compose in Gmail Web</span>
+                      </a>
+                    )}
                     <a
                       href={getWhatsAppUrl()}
                       target="_blank"
@@ -192,13 +212,6 @@ export const ApplyModal: React.FC<ApplyModalProps> = ({
                     >
                       <MessageCircle className="w-4 h-4 fill-current" />
                       <span>Chat on WhatsApp ({SCHOOL_CONTACTS.phone1})</span>
-                    </a>
-                    <a
-                      href={emailResult?.mailtoUrl || `mailto:${SCHOOL_CONTACTS.email}`}
-                      className="inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-amber-400 hover:bg-amber-300 text-slate-950 font-bold rounded-xl text-xs transition shadow-md w-full"
-                    >
-                      <Mail className="w-4 h-4" />
-                      <span>Open Pre-filled Mail Template</span>
                     </a>
                   </div>
                 </div>

@@ -38,12 +38,12 @@ export const ContactSection: React.FC = () => {
   const [emailResult, setEmailResult] = useState<EmailSendResult | null>(null);
   const [showMap, setShowMap] = useState(true);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!formData.name.trim() || !formData.email.trim() || !formData.message.trim()) return;
 
     setIsSubmitting(true);
-    const result = await dispatchContactInquiryEmail({
+    const result = dispatchContactInquiryEmail({
       name: formData.name,
       email: formData.email,
       phone: formData.phone,
@@ -55,10 +55,10 @@ export const ContactSection: React.FC = () => {
     setSubmitted(true);
   };
 
-  const handleResendInquiry = async () => {
+  const handleResendInquiry = () => {
     if (isResending) return;
     setIsResending(true);
-    const result = await dispatchContactInquiryEmail({
+    const result = dispatchContactInquiryEmail({
       name: formData.name,
       email: formData.email,
       phone: formData.phone,
@@ -203,11 +203,24 @@ export const ContactSection: React.FC = () => {
                   <div className="flex flex-wrap items-center justify-center gap-2 pt-1">
                     <a
                       href={emailResult?.mailtoUrl || `mailto:${SCHOOL_CONTACTS.email}`}
+                      target="_top"
+                      rel="noopener noreferrer"
                       className="px-4 py-2 rounded-full bg-amber-400 hover:bg-amber-300 text-[#0A192F] text-xs font-bold transition inline-flex items-center gap-1.5"
                     >
                       <Mail className="w-3.5 h-3.5" />
-                      <span>Open Mail Template</span>
+                      <span>Open Mail App</span>
                     </a>
+                    {emailResult?.gmailUrl && (
+                      <a
+                        href={emailResult.gmailUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="px-4 py-2 rounded-full bg-white hover:bg-slate-100 text-[#0A192F] text-xs font-bold transition inline-flex items-center gap-1.5"
+                      >
+                        <ExternalLink className="w-3.5 h-3.5 text-[#800020]" />
+                        <span>Compose in Gmail Web</span>
+                      </a>
+                    )}
                     <button
                       type="button"
                       onClick={handleResendInquiry}

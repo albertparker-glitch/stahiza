@@ -22,7 +22,8 @@ import {
   MessageCircle,
   MessageSquare,
   Copy,
-  RefreshCw
+  RefreshCw,
+  ExternalLink
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 
@@ -111,7 +112,7 @@ export const AdmissionFormSection: React.FC<AdmissionFormSectionProps> = () => {
     OFFICIAL_ITEMIZED_FEES.sportsWear +
     OFFICIAL_ITEMIZED_FEES.requirements;
 
-  const handleFormSubmit = async (e: React.FormEvent) => {
+  const handleFormSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!studentName || !parentPhone || !parentEmail) return;
 
@@ -133,8 +134,8 @@ export const AdmissionFormSection: React.FC<AdmissionFormSectionProps> = () => {
       sourceForm: 'Main Admissions Form'
     });
 
-    // Dispatch pre-filled mail template directly via mailto:
-    const dispatchResult = await dispatchApplicationEmail(appRecord);
+    // Dispatch pre-filled mail template synchronously inside user submit gesture
+    const dispatchResult = dispatchApplicationEmail(appRecord);
 
     setIsSubmitting(false);
     setEmailResult(dispatchResult);
@@ -142,10 +143,10 @@ export const AdmissionFormSection: React.FC<AdmissionFormSectionProps> = () => {
     setShowToast(true);
   };
 
-  const handleResendEmail = async () => {
+  const handleResendEmail = () => {
     if (!submittedRecord || isResending) return;
     setIsResending(true);
-    const dispatchResult = await dispatchApplicationEmail(submittedRecord);
+    const dispatchResult = dispatchApplicationEmail(submittedRecord);
     setEmailResult(dispatchResult);
     setIsResending(false);
     setShowToast(true);
@@ -208,10 +209,23 @@ export const AdmissionFormSection: React.FC<AdmissionFormSectionProps> = () => {
                   {emailResult?.mailtoUrl && (
                     <a
                       href={emailResult.mailtoUrl}
+                      target="_top"
+                      rel="noopener noreferrer"
                       className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-amber-400 hover:bg-amber-300 text-slate-950 font-bold rounded-lg text-xs transition shadow-sm"
                     >
                       <Mail className="w-3.5 h-3.5" />
-                      <span>Open Mail Template</span>
+                      <span>Open Mail App</span>
+                    </a>
+                  )}
+                  {emailResult?.gmailUrl && (
+                    <a
+                      href={emailResult.gmailUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white hover:bg-slate-100 text-slate-950 font-bold rounded-lg text-xs transition shadow-sm"
+                    >
+                      <ExternalLink className="w-3.5 h-3.5" />
+                      <span>Gmail Web</span>
                     </a>
                   )}
                 </div>
@@ -326,9 +340,31 @@ export const AdmissionFormSection: React.FC<AdmissionFormSectionProps> = () => {
                     We Will Contact You on WhatsApp or Email
                   </span>
                   <p className="text-xs text-slate-300">
-                    If your mail client did not launch automatically, click below to open the pre-filled mail template or reach us on WhatsApp:
+                    If your PC does not have a default mail app, click <strong>Compose in Gmail Web</strong> below or reach us on WhatsApp:
                   </p>
                   <div className="pt-2 flex flex-col sm:flex-row items-center justify-center gap-3 flex-wrap">
+                    <a
+                      href={emailResult?.mailtoUrl || `mailto:${SCHOOL_CONTACTS.email}`}
+                      target="_top"
+                      rel="noopener noreferrer"
+                      className="w-full sm:w-auto px-4 py-2.5 bg-amber-400 hover:bg-amber-300 text-slate-950 font-bold rounded-xl text-xs transition flex items-center justify-center gap-2"
+                    >
+                      <Mail className="w-4 h-4 text-slate-950" />
+                      <span>Open Mail App (mailto)</span>
+                    </a>
+
+                    {emailResult?.gmailUrl && (
+                      <a
+                        href={emailResult.gmailUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="w-full sm:w-auto px-4 py-2.5 bg-white hover:bg-slate-100 text-slate-950 font-bold rounded-xl text-xs transition flex items-center justify-center gap-2"
+                      >
+                        <ExternalLink className="w-4 h-4 text-[#800020]" />
+                        <span>Compose in Gmail Web</span>
+                      </a>
+                    )}
+
                     <a
                       href={getWhatsAppUrl()}
                       target="_blank"
@@ -337,14 +373,6 @@ export const AdmissionFormSection: React.FC<AdmissionFormSectionProps> = () => {
                     >
                       <MessageCircle className="w-4 h-4 fill-current" />
                       <span>Chat on WhatsApp ({SCHOOL_CONTACTS.phone1})</span>
-                    </a>
-
-                    <a
-                      href={emailResult?.mailtoUrl || `mailto:${SCHOOL_CONTACTS.email}`}
-                      className="w-full sm:w-auto px-4 py-2.5 bg-amber-400 hover:bg-amber-300 text-slate-950 font-bold rounded-xl text-xs transition flex items-center justify-center gap-2"
-                    >
-                      <Mail className="w-4 h-4 text-slate-950" />
-                      <span>Open Pre-filled Mail Template</span>
                     </a>
                   </div>
                 </div>

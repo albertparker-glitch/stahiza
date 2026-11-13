@@ -1821,7 +1821,7 @@ export default function App() {
               <div className="bg-gradient-to-br from-[#0A192F] to-[#173860] text-white p-6 rounded-2xl border border-slate-700/80 shadow-lg flex items-center justify-between hover:shadow-xl transition-all duration-300 hover:-translate-y-0.5">
                 <div className="space-y-1">
                   <div className="text-3xl sm:text-4xl font-extrabold font-['Montserrat'] text-amber-300">
-                    <AnimatedCounter target={1500} suffix="+" />
+                    <AnimatedCounter target={2000} suffix="+" />
                   </div>
                   <div className="text-xs font-bold text-slate-300 uppercase tracking-wider">
                     Total Students
@@ -1849,7 +1849,7 @@ export default function App() {
               <div className="bg-gradient-to-br from-[#0A192F] to-[#173860] text-white p-6 rounded-2xl border border-slate-700/80 shadow-lg flex items-center justify-between hover:shadow-xl transition-all duration-300 hover:-translate-y-0.5">
                 <div className="space-y-1">
                   <div className="text-3xl sm:text-4xl font-extrabold font-['Montserrat'] text-amber-300">
-                    <AnimatedCounter target={25} suffix="+" />
+                    <AnimatedCounter target={32} suffix="+" />
                   </div>
                   <div className="text-xs font-bold text-slate-300 uppercase tracking-wider">
                     Years of Excellence

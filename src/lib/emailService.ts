@@ -9,6 +9,7 @@ export interface EmailSendResult {
   payloadSummary: string;
   methodUsed: 'Mail Template';
   mailtoUrl: string;
+  gmailUrl: string;
 }
 
 export interface ContactInquiryInput {
@@ -21,46 +22,58 @@ export interface ContactInquiryInput {
   submittedAt?: string;
 }
 
+const MAX_MAILTO_URL_LENGTH = 1800;
+
 export function buildApplicationSummary(app: AdmissionApplication, recipient: string): string {
-  const combinationLine =
-    app.combination && (app.targetClass === 'S.5' || app.targetClass === 'S.6')
-      ? `\nA-Level Combo  : ${app.combination}`
-      : '';
-  const dobLine = app.dob ? `\nDate of Birth  : ${app.dob}` : '';
-  const notesLine = app.notes ? `\nNotes          : ${app.notes}` : '';
+  const lines = [
+    'NEW ADMISSION APPLICATION - STANDARD HIGH SCHOOL ZZANA',
+    `Reference Code: ${app.id}`,
+    `Date Submitted: ${app.submittedAt}`,
+    `Submitted Via: ${app.sourceForm || 'Admissions Portal'}`,
+    '',
+    'STUDENT DETAILS:',
+    `Student Name: ${app.studentName}`,
+    `Gender: ${app.gender}`,
+    ...(app.dob ? [`Date of Birth: ${app.dob}`] : []),
+    `Target Class: ${app.targetClass}`,
+    `Residence: ${app.residenceType} Section`,
+    ...(app.combination && (app.targetClass === 'S.5' || app.targetClass === 'S.6')
+      ? [`A-Level Combination: ${app.combination}`]
+      : []),
+    `Previous School: ${app.previousSchool || 'Not specified'}`,
+    `Academic Record: ${app.gradesAggregate || 'N/A'}`,
+    ...(app.notes ? [`Notes: ${app.notes}`] : []),
+    '',
+    'PARENT / GUARDIAN DETAILS:',
+    `Parent Name: ${app.parentName}`,
+    `Phone Number: ${app.parentPhone}`,
+    `Parent Email: ${app.parentEmail}`,
+    '',
+    `School Email: ${recipient} | Selection Code: ${SCHOOL_CONTACTS.selectionCode} | UNEB Centre: ${SCHOOL_CONTACTS.centerNo}`
+  ];
 
-  return `
-==================================================
-NEW ADMISSION APPLICATION SUBMISSION
-Standard High School Zzana - Admissions Portal
-==================================================
-Reference Code : ${app.id}
-Date Submitted : ${app.submittedAt}
-Submitted Via  : ${app.sourceForm || 'Admissions Portal'}
-Status         : Pending Administrative Approval
+  return lines.join('\n');
+}
 
-STUDENT DETAILS:
---------------------------------------------------
-Student Name   : ${app.studentName}
-Gender         : ${app.gender}${dobLine}
-Target Class   : ${app.targetClass}
-Residence      : ${app.residenceType} Section${combinationLine}
-Previous School: ${app.previousSchool || 'Not specified'}
-Academic Record: ${app.gradesAggregate || 'N/A'}${notesLine}
+function buildSafeMailtoUrl(recipient: string, subject: string, body: string): string {
+  const base = `mailto:${recipient}?subject=${encodeURIComponent(subject)}&body=`;
+  const maxEncodedBodyLen = Math.max(200, MAX_MAILTO_URL_LENGTH - base.length);
+  let encodedBody = encodeURIComponent(body);
 
-PARENT / GUARDIAN DETAILS:
---------------------------------------------------
-Parent Name    : ${app.parentName}
-Contact Phone  : ${app.parentPhone}
-Parent Email   : ${app.parentEmail}
+  if (encodedBody.length > maxEncodedBodyLen) {
+    // Trim cleanly before encoding so Windows/desktop mailto handlers never silently drop oversized URLs
+    let trimmed = body;
+    while (trimmed.length > 80 && encodeURIComponent(`${trimmed}\n[Truncated - use Copy Summary]`).length > maxEncodedBodyLen) {
+      trimmed = trimmed.slice(0, Math.floor(trimmed.length * 0.85));
+    }
+    encodedBody = encodeURIComponent(`${trimmed}\n[Truncated - use Copy Summary]`);
+  }
 
-RECIPIENT:
---------------------------------------------------
-School Admin Email: ${recipient}
-Selection Code    : ${SCHOOL_CONTACTS.selectionCode}
-UNEB Centre Code  : ${SCHOOL_CONTACTS.centerNo}
-==================================================
-  `.trim();
+  return `${base}${encodedBody}`;
+}
+
+function buildGmailComposeUrl(recipient: string, subject: string, body: string): string {
+  return `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(recipient)}&su=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
 }
 
 export function buildAdmissionMailtoUrl(
@@ -68,43 +81,30 @@ export function buildAdmissionMailtoUrl(
   recipient: string,
   payloadSummary: string
 ): string {
-  const mailtoSubject = encodeURIComponent(
-    `STAHIZA Admission Application - ${app.studentName} (${app.targetClass}) [${app.id}]`
-  );
-  const mailtoBody = encodeURIComponent(payloadSummary);
-  return `mailto:${recipient}?subject=${mailtoSubject}&body=${mailtoBody}`;
+  const subject = `STAHIZA Admission Application - ${app.studentName} (${app.targetClass}) [${app.id}]`;
+  return buildSafeMailtoUrl(recipient, subject, payloadSummary);
 }
 
 export function buildContactSummary(inquiry: ContactInquiryInput, recipient: string): string {
   const refCode = inquiry.id || `INQ-2026-${Math.floor(1000 + Math.random() * 9000)}`;
   const timestamp = inquiry.submittedAt || new Date().toLocaleString();
 
-  return `
-==================================================
-NEW ADMISSIONS & GENERAL INQUIRY
-Standard High School Zzana - Contact Desk
-==================================================
-Reference Code : ${refCode}
-Date Submitted : ${timestamp}
-Subject        : ${inquiry.subject}
-
-SENDER DETAILS:
---------------------------------------------------
-Full Name      : ${inquiry.name}
-Email Address  : ${inquiry.email}
-Phone/WhatsApp : ${inquiry.phone || 'Not provided'}
-
-MESSAGE:
---------------------------------------------------
-${inquiry.message}
-
-RECIPIENT:
---------------------------------------------------
-School Admin Email: ${recipient}
-Selection Code    : ${SCHOOL_CONTACTS.selectionCode}
-UNEB Centre Code  : ${SCHOOL_CONTACTS.centerNo}
-==================================================
-  `.trim();
+  return [
+    'NEW ADMISSIONS & GENERAL INQUIRY - STANDARD HIGH SCHOOL ZZANA',
+    `Reference Code: ${refCode}`,
+    `Date Submitted: ${timestamp}`,
+    `Subject: ${inquiry.subject}`,
+    '',
+    'SENDER DETAILS:',
+    `Full Name: ${inquiry.name}`,
+    `Email Address: ${inquiry.email}`,
+    `Phone / WhatsApp: ${inquiry.phone || 'Not provided'}`,
+    '',
+    'MESSAGE:',
+    inquiry.message,
+    '',
+    `School Email: ${recipient} | Selection Code: ${SCHOOL_CONTACTS.selectionCode} | UNEB Centre: ${SCHOOL_CONTACTS.centerNo}`
+  ].join('\n');
 }
 
 export function buildContactMailtoUrl(
@@ -112,17 +112,16 @@ export function buildContactMailtoUrl(
   recipient: string,
   payloadSummary: string
 ): string {
-  const mailtoSubject = encodeURIComponent(
-    `STAHIZA Inquiry: ${inquiry.subject} - ${inquiry.name}`
-  );
-  const mailtoBody = encodeURIComponent(payloadSummary);
-  return `mailto:${recipient}?subject=${mailtoSubject}&body=${mailtoBody}`;
+  const subject = `STAHIZA Inquiry: ${inquiry.subject} - ${inquiry.name}`;
+  return buildSafeMailtoUrl(recipient, subject, payloadSummary);
 }
 
 function triggerMailtoSafely(mailtoUrl: string): void {
   try {
     const anchor = document.createElement('a');
     anchor.href = mailtoUrl;
+    anchor.target = '_top';
+    anchor.rel = 'noopener noreferrer';
     anchor.style.display = 'none';
     document.body.appendChild(anchor);
     anchor.click();
@@ -133,14 +132,17 @@ function triggerMailtoSafely(mailtoUrl: string): void {
 }
 
 /**
- * Prepares a pre-filled mail template for school administration (hasty0joel@gmail.com)
- * and launches the user's default mail client directly via mailto:.
+ * Prepares a pre-filled mail template for school administration (hasty0joel@gmail.com),
+ * triggers the standard HTML5 mailto: link synchronously in the submit gesture, and
+ * also provides a Gmail web compose URL for PC users without a desktop mail client.
  */
-export async function dispatchApplicationEmail(app: AdmissionApplication): Promise<EmailSendResult> {
+export function dispatchApplicationEmail(app: AdmissionApplication): EmailSendResult {
   const recipient = SCHOOL_CONTACTS.email; // hasty0joel@gmail.com
   const now = new Date().toLocaleString();
   const payloadSummary = buildApplicationSummary(app, recipient);
-  const mailtoUrl = buildAdmissionMailtoUrl(app, recipient, payloadSummary);
+  const subject = `STAHIZA Admission Application - ${app.studentName} (${app.targetClass}) [${app.id}]`;
+  const mailtoUrl = buildSafeMailtoUrl(recipient, subject, payloadSummary);
+  const gmailUrl = buildGmailComposeUrl(recipient, subject, payloadSummary);
 
   triggerMailtoSafely(mailtoUrl);
 
@@ -151,15 +153,16 @@ export async function dispatchApplicationEmail(app: AdmissionApplication): Promi
     sentAt: now,
     payloadSummary,
     methodUsed: 'Mail Template',
-    mailtoUrl
+    mailtoUrl,
+    gmailUrl
   };
 }
 
 /**
- * Prepares a pre-filled mail template for general contact & admissions desk inquiries
- * and launches the user's default mail client directly via mailto:.
+ * Prepares a pre-filled mail template for general contact & admissions desk inquiries,
+ * triggers the standard HTML5 mailto: link synchronously, and returns a Gmail web compose URL.
  */
-export async function dispatchContactInquiryEmail(inquiry: ContactInquiryInput): Promise<EmailSendResult> {
+export function dispatchContactInquiryEmail(inquiry: ContactInquiryInput): EmailSendResult {
   const recipient = SCHOOL_CONTACTS.email;
   const now = new Date().toLocaleString();
   const normalizedInquiry: ContactInquiryInput = {
@@ -168,7 +171,9 @@ export async function dispatchContactInquiryEmail(inquiry: ContactInquiryInput):
     submittedAt: inquiry.submittedAt || now
   };
   const payloadSummary = buildContactSummary(normalizedInquiry, recipient);
-  const mailtoUrl = buildContactMailtoUrl(normalizedInquiry, recipient, payloadSummary);
+  const subject = `STAHIZA Inquiry: ${normalizedInquiry.subject} - ${normalizedInquiry.name}`;
+  const mailtoUrl = buildSafeMailtoUrl(recipient, subject, payloadSummary);
+  const gmailUrl = buildGmailComposeUrl(recipient, subject, payloadSummary);
 
   triggerMailtoSafely(mailtoUrl);
 
@@ -179,6 +184,7 @@ export async function dispatchContactInquiryEmail(inquiry: ContactInquiryInput):
     sentAt: now,
     payloadSummary,
     methodUsed: 'Mail Template',
-    mailtoUrl
+    mailtoUrl,
+    gmailUrl
   };
 }
