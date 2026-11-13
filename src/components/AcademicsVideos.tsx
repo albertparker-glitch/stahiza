@@ -9,43 +9,55 @@ interface AcademicVideo {
   title: string;
   description: string;
   tag: string;
+  spotlightLabel: string;
+  sourceLabel: string;
 }
 
 const ACADEMIC_VIDEOS: AcademicVideo[] = [
   {
     id: 'vid-1',
     youtubeId: 'L_k2lMeINqo',
-    title: 'STAHIZA Academic Journey & Campus Life',
-    description: 'Discover the teaching methodology, modern classrooms, and student dedication at Standard High School Zzana.',
-    tag: 'Academic Tour'
+    title: 'STAHIZA Pledges Science Excellence After Top UACE Results',
+    description: 'UBC Television Uganda coverage of Standard High School Zzana management and A-Level students celebrating top performers who scored 20 points and 17+ points in sciences.',
+    tag: 'UACE Sciences',
+    spotlightLabel: 'News Feature • UBC TV',
+    sourceLabel: 'UBC Television Uganda'
   },
   {
     id: 'vid-2',
     youtubeId: '6xILoTUTEME',
-    title: 'Student Discipline, Mentorship & Values',
-    description: 'Inside our student culture, academic mentorship sessions, and the holistic upbringing that fuels UNEB success.',
-    tag: 'Student Culture'
+    title: 'STAHIZA Shines in 2025 Senior Four UNEB Examinations',
+    description: 'RUTEX Media TV report featuring PRO Eliot Musinguzi on STAHIZA’s exceptional 2025 S.4 UCE results, dedicated full-time teachers, sports balance, and S.1 & S.5 admissions.',
+    tag: '2025 S.4 UCE Results',
+    spotlightLabel: 'Media Report • RUTEX TV',
+    sourceLabel: 'RUTEX MEDIA TV'
   },
   {
     id: 'vid-3',
     youtubeId: 'jubC506SVfI',
-    title: 'Excellence in UNEB Sciences & Arts',
-    description: 'Hands-on practical sessions in science laboratories, interactive seminars, and candidate drilling.',
-    tag: 'UNEB Preparation'
+    title: 'S.6 Candidates Celebrate Top A-Level UNEB Performance',
+    description: 'Jubilant campus scenes from STAHIZA TV capturing Senior Six candidates celebrating outstanding Uganda Advanced Certificate of Education (UACE) performance.',
+    tag: 'A-Level Celebrations',
+    spotlightLabel: 'Archive Clip • STAHIZA TV',
+    sourceLabel: 'STAHIZA TV'
   },
   {
     id: 'vid-4',
     youtubeId: 'P6dxdxyeBko',
-    title: 'Academic Excellence, UNEB Results & Student Success',
-    description: 'A look into the disciplined study culture, motivated teaching staff, and exemplary academic performance at STAHIZA.',
-    tag: 'Academic Excellence'
+    title: 'Congratulations to the STAHIZA Senior Four Class of 2025',
+    description: 'RUTEX Media TV congratulatory spotlight celebrating the Standard High School Zzana 2025 Senior Four cohort for their exemplary UNEB examination achievement.',
+    tag: 'S.4 Class of 2025',
+    spotlightLabel: 'Congratulations • RUTEX TV',
+    sourceLabel: 'RUTEX MEDIA TV'
   },
   {
     id: 'vid-5',
     youtubeId: '4ZXlyjdoJOg',
-    title: 'Holistic Education, Curriculum & Classroom Rigor',
-    description: 'Fostering intellectual growth, science and arts mastery, and comprehensive career preparation for every learner.',
-    tag: 'Curriculum & Rigor'
+    title: 'STAHIZA Top O-Level (UCE) Academic Achievers Showcase',
+    description: 'STAHIZA TV spotlight honoring Standard High School Zzana’s best-performing Senior Four students in the Uganda Certificate of Education (UCE) national examinations.',
+    tag: 'Top UCE Students',
+    spotlightLabel: 'Achievers • STAHIZA TV',
+    sourceLabel: 'STAHIZA TV'
   }
 ];
 
@@ -70,7 +82,7 @@ export const AcademicsVideos: React.FC = () => {
           Watch STAHIZA Academics in Action
         </h3>
         <p className="text-slate-600 text-sm sm:text-base leading-relaxed">
-          Experience our high-standard learning culture, inspiring faculty lectures, student testimonies, and rigorous preparation for national UNEB examinations.
+          Explore national TV features, UNEB UCE and UACE results celebrations, and official highlights showcasing STAHIZA’s academic excellence.
         </p>
       </motion.div>
 
@@ -151,12 +163,12 @@ export const AcademicsVideos: React.FC = () => {
                 <div className="space-y-2">
                   <div className="flex items-center gap-2 text-xs font-bold text-[#800020]">
                     <GraduationCap className="w-3.5 h-3.5 text-amber-600" />
-                    <span>Academic Spotlight</span>
+                    <span>{video.spotlightLabel}</span>
                   </div>
                   <h4 className="font-extrabold text-base sm:text-lg font-['Montserrat'] text-[#0A192F] line-clamp-2 leading-snug">
                     {video.title}
                   </h4>
-                  <p className="text-slate-600 text-xs sm:text-sm line-clamp-2 leading-relaxed">
+                  <p className="text-slate-600 text-xs sm:text-sm line-clamp-3 leading-relaxed">
                     {video.description}
                   </p>
                 </div>
@@ -164,7 +176,7 @@ export const AcademicsVideos: React.FC = () => {
                 <div className="pt-2 border-t border-slate-100 flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <SchoolBadgeImg size={24} />
-                    <span className="text-[11px] font-bold text-[#0A192F]">STAHIZA Media</span>
+                    <span className="text-[11px] font-bold text-[#0A192F]">{video.sourceLabel}</span>
                   </div>
                   
                   {isPlaying ? (

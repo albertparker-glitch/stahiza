@@ -10,48 +10,66 @@ interface SportsVideo {
   description: string;
   tag: string;
   badgeText: string;
+  categoryLabel: string;
+  sourceLabel: string;
+  ctaLabel: string;
 }
 
 const SPORTS_VIDEOS: SportsVideo[] = [
   {
     id: 'sports-1',
     youtubeId: 'xt0ocUlNoHs',
-    title: 'STAHIZA USSSA National Champions — Match Highlights',
-    description: 'Electric match action and thrilling moments from our championship run in the USSSA national football competitions.',
-    tag: 'USSSA Football',
-    badgeText: 'National Champions'
+    title: 'STAHIZA Conquers USSSA Aggrey Zone Boys’ Volleyball Unbeaten',
+    description: 'NIM Media 256 coverage of the USSSA Aggrey Zone qualifiers, where Standard High School Zzana enjoyed an unbeaten run to lift the Boys’ Volleyball trophy alongside St. Noa Girls in Netball.',
+    tag: 'USSSA Volleyball',
+    badgeText: 'Unbeaten Champions',
+    categoryLabel: 'STAHIZA Athletics',
+    sourceLabel: 'NIM Media 256',
+    ctaLabel: 'Watch Highlights'
   },
   {
     id: 'sports-2',
     youtubeId: '2k3VkRBNUnI',
-    title: 'Championship Pitch Battles & Match Winner',
-    description: 'Full-throttle tactical football, decisive goals, and unmatched determination on the pitch by STAHIZA sportsmen.',
-    tag: 'Tournament Play',
-    badgeText: 'Match Action'
+    title: 'Wakiso Aggrey Zone Boys’ Football Champions — Injury-Time Winner',
+    description: 'Norvan Visualz highlights of Henry Kato’s decisive injury-time goal securing the Wakiso District Aggrey Zone Boys’ Football trophy for Coach Nestroy Kizito’s STAHIZA squad.',
+    tag: 'Aggrey Zone Football',
+    badgeText: 'Zone Champions',
+    categoryLabel: 'STAHIZA Football',
+    sourceLabel: 'Norvan Visualz',
+    ctaLabel: 'Watch Highlights'
   },
   {
     id: 'sports-3',
     youtubeId: 'Pc0OiyHmoSI',
-    title: 'STAHIZA Team Victory Celebrations & School Spirit',
-    description: 'The jubilant songs, brass band, and triumphant celebrations as STAHIZA brings home trophies to Entebbe Road.',
-    tag: 'Celebration',
-    badgeText: 'Victory Parade'
+    title: 'Hi Skool Kiromo Checks In at Standard High School Zzana',
+    description: 'KIROMO Brand House high-school campus tour hosted by MC Ollo, featuring lively student interaction, youth energy, and talent moments at STAHIZA.',
+    tag: 'Campus Tour',
+    badgeText: 'Hi Skool Kiromo',
+    categoryLabel: 'Campus Talent & Spirit',
+    sourceLabel: 'KIROMO Brand House',
+    ctaLabel: 'Watch Video'
   },
   {
     id: 'sports-4',
     youtubeId: '0MNWG5ejKh0',
-    title: 'Elite Student Athletes: Skills, Drills & Speed',
-    description: 'Showcasing our top football prodigies, athletic stamina, and professional coaching that feeds top Ugandan football clubs.',
-    tag: 'Athletics & Skills',
-    badgeText: 'Talent Showcase'
+    title: 'Smashed Live Uganda Youth Awareness Experience at STAHIZA',
+    description: 'Produced by Topowa Youth Mentoring Uganda, this live educational theatre and mentorship outreach empowers STAHIZA students on underage drinking awareness and informed life choices.',
+    tag: 'Youth Mentoring',
+    badgeText: 'Smashed Live Uganda',
+    categoryLabel: 'Drama & Guidance',
+    sourceLabel: 'Topowa Youth Mentoring',
+    ctaLabel: 'Watch Video'
   },
   {
     id: 'sports-5',
     youtubeId: '0mREMbnzPSY',
-    title: 'Trophy Lift & The Legacy of STAHIZA Sports',
-    description: 'The crowning moments of our sports legacy, lifting gold medals and inspiring the next generation of champions.',
-    tag: 'Gold Medalists',
-    badgeText: 'Trophy Lift'
+    title: 'Teacher Mpamire Live Comedy Performance at STAHIZA',
+    description: 'Renowned Ugandan comedian and former STAHIZA history teacher Herbert Mendo Ssegujja (Teacher Mpamire) performs live on campus to the delight of students.',
+    tag: 'Live Comedy',
+    badgeText: 'Campus Event',
+    categoryLabel: 'Talent & Entertainment',
+    sourceLabel: 'Teacher Mpamire',
+    ctaLabel: 'Watch Performance'
   }
 ];
 
@@ -70,13 +88,13 @@ export const SportsVideos: React.FC = () => {
       >
         <div className="inline-flex items-center gap-2 bg-amber-400/20 border border-amber-500/30 text-amber-900 px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider">
           <Trophy className="w-4 h-4 text-amber-600" />
-          <span>USSSA Champions Match & Talent Footage</span>
+          <span>USSSA Champions, Talent & Campus Events</span>
         </div>
         <h3 className="text-2xl sm:text-4xl font-extrabold font-['Montserrat'] text-[#0A192F]">
-          STAHIZA Champions in Action
+          STAHIZA Sports, Talent & Live Moments
         </h3>
         <p className="text-slate-600 text-sm sm:text-base leading-relaxed">
-          Watch our reigning USSSA football champions, ball games powerhouses, and athletic stars conquer the pitch and bring home national trophies.
+          Relive our USSSA Aggrey Zone Volleyball and Football championship runs alongside vibrant campus tours, youth mentoring drama, and live comedy events.
         </p>
       </motion.div>
 
@@ -157,42 +175,42 @@ export const SportsVideos: React.FC = () => {
               {/* Card Content */}
               <div className="p-5 sm:p-6 flex flex-col justify-between flex-grow space-y-4">
                 <div className="space-y-2">
-                  <div className="flex items-center justify-between text-xs font-bold">
-                    <span className="text-[#800020] flex items-center gap-1.5">
-                      <Trophy className="w-3.5 h-3.5 text-amber-500" />
-                      STAHIZA Sports
+                  <div className="flex items-center justify-between text-xs font-bold gap-2">
+                    <span className="text-[#800020] flex items-center gap-1.5 truncate">
+                      <Trophy className="w-3.5 h-3.5 text-amber-500 shrink-0" />
+                      <span className="truncate">{video.categoryLabel}</span>
                     </span>
-                    <span className="bg-amber-100 text-amber-900 px-2 py-0.5 rounded-full text-[10px] font-bold">
+                    <span className="bg-amber-100 text-amber-900 px-2 py-0.5 rounded-full text-[10px] font-bold shrink-0">
                       {video.badgeText}
                     </span>
                   </div>
                   <h4 className="font-extrabold text-base sm:text-lg font-['Montserrat'] text-[#0A192F] line-clamp-2 leading-snug">
                     {video.title}
                   </h4>
-                  <p className="text-slate-600 text-xs sm:text-sm line-clamp-2 leading-relaxed">
+                  <p className="text-slate-600 text-xs sm:text-sm line-clamp-3 leading-relaxed">
                     {video.description}
                   </p>
                 </div>
 
                 <div className="pt-2 border-t border-slate-100 flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <SchoolBadgeImg size={24} />
-                    <span className="text-[11px] font-bold text-[#0A192F]">Champions Arena</span>
+                  <div className="flex items-center gap-2 min-w-0">
+                    <SchoolBadgeImg size={24} className="shrink-0" />
+                    <span className="text-[11px] font-bold text-[#0A192F] truncate">{video.sourceLabel}</span>
                   </div>
                   
                   {isPlaying ? (
                     <button
                       onClick={() => setActiveVideoId(null)}
-                      className="text-xs font-semibold text-slate-500 hover:text-slate-800"
+                      className="text-xs font-semibold text-slate-500 hover:text-slate-800 shrink-0"
                     >
                       Close Player
                     </button>
                   ) : (
                     <button
                       onClick={() => setActiveVideoId(video.id)}
-                      className="text-xs font-bold text-amber-600 hover:text-amber-700 flex items-center gap-1 group-hover:translate-x-1 transition-transform"
+                      className="text-xs font-bold text-amber-600 hover:text-amber-700 flex items-center gap-1 group-hover:translate-x-1 transition-transform shrink-0"
                     >
-                      <span>Watch Match</span>
+                      <span>{video.ctaLabel}</span>
                       <Play className="w-3 h-3 fill-current ml-0.5" />
                     </button>
                   )}
