@@ -856,7 +856,7 @@ export default function App() {
                       className="bg-white p-4 rounded-xl shadow-sm hover:shadow-md border border-slate-200 text-center col-span-2 sm:col-span-1 transition-shadow"
                     >
                       <div className="text-2xl sm:text-3xl font-black text-[#800020] font-['Montserrat']">
-                        Top <AnimatedCounter target={10} />
+                        Among <AnimatedCounter target={40} />
                       </div>
                       <div className="text-xs text-slate-600 font-medium mt-1">National Ranking</div>
                     </motion.div>
