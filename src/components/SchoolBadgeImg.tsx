@@ -7,43 +7,83 @@ interface SchoolBadgeProps {
   zoom?: number;
 }
 
-export const SchoolBadgeImg: React.FC<SchoolBadgeProps> = ({ className = "w-12 h-12", size = 48, zoom = 1.3 }) => {
+export const SchoolBadgeImg: React.FC<SchoolBadgeProps> = ({
+  className = 'w-12 h-12',
+  size = 48,
+  zoom = 1.15,
+}) => {
   const [attempt, setAttempt] = useState(0);
   const scaledSize = Math.round(size * zoom);
+  const hasExplicitSizeClass = /\b(w-|h-)\S+/.test(className);
+  const isCentered = /\bmx-auto\b/.test(className);
+  const paddingClass = size <= 24 ? 'p-0.5' : size <= 44 ? 'p-1' : 'p-1.5';
 
-  // Fallback sequence: 
+  // Fallback sequence:
   // 0: Supabase IMAGES bucket badge.png
   // 1: Supabase IMAGES bucket badge1.png
   // 2: Local /pages/images/badge.png
   // 3: Inline SVG Crest fallback
   const getBadgeSrc = (currentAttempt: number) => {
     switch (currentAttempt) {
-      case 0: return getSupabasePublicUrl('badge.png');
-      case 1: return getSupabasePublicUrl('badge1.png');
-      case 2: return '/pages/images/badge.png';
-      default: return '';
+      case 0:
+        return getSupabasePublicUrl('badge.png');
+      case 1:
+        return getSupabasePublicUrl('badge1.png');
+      case 2:
+        return '/pages/images/badge.png';
+      default:
+        return '';
     }
   };
 
   if (attempt >= 3) {
     return (
-      <svg width={size} height={size} viewBox="0 0 100 100" className={`shrink-0 drop-shadow-md ${className}`}>
-        <circle cx="50" cy="50" r="48" fill="#0F2A4A" stroke="#800020" strokeWidth="4" />
-        <text x="50" y="55" fill="#ffffff" fontSize="24" fontWeight="900" textAnchor="middle" fontFamily="Montserrat">STH</text>
-      </svg>
+      <span
+        className={`${
+          isCentered ? 'flex w-fit' : 'inline-flex'
+        } items-center justify-center rounded-full bg-[#ffffff]/95 ${paddingClass} shadow-md ring-1 ring-blue-200/80 shrink-0 transition duration-300 hover:scale-105 ${className}`}
+      >
+        <svg
+          width={hasExplicitSizeClass ? undefined : size}
+          height={hasExplicitSizeClass ? undefined : size}
+          viewBox="0 0 100 100"
+          className={`${hasExplicitSizeClass ? 'w-full h-full' : ''} shrink-0 drop-shadow-sm`}
+        >
+          <circle cx="50" cy="50" r="48" fill="#1E40AF" stroke="#9B1C31" strokeWidth="4" />
+          <text
+            x="50"
+            y="55"
+            fill="#ffffff"
+            fontSize="24"
+            fontWeight="900"
+            textAnchor="middle"
+            fontFamily="Montserrat"
+          >
+            STH
+          </text>
+        </svg>
+      </span>
     );
   }
 
   return (
-    <img 
-      src={getBadgeSrc(attempt)} 
-      alt="Standard High School Zzana Badge" 
-      width={scaledSize}
-      height={scaledSize}
-      className={`object-contain shrink-0 drop-shadow-md transform scale-125 hover:scale-135 transition duration-300 ${className}`}
-      onError={() => {
-        setAttempt(prev => prev + 1);
-      }}
-    />
+    <span
+      className={`${
+        isCentered ? 'flex w-fit' : 'inline-flex'
+      } items-center justify-center rounded-full bg-[#ffffff]/95 ${paddingClass} shadow-md ring-1 ring-blue-200/80 shrink-0 transition duration-300 hover:scale-105 ${className}`}
+    >
+      <img
+        src={getBadgeSrc(attempt)}
+        alt="Standard High School Zzana Badge"
+        width={hasExplicitSizeClass ? undefined : scaledSize}
+        height={hasExplicitSizeClass ? undefined : scaledSize}
+        className={`${
+          hasExplicitSizeClass ? 'w-full h-full' : ''
+        } object-contain shrink-0 brightness-150 saturate-90 contrast-105 drop-shadow-sm scale-110 transition duration-300`}
+        onError={() => {
+          setAttempt((prev) => prev + 1);
+        }}
+      />
+    </span>
   );
 };

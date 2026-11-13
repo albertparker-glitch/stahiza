@@ -207,7 +207,7 @@ export const AdmissionFormSection: React.FC<AdmissionFormSectionProps> = () => {
           </span>
           <span className="text-slate-300 dark:text-slate-700">•</span>
           <span className="bg-rose-50 text-[#800020] dark:bg-rose-950/50 dark:text-rose-300 border border-rose-200 dark:border-rose-900 px-2.5 py-1 rounded-full">
-            UNEB Centre: U1288
+            UNEB Centre: {SCHOOL_CONTACTS.centerNo}
           </span>
         </div>
         <h2 className="text-3xl sm:text-5xl font-black text-slate-900 dark:text-white tracking-tight">

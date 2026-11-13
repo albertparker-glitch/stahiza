@@ -418,7 +418,7 @@ export const SCHOOL_CONTACTS = {
   box: "P.O. Box 22981 Kampala - Uganda",
   hours: "Mon – Fri: 7:30 AM – 5:00 PM, Sat: 9:00 AM – 1:00 PM",
   selectionCode: "2624",
-  centerNo: "U1288",
+  centerNo: "U0833",
   mapsSearchUrl: "https://www.google.com/maps/search/?api=1&query=Standard+High+School+Zzana+Entebbe+Road+Kampala+Uganda",
   embedMapUrl: "https://maps.google.com/maps?q=Standard+High+School+Zzana+Entebbe+Road+Kampala+Uganda&t=&z=15&ie=UTF8&iwloc=&output=embed"
 };

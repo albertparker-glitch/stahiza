@@ -444,7 +444,7 @@ export const ContactSection: React.FC = () => {
                 UNEB Examination Center
               </h5>
               <p className="text-[11px] text-slate-300">
-                Centre U1288 (O & A Level)
+                Centre {SCHOOL_CONTACTS.centerNo} (O & A Level)
               </p>
             </div>
           </div>
