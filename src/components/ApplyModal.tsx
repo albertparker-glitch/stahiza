@@ -311,6 +311,9 @@ export const ApplyModal: React.FC<ApplyModalProps> = ({
                     </>
                   )}
                 </button>
+                <p className="text-[11px] text-slate-500 dark:text-slate-400 text-center leading-relaxed">
+                  Submitting copies the finished STAHIZA badge email and opens Gmail (PC) or Mail (Mobile) — press <strong className="text-slate-700 dark:text-slate-200">Ctrl+V</strong> / <strong className="text-slate-700 dark:text-slate-200">Paste</strong> inside the empty draft to send.
+                </p>
               </form>
             )}
           </motion.div>

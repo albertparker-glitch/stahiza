@@ -739,14 +739,38 @@ function triggerWebEmailSafely(gmailUrl: string): boolean {
   }
 }
 
+let originalDocTitleCache: string | null = null;
+let restoreTitleTimer: ReturnType<typeof setTimeout> | null = null;
+
+function showTemporaryPasteTabReminder(deviceType: 'pc' | 'mobile'): void {
+  if (typeof document === 'undefined') return;
+  if (originalDocTitleCache === null) {
+    originalDocTitleCache = document.title;
+  }
+  document.title =
+    deviceType === 'pc'
+      ? '✓ Copied! Press Ctrl+V in Gmail — STAHIZA'
+      : '✓ Copied! Tap Paste in Mail — STAHIZA';
+
+  if (restoreTitleTimer) clearTimeout(restoreTitleTimer);
+  restoreTitleTimer = setTimeout(() => {
+    if (originalDocTitleCache !== null) {
+      document.title = originalDocTitleCache;
+      originalDocTitleCache = null;
+    }
+  }, 15000);
+}
+
 export async function openGmailAndCopyStyledEmail(result: EmailSendResult): Promise<boolean> {
   const copyPromise = copyRichEmailPreservingGesture(result.htmlBody, result.payloadSummary);
+  showTemporaryPasteTabReminder('pc');
   triggerWebEmailSafely(result.gmailUrl);
   return copyPromise;
 }
 
 export async function openMailAppAndCopyStyledEmail(result: EmailSendResult): Promise<boolean> {
   const copyPromise = copyRichEmailPreservingGesture(result.htmlBody, result.payloadSummary);
+  showTemporaryPasteTabReminder('mobile');
   triggerMailtoSafely(result.mailtoUrl);
   return copyPromise;
 }
@@ -777,6 +801,7 @@ export async function dispatchApplicationEmail(app: AdmissionApplication): Promi
 
   // Copy rich HTML synchronously before launching compose so browser user-gesture activation stays intact
   const autoCopyPromise = copyRichEmailPreservingGesture(htmlBody, payloadSummary);
+  showTemporaryPasteTabReminder(deviceType);
   let popupBlocked = false;
 
   if (deviceType === 'pc') {
@@ -842,6 +867,7 @@ export async function dispatchContactInquiryEmail(inquiry: ContactInquiryInput):
   const emlFilename = `STAHIZA-Inquiry-${refCode}.eml`;
 
   const autoCopyPromise = copyRichEmailPreservingGesture(htmlBody, payloadSummary);
+  showTemporaryPasteTabReminder(deviceType);
   let popupBlocked = false;
 
   if (deviceType === 'pc') {

@@ -258,7 +258,7 @@ export const ContactSection: React.FC = () => {
                   </div>
 
                   {/* SUBMIT BUTTON WITH ARROW IN CIRCLE */}
-                  <div className="pt-2">
+                  <div className="pt-2 space-y-2">
                     <button
                       type="submit"
                       disabled={isSubmitting}
@@ -273,6 +273,9 @@ export const ContactSection: React.FC = () => {
                         )}
                       </div>
                     </button>
+                    <p className="text-[11px] text-slate-300/90 leading-relaxed">
+                      Copies the finished STAHIZA badge inquiry and opens Gmail (PC) or Mail (Mobile) — press <strong className="text-amber-300">Ctrl+V</strong> / <strong className="text-amber-300">Paste</strong> in the blank message box to send.
+                    </p>
                   </div>
 
                 </form>

@@ -183,56 +183,74 @@ export const BrandedEmailReadyCard: React.FC<BrandedEmailReadyCardProps> = ({
           )}
         </div>
 
-        {/* AUTO-COPY GUIDANCE STRIP */}
+        {/* HIGH-VISIBILITY 3-STEP PASTE & SEND BAR */}
         <div
-          className={`rounded-xl px-4 py-3 text-xs leading-relaxed border ${
+          className={`rounded-xl px-4 py-3.5 text-xs border space-y-2.5 ${
             copyStatus === 'manual-copied' || copyStatus === 'auto-copied'
               ? isDarkSurface
-                ? 'bg-emerald-950/40 border-emerald-700/60 text-emerald-200'
-                : 'bg-emerald-50 dark:bg-emerald-950/40 border-emerald-200 dark:border-emerald-800 text-emerald-900 dark:text-emerald-200'
+                ? 'bg-emerald-950/45 border-emerald-700/60 text-emerald-100'
+                : 'bg-emerald-50 dark:bg-emerald-950/40 border-emerald-200 dark:border-emerald-800 text-emerald-950 dark:text-emerald-100'
               : isDarkSurface
-              ? 'bg-amber-950/40 border-amber-700/60 text-amber-200'
-              : 'bg-amber-50 dark:bg-amber-950/40 border-amber-200 dark:border-amber-800 text-amber-950 dark:text-amber-200'
+              ? 'bg-amber-950/40 border-amber-700/60 text-amber-100'
+              : 'bg-amber-50 dark:bg-amber-950/40 border-amber-200 dark:border-amber-800 text-amber-950 dark:text-amber-100'
           }`}
         >
-          {isMobileDevice ? (
-            copyStatus === 'manual-copied' || copyStatus === 'auto-copied' ? (
-              <span>
-                <strong>Mobile detected — finished preview copied &amp; Mail App opened.</strong>{' '}
-                Browsers do not allow websites to auto-paste inside external mail apps without Google OAuth, so tap inside the empty body and tap <strong>Paste</strong> — or tap{' '}
-                <strong>Pre-Filled Draft (.eml)</strong> to open a draft already containing the full STAHIZA badge email.
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <span className="font-extrabold uppercase tracking-wider text-[11px]">
+              {isMobileDevice
+                ? 'How to Send This Badge Email on Mobile'
+                : emailResult.popupBlocked
+                ? 'Finished Email Copied — Click "Open Gmail & Paste" Below'
+                : 'How to Send This Badge Email in Gmail'}
+            </span>
+            <span className="text-[11px] font-semibold opacity-90">
+              Compose opens empty on purpose so no plain text gets sent
+            </span>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 text-[11px] font-semibold">
+            <div className={`rounded-lg px-3 py-2 border ${isDarkSurface ? 'bg-black/25 border-white/10' : 'bg-white/80 dark:bg-slate-900/70 border-black/10 dark:border-white/10'}`}>
+              <span className="font-extrabold text-emerald-600 dark:text-emerald-400">1. Copied ✓</span>
+              <p className="mt-0.5 font-normal opacity-90">
+                Full STAHIZA badge letter is on your clipboard.
+              </p>
+            </div>
+            <div className={`rounded-lg px-3 py-2 border ${isDarkSurface ? 'bg-black/25 border-white/10' : 'bg-white/80 dark:bg-slate-900/70 border-black/10 dark:border-white/10'}`}>
+              <span className="font-extrabold">2. {isMobileDevice ? 'Tap Mail Body' : 'Click Gmail Body'}</span>
+              <p className="mt-0.5 font-normal opacity-90">
+                {isMobileDevice
+                  ? 'Tap inside the blank message area.'
+                  : 'Click inside the blank compose message box.'}
+              </p>
+            </div>
+            <div className={`rounded-lg px-3 py-2 border ${isDarkSurface ? 'bg-black/25 border-white/10' : 'bg-white/80 dark:bg-slate-900/70 border-black/10 dark:border-white/10'}`}>
+              <span className="font-extrabold">
+                3.{' '}
+                {isMobileDevice ? (
+                  'Tap Paste & Send'
+                ) : (
+                  <>
+                    Press{' '}
+                    <kbd className="px-1.5 py-0.5 rounded bg-black/10 dark:bg-white/15 font-mono text-[10px] font-bold">
+                      Ctrl+V
+                    </kbd>{' '}
+                    /{' '}
+                    <kbd className="px-1.5 py-0.5 rounded bg-black/10 dark:bg-white/15 font-mono text-[10px] font-bold">
+                      Cmd+V
+                    </kbd>
+                  </>
+                )}
               </span>
-            ) : (
-              <span>
-                Tap <strong>Open Mail App &amp; Paste</strong> (copies the finished badge letter first), or tap{' '}
-                <strong>Pre-Filled Draft (.eml)</strong> to open a draft already containing the full design.
-              </span>
-            )
-          ) : copyStatus === 'manual-copied' ? (
-            <span>
-              <strong>Finished preview email copied with school badge!</strong> Click into the empty Gmail message box and press{' '}
-              <kbd className="px-1.5 py-0.5 rounded bg-black/10 dark:bg-white/10 font-mono text-[11px] font-bold">Ctrl+V</kbd>{' '}
-              (or <kbd className="px-1.5 py-0.5 rounded bg-black/10 dark:bg-white/10 font-mono text-[11px] font-bold">Cmd+V</kbd>) — or use{' '}
-              <strong>Pre-Filled Draft (.eml)</strong> for a draft that already has the badge email inside.
-            </span>
-          ) : copyStatus === 'auto-copied' ? (
-            <span>
-              <strong>
-                {emailResult.popupBlocked
-                  ? 'PC detected — finished preview copied (click Open Gmail below if your browser blocked the tab).'
-                  : 'PC detected — finished preview copied & Gmail Web opened.'}
-              </strong>{' '}
-              Browser security blocks websites from auto-pasting inside Gmail without OAuth, so press{' '}
-              <kbd className="px-1.5 py-0.5 rounded bg-black/10 dark:bg-white/10 font-mono text-[11px] font-bold">Ctrl+V</kbd>{' '}
-              (<kbd className="px-1.5 py-0.5 rounded bg-black/10 dark:bg-white/10 font-mono text-[11px] font-bold">Cmd+V</kbd>) in the compose box, or click{' '}
-              <strong>Pre-Filled Draft (.eml)</strong>.
-            </span>
-          ) : (
-            <span>
-              Click <strong>Open Gmail &amp; Paste Preview</strong> (copies the finished badge letter and opens Gmail) or{' '}
-              <strong>Pre-Filled Draft (.eml)</strong> for a ready-to-send draft with no pasting needed.
-            </span>
-          )}
+              <p className="mt-0.5 font-normal opacity-90">
+                Drops in the finished preview below, then hit Send.
+              </p>
+            </div>
+          </div>
+
+          <p className="text-[11px] opacity-85">
+            Want a draft that already has the badge email inside with zero pasting? Click{' '}
+            <strong>Pre-Filled Draft (.eml)</strong> below.
+          </p>
         </div>
 
         {/* ACTION TOOLBAR */}

@@ -576,8 +576,8 @@ export const AdmissionFormSection: React.FC<AdmissionFormSectionProps> = () => {
                       </>
                     )}
                   </button>
-                  <p className="text-[11px] text-slate-500 text-center mt-2">
-                    Application details are sent directly to <strong className="text-slate-700 dark:text-slate-300">{SCHOOL_CONTACTS.email}</strong>. Approval takes 2 business days.
+                  <p className="text-[11px] text-slate-500 text-center mt-2 leading-relaxed">
+                    Submitting copies the official STAHIZA badge letter to <strong className="text-slate-700 dark:text-slate-300">{SCHOOL_CONTACTS.email}</strong> and opens Gmail (PC) or Mail (Mobile) — just press <strong>Ctrl+V</strong> / <strong>Paste</strong> in the blank message box to send.
                   </p>
                 </div>
               </form>
