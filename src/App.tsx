@@ -17,6 +17,8 @@ import {
   ArrowRight,
   ChevronUp,
   ChevronDown,
+  Briefcase,
+  Search,
   Camera,
   X,
   Maximize2,
@@ -42,11 +44,13 @@ import { Preloader } from './components/Preloader';
 import { HeroParallaxVideo } from './components/HeroParallaxVideo';
 import { Leader, fetchLeaders, fetchMarqueeStaff, SCHOOL_CONTACTS } from './data/schoolData';
 import {
+  ALevelCombination,
   ALL_ARTS_COMBINATIONS,
   POPULAR_ARTS_COMBINATIONS,
   OTHER_ARTS_COMBINATIONS,
   ALL_SCIENCE_COMBINATIONS,
   SCIENCE_COMBINATION_GROUPS,
+  getCombinationGuidance,
 } from './data/aLevelCombinations';
 import { useTheme } from './context/ThemeContext';
 import { getSupabasePublicUrl, getSupabaseOthersUrl } from './lib/supabase';
@@ -268,11 +272,57 @@ export default function App() {
   const [activeFacilityPhotoIdx, setActiveFacilityPhotoIdx] = useState(0);
   const [selectedArtsComboCode, setSelectedArtsComboCode] = useState<string>(POPULAR_ARTS_COMBINATIONS[0]?.code || 'HEG');
   const [selectedScienceComboCode, setSelectedScienceComboCode] = useState<string>(SCIENCE_COMBINATION_GROUPS.physics[0]?.code || 'PCM');
+  const [openComboDropdown, setOpenComboDropdown] = useState<'arts' | 'sciences' | null>(null);
+  const [artsSearchQuery, setArtsSearchQuery] = useState('');
+  const [activeCombinationModal, setActiveCombinationModal] = useState<ALevelCombination | null>(null);
+
+  const artsDropdownRef = React.useRef<HTMLDivElement>(null);
+  const sciencesDropdownRef = React.useRef<HTMLDivElement>(null);
 
   const selectedArtsCombo =
     ALL_ARTS_COMBINATIONS.find((combo) => combo.code === selectedArtsComboCode) || ALL_ARTS_COMBINATIONS[0];
   const selectedScienceCombo =
     ALL_SCIENCE_COMBINATIONS.find((combo) => combo.code === selectedScienceComboCode) || ALL_SCIENCE_COMBINATIONS[0];
+
+  const handleSelectCombination = (combo: ALevelCombination, stream: 'arts' | 'sciences') => {
+    if (stream === 'arts') {
+      setSelectedArtsComboCode(combo.code);
+    } else {
+      setSelectedScienceComboCode(combo.code);
+    }
+    setOpenComboDropdown(null);
+    setActiveCombinationModal(combo);
+  };
+
+  useEffect(() => {
+    if (!openComboDropdown) return;
+    const handleOutsideClick = (e: MouseEvent) => {
+      const target = e.target as Node;
+      if (openComboDropdown === 'arts' && artsDropdownRef.current && !artsDropdownRef.current.contains(target)) {
+        setOpenComboDropdown(null);
+      }
+      if (openComboDropdown === 'sciences' && sciencesDropdownRef.current && !sciencesDropdownRef.current.contains(target)) {
+        setOpenComboDropdown(null);
+      }
+    };
+    document.addEventListener('mousedown', handleOutsideClick);
+    return () => document.removeEventListener('mousedown', handleOutsideClick);
+  }, [openComboDropdown]);
+
+  useEffect(() => {
+    if (!activeCombinationModal && !openComboDropdown) return;
+    const handleEsc = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        if (activeCombinationModal) {
+          setActiveCombinationModal(null);
+        } else if (openComboDropdown) {
+          setOpenComboDropdown(null);
+        }
+      }
+    };
+    window.addEventListener('keydown', handleEsc);
+    return () => window.removeEventListener('keydown', handleEsc);
+  }, [activeCombinationModal, openComboDropdown]);
 
   const openFacilityModal = (fac: CampusFacility) => {
     setSelectedFacility(fac);
@@ -1148,7 +1198,7 @@ export default function App() {
                 viewport={{ once: true }}
                 transition={{ duration: 0.45, delay: 0.1 }}
                 whileHover={{ y: -4 }}
-                className="bg-white rounded-3xl p-8 sm:p-10 shadow-sm border border-slate-200 space-y-6"
+                className={`bg-white rounded-3xl p-8 sm:p-10 shadow-sm border border-slate-200 space-y-6 relative ${openComboDropdown ? 'z-20' : 'z-0'}`}
               >
                 <div className="flex items-center justify-between">
                   <div className="w-14 h-14 rounded-2xl bg-blue-50 text-[#0A192F] flex items-center justify-center">
@@ -1163,106 +1213,266 @@ export default function App() {
 
                 <div className="space-y-5 pt-1">
                   {/* ARTS COMBINATIONS DROPDOWN */}
-                  <div className="bg-slate-50 border border-slate-200 rounded-2xl p-4 space-y-2.5">
+                  <div ref={artsDropdownRef} className={`bg-slate-50 border border-slate-200 rounded-2xl p-4 space-y-2.5 relative ${openComboDropdown === 'arts' ? 'z-30' : 'z-10'}`}>
                     <div className="flex items-center justify-between gap-2">
-                      <label htmlFor="a-level-arts-select" className="text-xs font-bold uppercase tracking-wider text-[#800020]">
+                      <span className="text-xs font-bold uppercase tracking-wider text-[#800020]">
                         Arts Combinations ({ALL_ARTS_COMBINATIONS.length})
-                      </label>
-                      <span className="text-[11px] font-semibold text-slate-500">11 Arts Subjects</span>
+                      </span>
+                      <span className="text-[11px] font-semibold text-slate-500">Click any combo for career info</span>
                     </div>
+
                     <div className="relative">
-                      <select
-                        id="a-level-arts-select"
-                        value={selectedArtsComboCode}
-                        onChange={(e) => setSelectedArtsComboCode(e.target.value)}
-                        className="w-full appearance-none bg-white border border-slate-300 rounded-xl pl-3.5 pr-10 py-2.5 text-sm font-semibold text-[#0A192F] focus:outline-none focus:ring-2 focus:ring-[#800020]/30 focus:border-[#800020] cursor-pointer"
+                      <button
+                        type="button"
+                        aria-haspopup="listbox"
+                        aria-expanded={openComboDropdown === 'arts'}
+                        onClick={() => setOpenComboDropdown((prev) => (prev === 'arts' ? null : 'arts'))}
+                        className="w-full bg-white border border-slate-300 rounded-xl pl-3.5 pr-10 py-2.5 text-left text-sm font-semibold text-[#0A192F] focus:outline-none focus:ring-2 focus:ring-[#800020]/30 focus:border-[#800020] cursor-pointer flex items-center justify-between transition"
                       >
-                        <optgroup label="Popular UNEB Arts Combinations">
-                          {POPULAR_ARTS_COMBINATIONS.map((combo) => (
-                            <option key={combo.code} value={combo.code}>
-                              {combo.code} — {combo.subjects.join(', ')}
-                            </option>
-                          ))}
-                        </optgroup>
-                        <optgroup label="All Generated Arts Combinations">
-                          {OTHER_ARTS_COMBINATIONS.map((combo) => (
-                            <option key={combo.code} value={combo.code}>
-                              {combo.code} — {combo.subjects.join(', ')}
-                            </option>
-                          ))}
-                        </optgroup>
-                      </select>
-                      <ChevronDown className="w-4 h-4 text-slate-500 pointer-events-none absolute right-3 top-1/2 -translate-y-1/2" />
+                        <span className="truncate">
+                          {selectedArtsCombo.code} — {selectedArtsCombo.subjects.join(', ')}
+                        </span>
+                        <ChevronDown
+                          className={`w-4 h-4 text-slate-500 shrink-0 absolute right-3 top-1/2 -translate-y-1/2 transition-transform duration-200 ${
+                            openComboDropdown === 'arts' ? 'rotate-180 text-[#800020]' : ''
+                          }`}
+                        />
+                      </button>
+
+                      <AnimatePresence>
+                        {openComboDropdown === 'arts' && (
+                          <motion.div
+                            initial={{ opacity: 0, y: -6 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: -6 }}
+                            transition={{ duration: 0.16 }}
+                            role="listbox"
+                            aria-label="Arts Combinations"
+                            className="absolute left-0 right-0 mt-2 z-30 bg-white border border-slate-200 rounded-2xl shadow-2xl overflow-hidden"
+                          >
+                            <div className="p-2.5 border-b border-slate-100 bg-slate-50 flex items-center gap-2">
+                              <Search className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                              <input
+                                type="text"
+                                value={artsSearchQuery}
+                                onChange={(e) => setArtsSearchQuery(e.target.value)}
+                                placeholder="Filter by subject or code (e.g. French, Art, HEG)..."
+                                className="w-full bg-white border border-slate-200 rounded-lg px-2.5 py-1.5 text-xs text-[#0A192F] focus:outline-none focus:border-[#800020]"
+                              />
+                            </div>
+                            <div className="max-h-64 overflow-y-auto divide-y divide-slate-100">
+                              {(() => {
+                                const query = artsSearchQuery.trim().toLowerCase();
+                                const filterCombo = (c: ALevelCombination) =>
+                                  !query ||
+                                  c.code.toLowerCase().includes(query) ||
+                                  c.subjects.some((s) => s.toLowerCase().includes(query));
+
+                                const popularFiltered = POPULAR_ARTS_COMBINATIONS.filter(filterCombo);
+                                const otherFiltered = OTHER_ARTS_COMBINATIONS.filter(filterCombo);
+
+                                if (popularFiltered.length === 0 && otherFiltered.length === 0) {
+                                  return (
+                                    <div className="px-4 py-6 text-center text-xs text-slate-500">
+                                      No Arts combinations match "{artsSearchQuery}".
+                                    </div>
+                                  );
+                                }
+
+                                return (
+                                  <>
+                                    {popularFiltered.length > 0 && (
+                                      <div className="py-1">
+                                        <div className="px-3.5 py-1.5 text-[10px] font-extrabold uppercase tracking-wider text-[#800020] bg-rose-50/70">
+                                          Popular UNEB Arts Combinations
+                                        </div>
+                                        {popularFiltered.map((combo) => {
+                                          const isActive = combo.code === selectedArtsComboCode;
+                                          return (
+                                            <button
+                                              type="button"
+                                              key={combo.code}
+                                              role="option"
+                                              aria-selected={isActive}
+                                              onClick={() => handleSelectCombination(combo, 'arts')}
+                                              className={`w-full px-3.5 py-2 text-left text-xs flex items-center justify-between gap-2 transition cursor-pointer ${
+                                                isActive
+                                                  ? 'bg-rose-50 text-[#800020] font-bold'
+                                                  : 'text-[#0A192F] hover:bg-slate-50 font-medium'
+                                              }`}
+                                            >
+                                              <span className="truncate">
+                                                <span className="font-bold">{combo.code}</span> — {combo.subjects.join(', ')}
+                                              </span>
+                                              <span className="text-[10px] font-semibold text-[#800020] shrink-0">
+                                                View paths
+                                              </span>
+                                            </button>
+                                          );
+                                        })}
+                                      </div>
+                                    )}
+
+                                    {otherFiltered.length > 0 && (
+                                      <div className="py-1">
+                                        <div className="px-3.5 py-1.5 text-[10px] font-extrabold uppercase tracking-wider text-slate-500 bg-slate-50">
+                                          All Generated Arts Combinations
+                                        </div>
+                                        {otherFiltered.map((combo) => {
+                                          const isActive = combo.code === selectedArtsComboCode;
+                                          return (
+                                            <button
+                                              type="button"
+                                              key={combo.code}
+                                              role="option"
+                                              aria-selected={isActive}
+                                              onClick={() => handleSelectCombination(combo, 'arts')}
+                                              className={`w-full px-3.5 py-2 text-left text-xs flex items-center justify-between gap-2 transition cursor-pointer ${
+                                                isActive
+                                                  ? 'bg-rose-50 text-[#800020] font-bold'
+                                                  : 'text-[#0A192F] hover:bg-slate-50 font-medium'
+                                              }`}
+                                            >
+                                              <span className="truncate">
+                                                <span className="font-bold">{combo.code}</span> — {combo.subjects.join(', ')}
+                                              </span>
+                                              <span className="text-[10px] font-semibold text-slate-400 shrink-0">
+                                                View paths
+                                              </span>
+                                            </button>
+                                          );
+                                        })}
+                                      </div>
+                                    )}
+                                  </>
+                                );
+                              })()}
+                            </div>
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
                     </div>
+
                     {selectedArtsCombo && (
-                      <div className="text-xs text-slate-600 flex flex-col gap-1 pt-0.5">
-                        <div>
-                          <span className="font-bold text-[#0A192F]">{selectedArtsCombo.code}:</span>{' '}
-                          {selectedArtsCombo.subjects.join(' • ')}
+                      <div className="text-xs text-slate-600 flex items-center justify-between gap-2 pt-0.5">
+                        <div className="min-w-0">
+                          <div className="truncate">
+                            <span className="font-bold text-[#0A192F]">{selectedArtsCombo.code}:</span>{' '}
+                            {selectedArtsCombo.subjects.join(' • ')}
+                          </div>
+                          <div className="text-[11px] text-slate-500">
+                            Subsidiary: {selectedArtsCombo.subsidiary}
+                          </div>
                         </div>
-                        <div className="text-[11px] text-slate-500">
-                          Subsidiary: {selectedArtsCombo.subsidiary}
-                        </div>
+                        <button
+                          type="button"
+                          onClick={() => setActiveCombinationModal(selectedArtsCombo)}
+                          className="text-[11px] font-bold text-[#800020] hover:underline shrink-0 cursor-pointer"
+                        >
+                          Career Paths →
+                        </button>
                       </div>
                     )}
                   </div>
 
                   {/* SCIENCES COMBINATIONS DROPDOWN */}
-                  <div className="bg-slate-50 border border-slate-200 rounded-2xl p-4 space-y-2.5">
+                  <div ref={sciencesDropdownRef} className={`bg-slate-50 border border-slate-200 rounded-2xl p-4 space-y-2.5 relative ${openComboDropdown === 'sciences' ? 'z-30' : 'z-10'}`}>
                     <div className="flex items-center justify-between gap-2">
-                      <label htmlFor="a-level-sciences-select" className="text-xs font-bold uppercase tracking-wider text-[#0A192F]">
+                      <span className="text-xs font-bold uppercase tracking-wider text-[#0A192F]">
                         Sciences Combinations ({ALL_SCIENCE_COMBINATIONS.length})
-                      </label>
+                      </span>
                       <span className="text-[11px] font-semibold text-slate-500">Biology & Physics Separated (PCB Only)</span>
                     </div>
+
                     <div className="relative">
-                      <select
-                        id="a-level-sciences-select"
-                        value={selectedScienceComboCode}
-                        onChange={(e) => setSelectedScienceComboCode(e.target.value)}
-                        className="w-full appearance-none bg-white border border-slate-300 rounded-xl pl-3.5 pr-10 py-2.5 text-sm font-semibold text-[#0A192F] focus:outline-none focus:ring-2 focus:ring-[#0A192F]/30 focus:border-[#0A192F] cursor-pointer"
+                      <button
+                        type="button"
+                        aria-haspopup="listbox"
+                        aria-expanded={openComboDropdown === 'sciences'}
+                        onClick={() => setOpenComboDropdown((prev) => (prev === 'sciences' ? null : 'sciences'))}
+                        className="w-full bg-white border border-slate-300 rounded-xl pl-3.5 pr-10 py-2.5 text-left text-sm font-semibold text-[#0A192F] focus:outline-none focus:ring-2 focus:ring-[#0A192F]/30 focus:border-[#0A192F] cursor-pointer flex items-center justify-between transition"
                       >
-                        <optgroup label="Physics Combinations (No Biology)">
-                          {SCIENCE_COMBINATION_GROUPS.physics.map((combo) => (
-                            <option key={combo.code} value={combo.code}>
-                              {combo.code} — {combo.subjects.join(', ')}
-                            </option>
-                          ))}
-                        </optgroup>
-                        <optgroup label="Biology Combinations (No Physics)">
-                          {SCIENCE_COMBINATION_GROUPS.biology.map((combo) => (
-                            <option key={combo.code} value={combo.code}>
-                              {combo.code} — {combo.subjects.join(', ')}
-                            </option>
-                          ))}
-                        </optgroup>
-                        <optgroup label="Physics & Biology Joint (PCB Only)">
-                          {SCIENCE_COMBINATION_GROUPS.pcbOnly.map((combo) => (
-                            <option key={combo.code} value={combo.code}>
-                              {combo.code} — {combo.subjects.join(', ')}
-                            </option>
-                          ))}
-                        </optgroup>
-                        <optgroup label="Mathematics & Chemistry">
-                          {SCIENCE_COMBINATION_GROUPS.other.map((combo) => (
-                            <option key={combo.code} value={combo.code}>
-                              {combo.code} — {combo.subjects.join(', ')}
-                            </option>
-                          ))}
-                        </optgroup>
-                      </select>
-                      <ChevronDown className="w-4 h-4 text-slate-500 pointer-events-none absolute right-3 top-1/2 -translate-y-1/2" />
+                        <span className="truncate">
+                          {selectedScienceCombo.code} — {selectedScienceCombo.subjects.join(', ')}
+                        </span>
+                        <ChevronDown
+                          className={`w-4 h-4 text-slate-500 shrink-0 absolute right-3 top-1/2 -translate-y-1/2 transition-transform duration-200 ${
+                            openComboDropdown === 'sciences' ? 'rotate-180 text-[#0A192F]' : ''
+                          }`}
+                        />
+                      </button>
+
+                      <AnimatePresence>
+                        {openComboDropdown === 'sciences' && (
+                          <motion.div
+                            initial={{ opacity: 0, y: -6 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: -6 }}
+                            transition={{ duration: 0.16 }}
+                            role="listbox"
+                            aria-label="Sciences Combinations"
+                            className="absolute left-0 right-0 mt-2 z-30 bg-white border border-slate-200 rounded-2xl shadow-2xl overflow-hidden max-h-72 overflow-y-auto divide-y divide-slate-100"
+                          >
+                            {[
+                              { label: 'Physics Combinations (No Biology)', items: SCIENCE_COMBINATION_GROUPS.physics },
+                              { label: 'Biology Combinations (No Physics)', items: SCIENCE_COMBINATION_GROUPS.biology },
+                              { label: 'Physics & Biology Joint (PCB Only)', items: SCIENCE_COMBINATION_GROUPS.pcbOnly },
+                              { label: 'Technical, Vocational & Applied Sciences', items: SCIENCE_COMBINATION_GROUPS.other },
+                            ].map((group) => (
+                              <div key={group.label} className="py-1">
+                                <div className="px-3.5 py-1.5 text-[10px] font-extrabold uppercase tracking-wider text-[#0A192F] bg-blue-50/70">
+                                  {group.label}
+                                </div>
+                                {group.items.map((combo) => {
+                                  const isActive = combo.code === selectedScienceComboCode;
+                                  return (
+                                    <button
+                                      type="button"
+                                      key={combo.code}
+                                      role="option"
+                                      aria-selected={isActive}
+                                      onClick={() => handleSelectCombination(combo, 'sciences')}
+                                      className={`w-full px-3.5 py-2 text-left text-xs flex items-center justify-between gap-2 transition cursor-pointer ${
+                                        isActive
+                                          ? 'bg-blue-50 text-[#0A192F] font-bold'
+                                          : 'text-[#0A192F] hover:bg-slate-50 font-medium'
+                                      }`}
+                                    >
+                                      <span className="truncate">
+                                        <span className="font-bold">{combo.code}</span> — {combo.subjects.join(', ')}
+                                      </span>
+                                      <span className="text-[10px] font-semibold text-[#800020] shrink-0">
+                                        View paths
+                                      </span>
+                                    </button>
+                                  );
+                                })}
+                              </div>
+                            ))}
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
                     </div>
+
                     {selectedScienceCombo && (
-                      <div className="text-xs text-slate-600 flex flex-col gap-1 pt-0.5">
-                        <div>
-                          <span className="font-bold text-[#0A192F]">{selectedScienceCombo.code}</span>{' '}
-                          <span className="text-[#800020] font-semibold">({selectedScienceCombo.stream})</span>:{' '}
-                          {selectedScienceCombo.subjects.join(' • ')}
+                      <div className="text-xs text-slate-600 flex items-center justify-between gap-2 pt-0.5">
+                        <div className="min-w-0">
+                          <div className="truncate">
+                            <span className="font-bold text-[#0A192F]">{selectedScienceCombo.code}</span>{' '}
+                            <span className="text-[#800020] font-semibold">({selectedScienceCombo.stream})</span>:{' '}
+                            {selectedScienceCombo.subjects.join(' • ')}
+                          </div>
+                          <div className="text-[11px] text-slate-500">
+                            Subsidiary: {selectedScienceCombo.subsidiary}
+                          </div>
                         </div>
-                        <div className="text-[11px] text-slate-500">
-                          Subsidiary: {selectedScienceCombo.subsidiary}
-                        </div>
+                        <button
+                          type="button"
+                          onClick={() => setActiveCombinationModal(selectedScienceCombo)}
+                          className="text-[11px] font-bold text-[#800020] hover:underline shrink-0 cursor-pointer"
+                        >
+                          Career Paths →
+                        </button>
                       </div>
                     )}
                   </div>
@@ -2023,6 +2233,177 @@ export default function App() {
             </motion.div>
           </div>
         )}
+      </AnimatePresence>
+
+      {/* A-LEVEL COMBINATION CAREER PATHS & UNIVERSITY COURSES MODAL */}
+      <AnimatePresence>
+        {activeCombinationModal && (() => {
+          const guidance = getCombinationGuidance(activeCombinationModal);
+          return (
+            <div
+              className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 overflow-y-auto"
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="combination-modal-title"
+            >
+              {/* Backdrop */}
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.2 }}
+                onClick={() => setActiveCombinationModal(null)}
+                className="fixed inset-0 bg-[#0A192F]/85 backdrop-blur-md"
+              />
+
+              {/* Modal Card */}
+              <motion.div
+                initial={{ opacity: 0, scale: 0.94, y: 16 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.94, y: 16 }}
+                transition={{ duration: 0.22, ease: 'easeOut' }}
+                onClick={(e) => e.stopPropagation()}
+                className="relative w-full max-w-2xl bg-white rounded-2xl sm:rounded-3xl shadow-2xl border border-slate-200 overflow-hidden z-10 my-auto flex flex-col"
+              >
+                {/* Header */}
+                <div className="px-5 sm:px-6 py-4 bg-slate-50 border-b border-slate-200 flex items-center justify-between gap-3">
+                  <div className="flex items-center gap-3 min-w-0">
+                    <div className="w-10 h-10 rounded-xl bg-[#0A192F] text-amber-300 flex items-center justify-center shrink-0 shadow-sm">
+                      <GraduationCap className="w-5 h-5" />
+                    </div>
+                    <div className="min-w-0">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span className="text-[10px] sm:text-xs font-bold uppercase tracking-wider text-[#800020] bg-rose-50 px-2 py-0.5 rounded-md border border-rose-100">
+                          {activeCombinationModal.stream} Stream
+                        </span>
+                        <span className="text-[11px] font-semibold text-slate-500">
+                          UNEB A-Level Pathway
+                        </span>
+                      </div>
+                      <h3
+                        id="combination-modal-title"
+                        className="text-lg sm:text-xl font-extrabold font-['Montserrat'] text-[#0A192F] truncate mt-0.5"
+                      >
+                        {activeCombinationModal.code} — {activeCombinationModal.subjects.join(', ')}
+                      </h3>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-2 shrink-0">
+                    <div className="hidden sm:block">
+                      <SchoolBadgeImg size={28} />
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setActiveCombinationModal(null)}
+                      aria-label="Close combination modal"
+                      className="p-2 rounded-xl text-slate-500 hover:text-slate-800 hover:bg-slate-200/70 transition-colors focus:outline-none focus:ring-2 focus:ring-[#800020] cursor-pointer"
+                    >
+                      <X className="w-5 h-5" />
+                    </button>
+                  </div>
+                </div>
+
+                {/* Body */}
+                <div className="p-5 sm:p-6 space-y-5 max-h-[75vh] overflow-y-auto">
+                  <p className="text-sm text-slate-700 leading-relaxed">
+                    {guidance.overview}
+                  </p>
+
+                  {/* Subject Structure Box */}
+                  <div className="bg-slate-50 border border-slate-200 rounded-2xl p-4 grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+                    <div>
+                      <span className="font-bold uppercase tracking-wider text-slate-500 block text-[10px]">
+                        Principal Subjects (3)
+                      </span>
+                      <span className="font-bold text-[#0A192F] text-sm mt-0.5 block">
+                        {activeCombinationModal.subjects.join(' • ')}
+                      </span>
+                    </div>
+                    <div>
+                      <span className="font-bold uppercase tracking-wider text-slate-500 block text-[10px]">
+                        Subsidiaries & General Paper
+                      </span>
+                      <span className="font-semibold text-slate-700 text-sm mt-0.5 block">
+                        {activeCombinationModal.subsidiary}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Courses & Careers Grid */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="bg-slate-50 border border-slate-200 rounded-2xl p-4 space-y-3">
+                      <div className="flex items-center gap-2">
+                        <div className="w-8 h-8 rounded-lg bg-[#800020]/10 text-[#800020] flex items-center justify-center shrink-0">
+                          <BookOpen className="w-4 h-4" />
+                        </div>
+                        <h4 className="font-bold text-sm text-[#0A192F]">Typical University Courses</h4>
+                      </div>
+                      <ul className="space-y-2 text-xs text-slate-700">
+                        {guidance.universityCourses.map((course) => (
+                          <li key={course} className="flex items-start gap-2">
+                            <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0 mt-0.5" />
+                            <span>{course}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+
+                    <div className="bg-slate-50 border border-slate-200 rounded-2xl p-4 space-y-3">
+                      <div className="flex items-center gap-2">
+                        <div className="w-8 h-8 rounded-lg bg-blue-900/10 text-[#0A192F] flex items-center justify-center shrink-0">
+                          <Briefcase className="w-4 h-4" />
+                        </div>
+                        <h4 className="font-bold text-sm text-[#0A192F]">Career Paths</h4>
+                      </div>
+                      <ul className="space-y-2 text-xs text-slate-700">
+                        {guidance.careerPaths.map((career) => (
+                          <li key={career} className="flex items-start gap-2">
+                            <ArrowRight className="w-3.5 h-3.5 text-[#800020] shrink-0 mt-0.5" />
+                            <span>{career}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  </div>
+
+                  {/* Admission Requirement Note */}
+                  <div className="bg-amber-500/10 border border-amber-400/40 rounded-xl p-3.5 text-xs text-slate-700 leading-relaxed">
+                    <span className="font-bold text-[#0A192F]">University Entry Note: </span>
+                    {guidance.admissionNote}
+                  </div>
+                </div>
+
+                {/* Footer */}
+                <div className="px-5 sm:px-6 py-3.5 bg-slate-50 border-t border-slate-200 flex flex-wrap items-center justify-between gap-3">
+                  <span className="text-xs text-slate-500 font-medium">
+                    Standard High School - Zzana • A-Level Admissions
+                  </span>
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setActiveCombinationModal(null);
+                        setApplyModalOpen(true);
+                      }}
+                      className="px-4 py-2 rounded-xl bg-[#800020] hover:bg-[#600018] text-white text-xs font-bold transition shadow-sm flex items-center gap-1.5 cursor-pointer"
+                    >
+                      <span>Apply for This Pathway</span>
+                      <ArrowRight className="w-3.5 h-3.5" />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setActiveCombinationModal(null)}
+                      className="px-3.5 py-2 rounded-xl bg-slate-200/80 hover:bg-slate-200 text-slate-700 text-xs font-semibold transition cursor-pointer"
+                    >
+                      Close
+                    </button>
+                  </div>
+                </div>
+              </motion.div>
+            </div>
+          );
+        })()}
       </AnimatePresence>
 
       {/* FLOATING ADMISSIONS WIDGET (WALKER SCHOOL STYLE QUICK DOCK) */}
