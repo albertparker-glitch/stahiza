@@ -1209,22 +1209,28 @@ export default function App() {
                   </div>
 
                   <div className="relative">
-                    <button
-                      type="button"
-                      aria-haspopup="listbox"
-                      aria-expanded={openComboDropdown === 'olevel'}
-                      onClick={() => setOpenComboDropdown((prev) => (prev === 'olevel' ? null : 'olevel'))}
-                      className="w-full bg-white border border-slate-300 rounded-xl pl-3.5 pr-10 py-2.5 text-left text-sm font-semibold text-[#0A192F] focus:outline-none focus:ring-2 focus:ring-[#800020]/30 focus:border-[#800020] cursor-pointer flex items-center justify-between transition"
-                    >
-                      <span className="truncate">
-                        {selectedOLevelSubject.name} ({selectedOLevelSubject.category})
-                      </span>
-                      <ChevronDown
-                        className={`w-4 h-4 text-slate-500 shrink-0 absolute right-3 top-1/2 -translate-y-1/2 transition-transform duration-200 ${
-                          openComboDropdown === 'olevel' ? 'rotate-180 text-[#800020]' : ''
-                        }`}
-                      />
-                    </button>
+                    {(() => {
+                      const SelectedOLevelIcon = selectedOLevelSubject.icon;
+                      return (
+                        <button
+                          type="button"
+                          aria-haspopup="listbox"
+                          aria-expanded={openComboDropdown === 'olevel'}
+                          onClick={() => setOpenComboDropdown((prev) => (prev === 'olevel' ? null : 'olevel'))}
+                          className="w-full bg-white border border-slate-300 rounded-xl pl-3.5 pr-10 py-2.5 text-left text-sm font-semibold text-[#0A192F] focus:outline-none focus:ring-2 focus:ring-[#800020]/30 focus:border-[#800020] cursor-pointer flex items-center gap-2.5 transition"
+                        >
+                          <SelectedOLevelIcon className="w-4 h-4 text-[#800020] shrink-0" />
+                          <span className="truncate">
+                            {selectedOLevelSubject.name} ({selectedOLevelSubject.category})
+                          </span>
+                          <ChevronDown
+                            className={`w-4 h-4 text-slate-500 shrink-0 absolute right-3 top-1/2 -translate-y-1/2 transition-transform duration-200 ${
+                              openComboDropdown === 'olevel' ? 'rotate-180 text-[#800020]' : ''
+                            }`}
+                          />
+                        </button>
+                      );
+                    })()}
 
                     <AnimatePresence>
                       {openComboDropdown === 'olevel' && (
@@ -1275,6 +1281,7 @@ export default function App() {
                                       </div>
                                       {coreFiltered.map((subj) => {
                                         const isActive = subj.code === selectedOLevelSubjectCode;
+                                        const SubjectIcon = subj.icon;
                                         return (
                                           <button
                                             type="button"
@@ -1291,7 +1298,18 @@ export default function App() {
                                                 : 'text-[#0A192F] hover:bg-slate-50 font-medium'
                                             }`}
                                           >
-                                            <span className="truncate">{subj.name}</span>
+                                            <span className="flex items-center gap-2.5 min-w-0">
+                                              <span
+                                                className={`w-6 h-6 rounded-lg flex items-center justify-center shrink-0 ${
+                                                  isActive
+                                                    ? 'bg-[#800020]/15 text-[#800020]'
+                                                    : 'bg-rose-50 text-[#800020]'
+                                                }`}
+                                              >
+                                                <SubjectIcon className="w-3.5 h-3.5" />
+                                              </span>
+                                              <span className="truncate">{subj.name}</span>
+                                            </span>
                                             <span className="text-[10px] font-semibold text-slate-400 shrink-0">
                                               Core
                                             </span>
@@ -1308,6 +1326,7 @@ export default function App() {
                                       </div>
                                       {electiveFiltered.map((subj) => {
                                         const isActive = subj.code === selectedOLevelSubjectCode;
+                                        const SubjectIcon = subj.icon;
                                         return (
                                           <button
                                             type="button"
@@ -1324,7 +1343,18 @@ export default function App() {
                                                 : 'text-[#0A192F] hover:bg-slate-50 font-medium'
                                             }`}
                                           >
-                                            <span className="truncate">{subj.name}</span>
+                                            <span className="flex items-center gap-2.5 min-w-0">
+                                              <span
+                                                className={`w-6 h-6 rounded-lg flex items-center justify-center shrink-0 ${
+                                                  isActive
+                                                    ? 'bg-[#800020]/15 text-[#800020]'
+                                                    : 'bg-blue-50 text-[#0A192F]'
+                                                }`}
+                                              >
+                                                <SubjectIcon className="w-3.5 h-3.5" />
+                                              </span>
+                                              <span className="truncate">{subj.name}</span>
+                                            </span>
                                             <span className="text-[10px] font-semibold text-slate-400 shrink-0">
                                               Elective
                                             </span>
@@ -1342,17 +1372,25 @@ export default function App() {
                     </AnimatePresence>
                   </div>
 
-                  {selectedOLevelSubject && (
-                    <div className="text-xs text-slate-600 space-y-1 pt-0.5">
-                      <div>
-                        <span className="font-bold text-[#0A192F]">{selectedOLevelSubject.name}:</span>{' '}
-                        {selectedOLevelSubject.focus}
+                  {selectedOLevelSubject && (() => {
+                    const SelectedSummaryIcon = selectedOLevelSubject.icon;
+                    return (
+                      <div className="text-xs text-slate-600 flex items-start gap-2.5 pt-0.5">
+                        <div className="w-7 h-7 rounded-lg bg-[#800020]/10 text-[#800020] flex items-center justify-center shrink-0 mt-0.5">
+                          <SelectedSummaryIcon className="w-3.5 h-3.5" />
+                        </div>
+                        <div className="space-y-1 min-w-0">
+                          <div>
+                            <span className="font-bold text-[#0A192F]">{selectedOLevelSubject.name}:</span>{' '}
+                            {selectedOLevelSubject.focus}
+                          </div>
+                          <div className="text-[11px] text-slate-500">
+                            Assessment: {selectedOLevelSubject.assessment}
+                          </div>
+                        </div>
                       </div>
-                      <div className="text-[11px] text-slate-500">
-                        Assessment: {selectedOLevelSubject.assessment}
-                      </div>
-                    </div>
-                  )}
+                    );
+                  })()}
                 </div>
 
                 <ul className="space-y-3 text-sm font-medium text-slate-700">
