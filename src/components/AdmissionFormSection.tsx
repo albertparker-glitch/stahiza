@@ -4,7 +4,7 @@ import { SCHOOL_CONTACTS } from '../data/schoolData';
 import { ALL_SCIENCE_COMBINATIONS, POPULAR_ARTS_COMBINATIONS } from '../data/aLevelCombinations';
 import { ClassLevel, ResidenceType, AdmissionApplication } from '../types/admission';
 import { submitNewApplication } from '../lib/admissionStore';
-import { dispatchApplicationEmail, EmailSendResult } from '../lib/emailService';
+import { dispatchApplicationEmail, copyRichEmailToClipboard, EmailSendResult } from '../lib/emailService';
 import { 
   Printer, 
   CheckCircle2, 
@@ -23,7 +23,8 @@ import {
   MessageSquare,
   Copy,
   RefreshCw,
-  ExternalLink
+  ExternalLink,
+  Eye
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 
@@ -89,6 +90,7 @@ export const AdmissionFormSection: React.FC<AdmissionFormSectionProps> = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isResending, setIsResending] = useState(false);
   const [copiedSummary, setCopiedSummary] = useState(false);
+  const [showEmailPreview, setShowEmailPreview] = useState(false);
   const [submittedRecord, setSubmittedRecord] = useState<AdmissionApplication | null>(null);
   const [emailResult, setEmailResult] = useState<EmailSendResult | null>(null);
   const [showToast, setShowToast] = useState(false);
@@ -154,12 +156,13 @@ export const AdmissionFormSection: React.FC<AdmissionFormSectionProps> = () => {
 
   const handleCopySummary = async () => {
     if (!emailResult?.payloadSummary) return;
-    try {
-      await navigator.clipboard.writeText(emailResult.payloadSummary);
-      setCopiedSummary(true);
+    const copied = await copyRichEmailToClipboard(
+      emailResult.htmlBody,
+      emailResult.payloadSummary
+    );
+    setCopiedSummary(copied);
+    if (copied) {
       setTimeout(() => setCopiedSummary(false), 2500);
-    } catch {
-      setCopiedSummary(false);
     }
   };
 
@@ -434,14 +437,25 @@ export const AdmissionFormSection: React.FC<AdmissionFormSectionProps> = () => {
                       {copiedSummary ? (
                         <>
                           <Check className="w-3.5 h-3.5 text-emerald-600" />
-                          <span>Details Copied</span>
+                          <span>Styled Email Copied</span>
                         </>
                       ) : (
                         <>
                           <Copy className="w-3.5 h-3.5" />
-                          <span>Copy Application Summary</span>
+                          <span>Copy Styled Email</span>
                         </>
                       )}
+                    </button>
+                  )}
+
+                  {emailResult?.htmlBody && (
+                    <button
+                      type="button"
+                      onClick={() => setShowEmailPreview((prev) => !prev)}
+                      className="px-4 py-2.5 bg-[#800020]/10 dark:bg-rose-950/50 text-[#800020] dark:text-rose-300 border border-[#800020]/20 font-bold rounded-xl text-xs hover:bg-[#800020]/15 transition inline-flex items-center gap-1.5 cursor-pointer"
+                    >
+                      <Eye className="w-3.5 h-3.5" />
+                      <span>{showEmailPreview ? 'Hide Email Preview' : 'Preview Branded Email'}</span>
                     </button>
                   )}
 
@@ -451,6 +465,7 @@ export const AdmissionFormSection: React.FC<AdmissionFormSectionProps> = () => {
                       setSubmittedRecord(null);
                       setEmailResult(null);
                       setCopiedSummary(false);
+                      setShowEmailPreview(false);
                       setStudentName('');
                       setDob('');
                       setParentName('');
@@ -464,6 +479,26 @@ export const AdmissionFormSection: React.FC<AdmissionFormSectionProps> = () => {
                     Submit Another Student Application
                   </button>
                 </div>
+
+                {showEmailPreview && emailResult?.htmlBody && (
+                  <div className="mt-4 rounded-2xl overflow-hidden border border-slate-200 dark:border-slate-700 shadow-lg bg-[#f1f3f8] text-left">
+                    <div className="px-4 py-2.5 bg-slate-900 text-white flex items-center justify-between text-xs font-bold">
+                      <span>Official STAHIZA Admission Email Preview (Paste into Gmail after copying)</span>
+                      <button
+                        type="button"
+                        onClick={() => setShowEmailPreview(false)}
+                        className="text-slate-300 hover:text-white cursor-pointer"
+                      >
+                        Close
+                      </button>
+                    </div>
+                    <iframe
+                      title="STAHIZA Admission Email Preview"
+                      srcDoc={emailResult.htmlBody}
+                      className="w-full h-[520px] border-0 bg-[#f1f3f8]"
+                    />
+                  </div>
+                )}
               </div>
             ) : (
               /* APPLICATION ENTRY FORM */

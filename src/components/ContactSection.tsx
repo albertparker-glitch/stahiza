@@ -15,11 +15,12 @@ import {
   Award,
   Copy,
   Check,
-  RefreshCw
+  RefreshCw,
+  Eye
 } from 'lucide-react';
 import { SchoolBadgeImg } from './SchoolBadgeImg';
 import { SCHOOL_CONTACTS } from '../data/schoolData';
-import { dispatchContactInquiryEmail, EmailSendResult } from '../lib/emailService';
+import { dispatchContactInquiryEmail, copyRichEmailToClipboard, EmailSendResult } from '../lib/emailService';
 import { getSupabaseVideoUrl, getSupabaseVideosUrl, getSupabasePublicUrl } from '../lib/supabase';
 import { motion } from 'motion/react';
 
@@ -34,6 +35,7 @@ export const ContactSection: React.FC = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isResending, setIsResending] = useState(false);
   const [copiedSummary, setCopiedSummary] = useState(false);
+  const [showEmailPreview, setShowEmailPreview] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [emailResult, setEmailResult] = useState<EmailSendResult | null>(null);
   const [showMap, setShowMap] = useState(true);
@@ -71,12 +73,13 @@ export const ContactSection: React.FC = () => {
 
   const handleCopyInquiry = async () => {
     if (!emailResult?.payloadSummary) return;
-    try {
-      await navigator.clipboard.writeText(emailResult.payloadSummary);
-      setCopiedSummary(true);
+    const copied = await copyRichEmailToClipboard(
+      emailResult.htmlBody,
+      emailResult.payloadSummary
+    );
+    setCopiedSummary(copied);
+    if (copied) {
       setTimeout(() => setCopiedSummary(false), 2500);
-    } catch {
-      setCopiedSummary(false);
     }
   };
 
@@ -248,14 +251,24 @@ export const ContactSection: React.FC = () => {
                         {copiedSummary ? (
                           <>
                             <Check className="w-3.5 h-3.5 text-emerald-300" />
-                            <span>Copied</span>
+                            <span>Styled Email Copied</span>
                           </>
                         ) : (
                           <>
                             <Copy className="w-3.5 h-3.5" />
-                            <span>Copy</span>
+                            <span>Copy Styled Email</span>
                           </>
                         )}
+                      </button>
+                    )}
+                    {emailResult?.htmlBody && (
+                      <button
+                        type="button"
+                        onClick={() => setShowEmailPreview((prev) => !prev)}
+                        className="px-4 py-2 rounded-full bg-white/15 hover:bg-white/25 text-white text-xs font-semibold transition border border-white/20 inline-flex items-center gap-1.5 cursor-pointer"
+                      >
+                        <Eye className="w-3.5 h-3.5 text-amber-300" />
+                        <span>{showEmailPreview ? 'Hide Preview' : 'Preview Email'}</span>
                       </button>
                     )}
                     <button
@@ -264,6 +277,7 @@ export const ContactSection: React.FC = () => {
                         setSubmitted(false);
                         setEmailResult(null);
                         setCopiedSummary(false);
+                        setShowEmailPreview(false);
                         setFormData({
                           name: '',
                           email: '',
@@ -277,6 +291,15 @@ export const ContactSection: React.FC = () => {
                       Send Another Inquiry
                     </button>
                   </div>
+                  {showEmailPreview && emailResult?.htmlBody && (
+                    <div className="mt-4 rounded-2xl overflow-hidden border border-white/20 shadow-xl bg-[#f1f3f8] text-left">
+                      <iframe
+                        title="STAHIZA Inquiry Email Preview"
+                        srcDoc={emailResult.htmlBody}
+                        className="w-full h-[360px] border-0 bg-[#f1f3f8]"
+                      />
+                    </div>
+                  )}
                 </div>
               ) : (
                 <form onSubmit={handleSubmit} className="space-y-4 pt-1">
