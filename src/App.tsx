@@ -263,6 +263,22 @@ export const CAMPUS_FACILITIES: CampusFacility[] = [
   },
 ];
 
+const dropdownContainerVariants = {
+  hidden: { opacity: 0 },
+  show: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.025,
+      delayChildren: 0.01,
+    },
+  },
+};
+
+const dropdownItemVariants = {
+  hidden: { opacity: 0, y: 6 },
+  show: { opacity: 1, y: 0, transition: { duration: 0.18, ease: 'easeOut' } },
+};
+
 export default function App() {
   const { theme } = useTheme();
   const isDark = theme === 'dark';
@@ -1279,15 +1295,18 @@ export default function App() {
                                       <div className="px-3.5 py-1.5 text-[10px] font-extrabold uppercase tracking-wider text-[#800020] bg-rose-50/70">
                                         Compulsory Core Subjects
                                       </div>
-                                      {coreFiltered.map((subj) => {
+                                      {coreFiltered.map((subj, idx) => {
                                         const isActive = subj.code === selectedOLevelSubjectCode;
                                         const SubjectIcon = subj.icon;
                                         return (
-                                          <button
+                                          <motion.button
                                             type="button"
                                             key={subj.code}
                                             role="option"
                                             aria-selected={isActive}
+                                            initial={{ opacity: 0, x: -8 }}
+                                            animate={{ opacity: 1, x: 0 }}
+                                            transition={{ duration: 0.16, delay: Math.min(idx, 12) * 0.025, ease: 'easeOut' }}
                                             onClick={() => {
                                               setSelectedOLevelSubjectCode(subj.code);
                                               setOpenComboDropdown(null);
@@ -1313,7 +1332,7 @@ export default function App() {
                                             <span className="text-[10px] font-semibold text-slate-400 shrink-0">
                                               Core
                                             </span>
-                                          </button>
+                                          </motion.button>
                                         );
                                       })}
                                     </div>
@@ -1324,15 +1343,19 @@ export default function App() {
                                       <div className="px-3.5 py-1.5 text-[10px] font-extrabold uppercase tracking-wider text-[#0A192F] bg-blue-50/70">
                                         Elective, Vocational & Language Subjects
                                       </div>
-                                      {electiveFiltered.map((subj) => {
+                                      {electiveFiltered.map((subj, idx) => {
                                         const isActive = subj.code === selectedOLevelSubjectCode;
                                         const SubjectIcon = subj.icon;
+                                        const staggerIndex = coreFiltered.length + idx;
                                         return (
-                                          <button
+                                          <motion.button
                                             type="button"
                                             key={subj.code}
                                             role="option"
                                             aria-selected={isActive}
+                                            initial={{ opacity: 0, x: -8 }}
+                                            animate={{ opacity: 1, x: 0 }}
+                                            transition={{ duration: 0.16, delay: Math.min(staggerIndex, 14) * 0.025, ease: 'easeOut' }}
                                             onClick={() => {
                                               setSelectedOLevelSubjectCode(subj.code);
                                               setOpenComboDropdown(null);
@@ -1358,7 +1381,7 @@ export default function App() {
                                             <span className="text-[10px] font-semibold text-slate-400 shrink-0">
                                               Elective
                                             </span>
-                                          </button>
+                                          </motion.button>
                                         );
                                       })}
                                     </div>
@@ -1494,14 +1517,17 @@ export default function App() {
                                         <div className="px-3.5 py-1.5 text-[10px] font-extrabold uppercase tracking-wider text-[#800020] bg-rose-50/70">
                                           Popular UNEB Arts Combinations
                                         </div>
-                                        {popularFiltered.map((combo) => {
+                                        {popularFiltered.map((combo, idx) => {
                                           const isActive = combo.code === selectedArtsComboCode;
                                           return (
-                                            <button
+                                            <motion.button
                                               type="button"
                                               key={combo.code}
                                               role="option"
                                               aria-selected={isActive}
+                                              initial={{ opacity: 0, x: -8 }}
+                                              animate={{ opacity: 1, x: 0 }}
+                                              transition={{ duration: 0.16, delay: Math.min(idx, 12) * 0.025, ease: 'easeOut' }}
                                               onClick={() => handleSelectCombination(combo, 'arts')}
                                               className={`w-full px-3.5 py-2 text-left text-xs flex items-center justify-between gap-2 transition cursor-pointer ${
                                                 isActive
@@ -1515,7 +1541,7 @@ export default function App() {
                                               <span className="text-[10px] font-semibold text-[#800020] shrink-0">
                                                 View paths
                                               </span>
-                                            </button>
+                                            </motion.button>
                                           );
                                         })}
                                       </div>
@@ -1526,14 +1552,18 @@ export default function App() {
                                         <div className="px-3.5 py-1.5 text-[10px] font-extrabold uppercase tracking-wider text-slate-500 bg-slate-50">
                                           All Generated Arts Combinations
                                         </div>
-                                        {otherFiltered.map((combo) => {
+                                        {otherFiltered.map((combo, idx) => {
                                           const isActive = combo.code === selectedArtsComboCode;
+                                          const staggerIndex = popularFiltered.length + idx;
                                           return (
-                                            <button
+                                            <motion.button
                                               type="button"
                                               key={combo.code}
                                               role="option"
                                               aria-selected={isActive}
+                                              initial={{ opacity: 0, x: -8 }}
+                                              animate={{ opacity: 1, x: 0 }}
+                                              transition={{ duration: 0.16, delay: Math.min(staggerIndex, 14) * 0.02, ease: 'easeOut' }}
                                               onClick={() => handleSelectCombination(combo, 'arts')}
                                               className={`w-full px-3.5 py-2 text-left text-xs flex items-center justify-between gap-2 transition cursor-pointer ${
                                                 isActive
@@ -1547,7 +1577,7 @@ export default function App() {
                                               <span className="text-[10px] font-semibold text-slate-400 shrink-0">
                                                 View paths
                                               </span>
-                                            </button>
+                                            </motion.button>
                                           );
                                         })}
                                       </div>
@@ -1626,19 +1656,23 @@ export default function App() {
                               { label: 'Biology Combinations (No Physics)', items: SCIENCE_COMBINATION_GROUPS.biology },
                               { label: 'Physics & Biology Joint (PCB Only)', items: SCIENCE_COMBINATION_GROUPS.pcbOnly },
                               { label: 'Technical, Vocational & Applied Sciences', items: SCIENCE_COMBINATION_GROUPS.other },
-                            ].map((group) => (
+                            ].map((group, groupIdx) => (
                               <div key={group.label} className="py-1">
                                 <div className="px-3.5 py-1.5 text-[10px] font-extrabold uppercase tracking-wider text-[#0A192F] bg-blue-50/70">
                                   {group.label}
                                 </div>
-                                {group.items.map((combo) => {
+                                {group.items.map((combo, itemIdx) => {
                                   const isActive = combo.code === selectedScienceComboCode;
+                                  const staggerIndex = groupIdx * 3 + itemIdx;
                                   return (
-                                    <button
+                                    <motion.button
                                       type="button"
                                       key={combo.code}
                                       role="option"
                                       aria-selected={isActive}
+                                      initial={{ opacity: 0, x: -8 }}
+                                      animate={{ opacity: 1, x: 0 }}
+                                      transition={{ duration: 0.16, delay: Math.min(staggerIndex, 13) * 0.025, ease: 'easeOut' }}
                                       onClick={() => handleSelectCombination(combo, 'sciences')}
                                       className={`w-full px-3.5 py-2 text-left text-xs flex items-center justify-between gap-2 transition cursor-pointer ${
                                         isActive
@@ -1652,7 +1686,7 @@ export default function App() {
                                       <span className="text-[10px] font-semibold text-[#800020] shrink-0">
                                         View paths
                                       </span>
-                                    </button>
+                                    </motion.button>
                                   );
                                 })}
                               </div>
