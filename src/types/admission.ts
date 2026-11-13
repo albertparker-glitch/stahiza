@@ -9,12 +9,14 @@ export interface AdmissionApplication {
   dob?: string;
   targetClass: ClassLevel;
   residenceType: ResidenceType;
+  combination?: string;
   parentName: string;
   parentPhone: string;
   parentEmail: string;
   previousSchool: string;
   gradesAggregate?: string;
   address?: string;
+  sourceForm?: 'Main Admissions Form' | 'Quick Apply Modal';
   submittedAt: string;
   status: ApplicationStatus;
   notes?: string;

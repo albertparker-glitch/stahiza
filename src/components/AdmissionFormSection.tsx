@@ -3,7 +3,7 @@ import { SchoolBadgeImg } from './SchoolBadgeImg';
 import { SCHOOL_CONTACTS } from '../data/schoolData';
 import { ClassLevel, ResidenceType, AdmissionApplication } from '../types/admission';
 import { submitNewApplication } from '../lib/admissionStore';
-import { dispatchApplicationEmail } from '../lib/emailService';
+import { dispatchApplicationEmail, EmailSendResult } from '../lib/emailService';
 import { 
   Printer, 
   CheckCircle2, 
@@ -83,6 +83,7 @@ export const AdmissionFormSection: React.FC<AdmissionFormSectionProps> = () => {
   // Submission Flow & Email Status State
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submittedRecord, setSubmittedRecord] = useState<AdmissionApplication | null>(null);
+  const [emailResult, setEmailResult] = useState<EmailSendResult | null>(null);
   const [showToast, setShowToast] = useState(false);
 
   useEffect(() => {
@@ -117,17 +118,20 @@ export const AdmissionFormSection: React.FC<AdmissionFormSectionProps> = () => {
       dob,
       targetClass: selectedClass,
       residenceType,
+      combination: isALevel ? combination : undefined,
       parentName,
       parentPhone,
       parentEmail,
       previousSchool: previousSchool || 'Primary/Secondary School',
-      gradesAggregate: gradesAggregate || 'Standard Entry Record'
+      gradesAggregate: gradesAggregate || 'Standard Entry Record',
+      sourceForm: 'Main Admissions Form'
     });
 
-    // Auto-dispatch form via email service payload
-    await dispatchApplicationEmail(appRecord);
+    // Auto-dispatch form via server EmailJS REST API (with automatic mailto fallback)
+    const dispatchResult = await dispatchApplicationEmail(appRecord);
 
     setIsSubmitting(false);
+    setEmailResult(dispatchResult);
     setSubmittedRecord(appRecord);
     setShowToast(true);
   };
@@ -156,16 +160,24 @@ export const AdmissionFormSection: React.FC<AdmissionFormSectionProps> = () => {
                 <CheckCircle2 className="w-6 h-6" />
               </div>
               <div className="space-y-1.5">
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 flex-wrap">
                   <h4 className="font-bold text-sm text-white">Application Sent!</h4>
-                  <span className="px-2 py-0.5 bg-emerald-500 text-slate-950 font-black text-[10px] rounded uppercase font-mono">
-                    PENDING APPROVAL
+                  <span
+                    className={`px-2 py-0.5 font-black text-[10px] rounded uppercase font-mono ${
+                      emailResult?.fallbackTriggered
+                        ? 'bg-amber-400 text-slate-950'
+                        : 'bg-emerald-500 text-slate-950'
+                    }`}
+                  >
+                    {emailResult?.fallbackTriggered ? 'MAILTO FALLBACK READY' : 'SENT VIA EMAILJS'}
                   </span>
                 </div>
                 <p className="text-xs text-slate-300 leading-relaxed">
-                  Application sent, pending approval in <strong>2 business days</strong>. We will contact you on WhatsApp or Email ({SCHOOL_CONTACTS.email}).
+                  {emailResult?.fallbackTriggered
+                    ? `Your email draft to ${SCHOOL_CONTACTS.email} was prepared automatically. Application pending approval in 2 business days.`
+                    : `Application sent, pending approval in 2 business days. We will contact you on WhatsApp or Email (${SCHOOL_CONTACTS.email}).`}
                 </p>
-                <div className="pt-1">
+                <div className="pt-1 flex flex-wrap items-center gap-2">
                   <a
                     href={getWhatsAppUrl()}
                     target="_blank"
@@ -175,6 +187,15 @@ export const AdmissionFormSection: React.FC<AdmissionFormSectionProps> = () => {
                     <MessageCircle className="w-3.5 h-3.5 fill-current" />
                     <span>Follow up on WhatsApp</span>
                   </a>
+                  {emailResult?.fallbackTriggered && (
+                    <a
+                      href={emailResult.mailtoUrl}
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-amber-400 hover:bg-amber-300 text-slate-950 font-bold rounded-lg text-xs transition shadow-sm"
+                    >
+                      <Mail className="w-3.5 h-3.5" />
+                      <span>Open Email Draft</span>
+                    </a>
+                  )}
                 </div>
               </div>
             </div>
@@ -265,14 +286,33 @@ export const AdmissionFormSection: React.FC<AdmissionFormSectionProps> = () => {
                 </div>
 
                 <div className="space-y-2">
-                  <span className="px-3.5 py-1 bg-amber-100 text-amber-900 dark:bg-amber-950 dark:text-amber-300 rounded-full text-xs font-black uppercase font-mono tracking-wider">
-                    Application Sent, Pending Approval in 2 Business Days
-                  </span>
+                  <div className="flex items-center justify-center gap-2 flex-wrap">
+                    <span className="px-3.5 py-1 bg-amber-100 text-amber-900 dark:bg-amber-950 dark:text-amber-300 rounded-full text-xs font-black uppercase font-mono tracking-wider">
+                      Application Sent, Pending Approval in 2 Business Days
+                    </span>
+                    <span
+                      className={`px-3 py-1 rounded-full text-[11px] font-bold font-mono ${
+                        emailResult?.fallbackTriggered
+                          ? 'bg-amber-50 text-amber-800 border border-amber-200 dark:bg-amber-950/60 dark:text-amber-300 dark:border-amber-800'
+                          : 'bg-emerald-50 text-emerald-700 border border-emerald-200 dark:bg-emerald-950/60 dark:text-emerald-300 dark:border-emerald-800'
+                      }`}
+                    >
+                      Ref: {submittedRecord.id} • {emailResult?.methodUsed || 'EmailJS Server API'}
+                    </span>
+                  </div>
                   <h3 className="text-2xl font-black text-slate-900 dark:text-white pt-2">
                     Thank You, {submittedRecord.parentName}!
                   </h3>
                   <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 max-w-md mx-auto leading-relaxed">
-                    Your application for <strong className="text-slate-900 dark:text-white">{submittedRecord.studentName}</strong> ({submittedRecord.targetClass}, {submittedRecord.residenceType} Section) has been sent directly to school administration (<strong className="text-slate-900 dark:text-white">{SCHOOL_CONTACTS.email}</strong>).
+                    {emailResult?.fallbackTriggered ? (
+                      <>
+                        Your application for <strong className="text-slate-900 dark:text-white">{submittedRecord.studentName}</strong> ({submittedRecord.targetClass}, {submittedRecord.residenceType} Section) was prepared for your mail app to send to <strong className="text-slate-900 dark:text-white">{SCHOOL_CONTACTS.email}</strong>.
+                      </>
+                    ) : (
+                      <>
+                        Your application for <strong className="text-slate-900 dark:text-white">{submittedRecord.studentName}</strong> ({submittedRecord.targetClass}, {submittedRecord.residenceType} Section) has been sent directly to school administration (<strong className="text-slate-900 dark:text-white">{SCHOOL_CONTACTS.email}</strong>).
+                      </>
+                    )}
                   </p>
                 </div>
 
@@ -282,9 +322,11 @@ export const AdmissionFormSection: React.FC<AdmissionFormSectionProps> = () => {
                     We Will Contact You on WhatsApp or Email
                   </span>
                   <p className="text-xs text-slate-300">
-                    Need immediate assistance or want to send additional documents? Contact our admissions office directly:
+                    {emailResult?.fallbackTriggered
+                      ? 'If your email app did not open automatically, click below to send your pre-filled draft or reach us on WhatsApp:'
+                      : 'Need immediate assistance or want to send additional documents? Contact our admissions office directly:'}
                   </p>
-                  <div className="pt-2 flex flex-col sm:flex-row items-center justify-center gap-3">
+                  <div className="pt-2 flex flex-col sm:flex-row items-center justify-center gap-3 flex-wrap">
                     <a
                       href={getWhatsAppUrl()}
                       target="_blank"
@@ -296,11 +338,15 @@ export const AdmissionFormSection: React.FC<AdmissionFormSectionProps> = () => {
                     </a>
 
                     <a
-                      href={`mailto:${SCHOOL_CONTACTS.email}`}
-                      className="w-full sm:w-auto px-4 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold rounded-xl text-xs transition flex items-center justify-center gap-2"
+                      href={emailResult?.mailtoUrl || `mailto:${SCHOOL_CONTACTS.email}`}
+                      className={`w-full sm:w-auto px-4 py-2.5 font-semibold rounded-xl text-xs transition flex items-center justify-center gap-2 ${
+                        emailResult?.fallbackTriggered
+                          ? 'bg-amber-400 hover:bg-amber-300 text-slate-950 font-bold'
+                          : 'bg-slate-800 hover:bg-slate-700 text-slate-200'
+                      }`}
                     >
-                      <Mail className="w-4 h-4 text-amber-300" />
-                      <span>Email Office</span>
+                      <Mail className={`w-4 h-4 ${emailResult?.fallbackTriggered ? 'text-slate-950' : 'text-amber-300'}`} />
+                      <span>{emailResult?.fallbackTriggered ? 'Open Pre-filled Email Draft' : 'Email Office'}</span>
                     </a>
                   </div>
                 </div>
@@ -310,9 +356,13 @@ export const AdmissionFormSection: React.FC<AdmissionFormSectionProps> = () => {
                   <button
                     onClick={() => {
                       setSubmittedRecord(null);
+                      setEmailResult(null);
                       setStudentName('');
+                      setParentName('');
                       setParentPhone('');
                       setParentEmail('');
+                      setPreviousSchool('');
+                      setGradesAggregate('');
                     }}
                     className="px-5 py-2.5 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold rounded-xl text-xs hover:bg-slate-200 transition"
                   >

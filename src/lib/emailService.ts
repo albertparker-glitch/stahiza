@@ -1,4 +1,3 @@
-import emailjs from '@emailjs/browser';
 import { AdmissionApplication } from '../types/admission';
 import { SCHOOL_CONTACTS } from '../data/schoolData';
 
@@ -8,56 +7,47 @@ export interface EmailSendResult {
   recipient: string;
   sentAt: string;
   payloadSummary: string;
-  methodUsed: 'EmailJS' | 'Direct Mailto Fallback';
+  methodUsed: 'EmailJS Server API' | 'Direct Mailto Fallback';
+  mailtoUrl: string;
+  fallbackTriggered: boolean;
 }
 
-const EMAILJS_SERVICE_ID = import.meta.env.VITE_EMAILJS_SERVICE_ID || 'service_stahiza';
-const EMAILJS_TEMPLATE_ID = import.meta.env.VITE_EMAILJS_TEMPLATE_ID || 'template_admission';
-const EMAILJS_PUBLIC_KEY = import.meta.env.VITE_EMAILJS_PUBLIC_KEY || 'stahiza_public_key';
+interface ServerEmailDispatchPayload {
+  ok?: boolean;
+  method?: 'emailjs_rest' | 'fallback_required';
+  configured?: boolean;
+  fallbackRequired?: boolean;
+  recipient?: string;
+  message?: string;
+  error?: string;
+}
 
-/**
- * Dispatches completed application form details to school administration (hasty0joel@gmail.com)
- * Uses @emailjs/browser SDK with automated mailto fallback handler.
- */
-export async function dispatchApplicationEmail(app: AdmissionApplication): Promise<EmailSendResult> {
-  const recipient = SCHOOL_CONTACTS.email; // hasty0joel@gmail.com
-  const now = new Date().toLocaleString();
+export function buildApplicationSummary(app: AdmissionApplication, recipient: string): string {
+  const combinationLine =
+    app.combination && (app.targetClass === 'S.5' || app.targetClass === 'S.6')
+      ? `\nA-Level Combo  : ${app.combination}`
+      : '';
+  const dobLine = app.dob ? `\nDate of Birth  : ${app.dob}` : '';
+  const notesLine = app.notes ? `\nNotes          : ${app.notes}` : '';
 
-  const templateParams = {
-    to_email: recipient,
-    reply_to: app.parentEmail,
-    student_name: app.studentName,
-    gender: app.gender,
-    target_class: app.targetClass,
-    residence_type: app.residenceType,
-    parent_name: app.parentName,
-    parent_phone: app.parentPhone,
-    parent_email: app.parentEmail,
-    previous_school: app.previousSchool,
-    grades_aggregate: app.gradesAggregate || 'N/A',
-    ref_code: app.id,
-    submitted_at: app.submittedAt,
-    selection_code: SCHOOL_CONTACTS.selectionCode,
-    center_no: SCHOOL_CONTACTS.centerNo
-  };
-
-  const payloadSummary = `
+  return `
 ==================================================
 NEW ADMISSION APPLICATION SUBMISSION
 Standard High School Zzana - Admissions Portal
 ==================================================
 Reference Code : ${app.id}
 Date Submitted : ${app.submittedAt}
+Submitted Via  : ${app.sourceForm || 'Admissions Portal'}
 Status         : Pending Administrative Approval
 
 STUDENT DETAILS:
 --------------------------------------------------
 Student Name   : ${app.studentName}
-Gender         : ${app.gender}
+Gender         : ${app.gender}${dobLine}
 Target Class   : ${app.targetClass}
-Residence      : ${app.residenceType} Section
-Previous School: ${app.previousSchool}
-Academic Record: ${app.gradesAggregate || 'N/A'}
+Residence      : ${app.residenceType} Section${combinationLine}
+Previous School: ${app.previousSchool || 'Not specified'}
+Academic Record: ${app.gradesAggregate || 'N/A'}${notesLine}
 
 PARENT / GUARDIAN DETAILS:
 --------------------------------------------------
@@ -72,50 +62,81 @@ Selection Code    : ${SCHOOL_CONTACTS.selectionCode}
 UNEB Centre Code  : ${SCHOOL_CONTACTS.centerNo}
 ==================================================
   `.trim();
+}
 
-  console.log(`[EmailJS Dispatch] Sending application ${app.id} to ${recipient}...`);
+export function buildAdmissionMailtoUrl(app: AdmissionApplication, recipient: string, payloadSummary: string): string {
+  const mailtoSubject = encodeURIComponent(
+    `STAHIZA Admission Application - ${app.studentName} (${app.targetClass}) [${app.id}]`
+  );
+  const mailtoBody = encodeURIComponent(payloadSummary);
+  return `mailto:${recipient}?subject=${mailtoSubject}&body=${mailtoBody}`;
+}
+
+/**
+ * Dispatches completed application form details to school administration (hasty0joel@gmail.com)
+ * via the server-side EmailJS REST API route, with automatic mailto fallback if keys are missing
+ * or if an upstream network/API error occurs.
+ */
+export async function dispatchApplicationEmail(app: AdmissionApplication): Promise<EmailSendResult> {
+  const recipient = SCHOOL_CONTACTS.email; // hasty0joel@gmail.com
+  const now = new Date().toLocaleString();
+  const payloadSummary = buildApplicationSummary(app, recipient);
+  const mailtoUrl = buildAdmissionMailtoUrl(app, recipient, payloadSummary);
 
   try {
-    // Attempt EmailJS SDK transmission
-    const response = await emailjs.send(
-      EMAILJS_SERVICE_ID,
-      EMAILJS_TEMPLATE_ID,
-      templateParams,
-      EMAILJS_PUBLIC_KEY
-    );
+    const response = await fetch('/api/send-admission-email', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        application: app,
+        payloadSummary
+      })
+    });
 
-    console.log('[EmailJS Success]', response.status, response.text);
-
-    return {
-      success: true,
-      message: `Application form pre-filled and dispatched via EmailJS to ${recipient}`,
-      recipient,
-      sentAt: now,
-      payloadSummary,
-      methodUsed: 'EmailJS'
-    };
-  } catch (err) {
-    console.warn('[EmailJS API Notice] Keys pending or API response fallback triggered:', err);
-
-    // Fallback: Also construct a mailto link target for guaranteed delivery
-    const mailtoSubject = encodeURIComponent(`STAHIZA Admission Application - ${app.studentName} (${app.targetClass}) [${app.id}]`);
-    const mailtoBody = encodeURIComponent(payloadSummary);
-    const mailtoUrl = `mailto:${recipient}?subject=${mailtoSubject}&body=${mailtoBody}`;
-
-    // Automatically trigger mailto link if requested
+    let data: ServerEmailDispatchPayload | null = null;
     try {
-      window.location.href = mailtoUrl;
-    } catch (e) {
-      console.log('Mailto window trigger complete');
+      data = await response.json();
+    } catch {
+      data = null;
     }
 
-    return {
-      success: true,
-      message: `Application details pre-filled and dispatched to ${recipient}`,
-      recipient,
-      sentAt: now,
-      payloadSummary,
-      methodUsed: 'Direct Mailto Fallback'
-    };
+    if (response.ok && data?.ok) {
+      return {
+        success: true,
+        message: data.message || `Application dispatched automatically via EmailJS to ${recipient}`,
+        recipient,
+        sentAt: now,
+        payloadSummary,
+        methodUsed: 'EmailJS Server API',
+        mailtoUrl,
+        fallbackTriggered: false
+      };
+    }
+
+    console.warn(
+      '[Admission Email Fallback] Server EmailJS unavailable or unconfigured:',
+      data?.error || `HTTP ${response.status}`
+    );
+  } catch (err) {
+    console.warn('[Admission Email Fallback] Network error contacting server email route:', err);
   }
+
+  try {
+    window.location.href = mailtoUrl;
+  } catch (e) {
+    console.warn('Automatic mailto trigger skipped by browser context:', e);
+  }
+
+  return {
+    success: true,
+    message: `EmailJS fallback opened a pre-filled email draft to ${recipient}`,
+    recipient,
+    sentAt: now,
+    payloadSummary,
+    methodUsed: 'Direct Mailto Fallback',
+    mailtoUrl,
+    fallbackTriggered: true
+  };
 }

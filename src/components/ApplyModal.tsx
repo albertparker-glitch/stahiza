@@ -4,7 +4,7 @@ import { SchoolBadgeImg } from './SchoolBadgeImg';
 import { SCHOOL_CONTACTS } from '../data/schoolData';
 import { ClassLevel, ResidenceType, AdmissionApplication } from '../types/admission';
 import { submitNewApplication } from '../lib/admissionStore';
-import { dispatchApplicationEmail } from '../lib/emailService';
+import { dispatchApplicationEmail, EmailSendResult } from '../lib/emailService';
 import { motion, AnimatePresence } from 'motion/react';
 
 interface ApplyModalProps {
@@ -20,6 +20,7 @@ export const ApplyModal: React.FC<ApplyModalProps> = ({
 }) => {
   const [applyForm, setApplyForm] = useState({
     studentName: '',
+    gender: 'Male' as 'Male' | 'Female',
     parentName: '',
     phone: '',
     email: '',
@@ -32,28 +33,55 @@ export const ApplyModal: React.FC<ApplyModalProps> = ({
   
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submittedRecord, setSubmittedRecord] = useState<AdmissionApplication | null>(null);
+  const [emailResult, setEmailResult] = useState<EmailSendResult | null>(null);
+
+  const resetModalState = () => {
+    setSubmittedRecord(null);
+    setEmailResult(null);
+    setApplyForm({
+      studentName: '',
+      gender: 'Male',
+      parentName: '',
+      phone: '',
+      email: '',
+      selectedClass: 'S.1',
+      boardingStatus: 'Boarding',
+      combination: 'PCM / ICT (Physics, Chemistry, Mathematics)',
+      previousSchool: '',
+      notes: ''
+    });
+  };
+
+  const handleClose = () => {
+    onClose();
+    resetModalState();
+  };
 
   const handleApplySubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!applyForm.studentName || !applyForm.phone || !applyForm.email) return;
 
     setIsSubmitting(true);
+    const isUpperSecondary = applyForm.selectedClass === 'S.5' || applyForm.selectedClass === 'S.6';
 
     const created = submitNewApplication({
       studentName: applyForm.studentName,
-      gender: 'Male',
-      dob: '2010-01-01',
+      gender: applyForm.gender,
       targetClass: applyForm.selectedClass,
       residenceType: applyForm.boardingStatus,
+      combination: isUpperSecondary ? applyForm.combination : undefined,
       parentName: applyForm.parentName,
       parentPhone: applyForm.phone,
       parentEmail: applyForm.email,
-      previousSchool: applyForm.previousSchool || 'Primary/Secondary School'
+      previousSchool: applyForm.previousSchool || 'Primary/Secondary School',
+      sourceForm: 'Quick Apply Modal',
+      notes: applyForm.notes || undefined
     });
 
-    await dispatchApplicationEmail(created);
+    const result = await dispatchApplicationEmail(created);
 
     setIsSubmitting(false);
+    setEmailResult(result);
     setSubmittedRecord(created);
   };
 
@@ -75,7 +103,7 @@ export const ApplyModal: React.FC<ApplyModalProps> = ({
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.25 }}
-            onClick={() => { onClose(); setSubmittedRecord(null); }}
+            onClick={handleClose}
             className="fixed inset-0 bg-black/80 backdrop-blur-sm"
           />
 
@@ -88,7 +116,7 @@ export const ApplyModal: React.FC<ApplyModalProps> = ({
             className="bg-white dark:bg-slate-900 rounded-3xl max-w-2xl w-full p-6 sm:p-9 shadow-2xl relative my-8 z-10 border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-white"
           >
             <button
-              onClick={() => { onClose(); setSubmittedRecord(null); }}
+              onClick={handleClose}
               className="absolute top-6 right-6 p-2 text-slate-400 hover:text-slate-700 dark:hover:text-white bg-slate-100 dark:bg-slate-800 rounded-full transition cursor-pointer"
             >
               <X className="w-5 h-5" />
@@ -101,39 +129,71 @@ export const ApplyModal: React.FC<ApplyModalProps> = ({
                 </div>
 
                 <div className="space-y-2">
-                  <span className="px-3.5 py-1 bg-amber-100 text-amber-900 dark:bg-amber-950 dark:text-amber-300 rounded-full text-xs font-black uppercase font-mono tracking-wider">
-                    Application Sent, Pending Approval in 2 Business Days
-                  </span>
+                  <div className="flex items-center justify-center gap-2 flex-wrap">
+                    <span className="px-3.5 py-1 bg-amber-100 text-amber-900 dark:bg-amber-950 dark:text-amber-300 rounded-full text-xs font-black uppercase font-mono tracking-wider">
+                      Application Sent, Pending Approval in 2 Business Days
+                    </span>
+                    <span
+                      className={`px-3 py-1 rounded-full text-[11px] font-bold font-mono ${
+                        emailResult?.fallbackTriggered
+                          ? 'bg-amber-50 text-amber-800 border border-amber-200 dark:bg-amber-950/60 dark:text-amber-300 dark:border-amber-800'
+                          : 'bg-emerald-50 text-emerald-700 border border-emerald-200 dark:bg-emerald-950/60 dark:text-emerald-300 dark:border-emerald-800'
+                      }`}
+                    >
+                      Ref: {submittedRecord.id} • {emailResult?.methodUsed || 'EmailJS Server API'}
+                    </span>
+                  </div>
                   <h3 className="text-2xl font-black text-slate-900 dark:text-white font-['Montserrat'] pt-2">
                     Application Received!
                   </h3>
                   <p className="text-slate-600 dark:text-slate-300 text-xs max-w-md mx-auto leading-relaxed">
-                    Thank you, <span className="font-bold">{submittedRecord.parentName}</span>. Your application for <span className="font-bold text-[#800020] dark:text-amber-400">{submittedRecord.studentName}</span> ({submittedRecord.targetClass}, {submittedRecord.residenceType}) was sent directly to <strong className="text-slate-900 dark:text-white">{SCHOOL_CONTACTS.email}</strong>.
+                    {emailResult?.fallbackTriggered ? (
+                      <>
+                        Thank you, <span className="font-bold">{submittedRecord.parentName}</span>. Your application draft for <span className="font-bold text-[#800020] dark:text-amber-400">{submittedRecord.studentName}</span> ({submittedRecord.targetClass}, {submittedRecord.residenceType}) was prepared for your mail app to send to <strong className="text-slate-900 dark:text-white">{SCHOOL_CONTACTS.email}</strong>.
+                      </>
+                    ) : (
+                      <>
+                        Thank you, <span className="font-bold">{submittedRecord.parentName}</span>. Your application for <span className="font-bold text-[#800020] dark:text-amber-400">{submittedRecord.studentName}</span> ({submittedRecord.targetClass}, {submittedRecord.residenceType}) was sent directly to <strong className="text-slate-900 dark:text-white">{SCHOOL_CONTACTS.email}</strong>.
+                      </>
+                    )}
                   </p>
                 </div>
 
-                {/* WHATSAPP FOLLOW UP CARD */}
+                {/* WHATSAPP & FALLBACK EMAIL FOLLOW UP CARD */}
                 <div className="p-5 bg-slate-900 text-white rounded-2xl max-w-md mx-auto border border-slate-800 shadow-xl space-y-3 text-center">
                   <span className="text-[11px] text-amber-300 uppercase tracking-widest font-bold block">
                     We Will Contact You on WhatsApp or Email
                   </span>
                   <p className="text-xs text-slate-300">
-                    You can also follow up directly with our admissions team on WhatsApp:
+                    {emailResult?.fallbackTriggered
+                      ? 'If your email app did not launch automatically, click below to open your pre-filled email draft or follow up on WhatsApp:'
+                      : 'You can also follow up directly with our admissions team on WhatsApp:'}
                   </p>
-                  <a
-                    href={getWhatsAppUrl()}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-[#25D366] hover:bg-[#1ebd59] text-slate-950 font-bold rounded-xl text-xs transition shadow-md w-full"
-                  >
-                    <MessageCircle className="w-4 h-4 fill-current" />
-                    <span>Chat on WhatsApp ({SCHOOL_CONTACTS.phone1})</span>
-                  </a>
+                  <div className="flex flex-col gap-2">
+                    <a
+                      href={getWhatsAppUrl()}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-[#25D366] hover:bg-[#1ebd59] text-slate-950 font-bold rounded-xl text-xs transition shadow-md w-full"
+                    >
+                      <MessageCircle className="w-4 h-4 fill-current" />
+                      <span>Chat on WhatsApp ({SCHOOL_CONTACTS.phone1})</span>
+                    </a>
+                    {emailResult?.fallbackTriggered && (
+                      <a
+                        href={emailResult.mailtoUrl}
+                        className="inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-amber-400 hover:bg-amber-300 text-slate-950 font-bold rounded-xl text-xs transition shadow-md w-full"
+                      >
+                        <Mail className="w-4 h-4" />
+                        <span>Open Pre-filled Email Draft</span>
+                      </a>
+                    )}
+                  </div>
                 </div>
 
                 <div className="flex justify-center pt-2">
                   <button
-                    onClick={() => { onClose(); setSubmittedRecord(null); }}
+                    onClick={handleClose}
                     className="px-6 py-2.5 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 text-slate-700 dark:text-slate-300 font-bold rounded-xl text-xs transition"
                   >
                     Done / Close
@@ -210,8 +270,8 @@ export const ApplyModal: React.FC<ApplyModalProps> = ({
                   </div>
                 </div>
 
-                {/* CLASS & BOARDING */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                {/* CLASS, ATTENDANCE & GENDER */}
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                   <div>
                     <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">Class (S.1 to S.6) *</label>
                     <select
@@ -239,6 +299,29 @@ export const ApplyModal: React.FC<ApplyModalProps> = ({
                       <option value="Day">Day Section</option>
                     </select>
                   </div>
+
+                  <div>
+                    <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">Gender *</label>
+                    <select
+                      value={applyForm.gender}
+                      onChange={e => setApplyForm({ ...applyForm, gender: e.target.value as 'Male' | 'Female' })}
+                      className="w-full px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs font-bold text-slate-900 dark:text-white"
+                    >
+                      <option value="Male">Male</option>
+                      <option value="Female">Female</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">Previous School Attended</label>
+                  <input
+                    type="text"
+                    value={applyForm.previousSchool}
+                    onChange={e => setApplyForm({ ...applyForm, previousSchool: e.target.value })}
+                    placeholder="e.g. Kampala Parents / Previous Secondary School"
+                    className="w-full px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-xs focus:ring-2 focus:ring-slate-900 focus:outline-none"
+                  />
                 </div>
 
                 {/* A-LEVEL COMBINATION */}
